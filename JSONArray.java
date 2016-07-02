@@ -25,7 +25,6 @@ package org.json;
  */
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -71,13 +70,15 @@ import java.util.Map;
  * <li>Strings do not need to be quoted at all if they do not begin with a quote
  * or single quote, and if they do not contain leading or trailing spaces, and
  * if they do not contain any of these characters:
- * <code>{ } [ ] / \ : , #</code> and if they do not look like numbers and
+ * <code>{ } [ ] / \ : , = ; #</code> and if they do not look like numbers and
  * if they are not the reserved words <code>true</code>, <code>false</code>, or
  * <code>null</code>.</li>
+ * <li>Values can be separated by <code>;</code> <small>(semicolon)</small> as
+ * well as by <code>,</code> <small>(comma)</small>.</li>
  * </ul>
  *
  * @author JSON.org
- * @version 2016-05-20
+ * @version 2012-11-13
  */
 public class JSONArray implements Iterable<Object> {
 
@@ -103,37 +104,49 @@ public class JSONArray implements Iterable<Object> {
      */
     public JSONArray(JSONTokener x) throws JSONException {
         this();
-        if (x.nextClean() != '[') {
+        JSONToken c = x.nextTokenType();
+
+        if (c != JSONToken.START_ARRAY) {
             throw x.syntaxError("A JSONArray text must start with '['");
         }
-        if (x.nextClean() != ']') {
-            x.back();
-            for (;;) {
-                if (x.nextClean() == ',') {
+
+        for (;;) {
+            c = x.nextTokenType();
+            switch(c) {
+                case VALUE_SEPARATOR:
+                    // this should not be valid in a strict mode parse
+                    this.put(JSONObject.NULL);
+                    continue;
+                case VALUE:
+                case START_ARRAY:
+                case START_OBJECT:
                     x.back();
-                    this.myArrayList.add(JSONObject.NULL);
-                } else {
-                    x.back();
-                    this.myArrayList.add(x.nextValue());
-                }
-                switch (x.nextClean()) {
-                case ',':
-                    if (x.nextClean() == ']') {
-                        return;
-                    }
-                    x.back();
+                    this.put(x.nextValue());
                     break;
-                case ']':
+                case END_ARRAY:
+                    return;
+                default:
+                    throw x.syntaxError("expected array value");
+            }
+
+            c = x.nextTokenType();
+            switch (c) {
+                case VALUE_SEPARATOR:
+                    break;
+                case END_ARRAY:
                     return;
                 default:
                     throw x.syntaxError("Expected a ',' or ']'");
-                }
             }
         }
     }
 
     /**
      * Construct a JSONArray from a source JSON text.
+     * <p>
+     * This performs a lenient parse using the {@code JSONTokener} parser.
+     * For a strict parse, use the {@code JSONStrictTokener} class.
+     * </p>
      *
      * @param source
      *            A string that begins with <code>[</code>&nbsp;<small>(left
@@ -155,9 +168,9 @@ public class JSONArray implements Iterable<Object> {
     public JSONArray(Collection<?> collection) {
         this.myArrayList = new ArrayList<Object>();
         if (collection != null) {
-        	for (Object o: collection){
-        		this.myArrayList.add(JSONObject.wrap(o));
-        	}
+               for (Object o: collection){
+                       this.myArrayList.add(JSONObject.wrap(o));
+               }
         }
     }
 
@@ -601,7 +614,6 @@ public class JSONArray implements Iterable<Object> {
         }
     }
 
-
     /**
      * Get the optional BigInteger value associated with an index. The
      * defaultValue is returned if there is no value for the index, or if the
@@ -736,7 +748,7 @@ public class JSONArray implements Iterable<Object> {
      * @return this.
      */
     public JSONArray put(boolean value) {
-        this.put(value ? Boolean.TRUE : Boolean.FALSE);
+        this.put(Boolean.valueOf(value));
         return this;
     }
 
@@ -763,7 +775,7 @@ public class JSONArray implements Iterable<Object> {
      * @return this.
      */
     public JSONArray put(double value) throws JSONException {
-        Double d = new Double(value);
+        Double d = Double.valueOf(value);
         JSONObject.testValidity(d);
         this.put(d);
         return this;
@@ -777,7 +789,7 @@ public class JSONArray implements Iterable<Object> {
      * @return this.
      */
     public JSONArray put(int value) {
-        this.put(new Integer(value));
+        this.put(Integer.valueOf(value));
         return this;
     }
 
@@ -789,7 +801,7 @@ public class JSONArray implements Iterable<Object> {
      * @return this.
      */
     public JSONArray put(long value) {
-        this.put(new Long(value));
+        this.put(Long.valueOf(value));
         return this;
     }
 
@@ -834,7 +846,7 @@ public class JSONArray implements Iterable<Object> {
      *             If the index is negative.
      */
     public JSONArray put(int index, boolean value) throws JSONException {
-        this.put(index, value ? Boolean.TRUE : Boolean.FALSE);
+        this.put(index, Boolean.valueOf(value));
         return this;
     }
 
@@ -1101,10 +1113,8 @@ public class JSONArray implements Iterable<Object> {
      * @throws JSONException
      */
     public String toString(int indentFactor) throws JSONException {
-        StringWriter sw = new StringWriter();
-        synchronized (sw.getBuffer()) {
-            return this.write(sw, indentFactor, 0).toString();
-        }
+        StringBuilder sb = new StringBuilder();
+        return this.write(sb, indentFactor, 0).toString();
     }
 
     /**
@@ -1113,6 +1123,8 @@ public class JSONArray implements Iterable<Object> {
      * <p>
      * Warning: This method assumes that the data structure is acyclical.
      *
+     * @param writer
+     *            Writes the serialized JSON
      * @return The writer.
      * @throws JSONException
      */
