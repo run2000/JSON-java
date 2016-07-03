@@ -116,6 +116,7 @@ public class JSONTokener extends Scanner {
      * Get the type of the next token in the stream, skipping whitespace.
      *
      * @return the Token type representing the next token type
+     * @see JSONToken
      */
     public JSONToken nextTokenType() throws JSONException {
         char c = nextClean();
@@ -358,5 +359,24 @@ public class JSONTokener extends Scanner {
         protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
             return size() > maxCapacity;
         }
+    }
+
+    /**
+     * Tokens that can be identified with at most one character lookahead.
+     * Produced by {@link JSONTokener} and consumed by related JSON objects
+     * to allow strict versus lenient parsing.
+     *
+     * @author JSON.org
+     * @version 2016-06-08
+     */
+    public enum JSONToken {
+        VALUE,
+        START_ARRAY,
+        END_ARRAY,
+        START_OBJECT,
+        END_OBJECT,
+        KEY_SEPARATOR,
+        VALUE_SEPARATOR,
+        END
     }
 }

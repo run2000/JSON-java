@@ -24,6 +24,8 @@ package org.json;
  SOFTWARE.
  */
 
+import org.json.JSONTokener.JSONToken;
+
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
