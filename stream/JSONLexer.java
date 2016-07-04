@@ -78,6 +78,10 @@ public final class JSONLexer {
     /**
      * Construct a JSONLexer from an {@code InputStream} and supplied
      * {@code Charset}.
+     *
+     * @param inputStream   the input stream containing the JSON data
+     * @param charset       the character set with which to interpret the
+     *                      input stream
      */
     public JSONLexer(InputStream inputStream, Charset charset) {
         scanner = new Scanner(inputStream, charset);
@@ -490,6 +494,11 @@ public final class JSONLexer {
         return scanner.syntaxError(cause);
     }
 
+    /**
+     * Indicates the current position of the lexer.
+     *
+     * @return a String of the current position
+     */
     public String position() {
         return scanner.toString();
     }

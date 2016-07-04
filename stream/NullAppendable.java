@@ -11,23 +11,57 @@ import java.io.IOException;
  */
 public final class NullAppendable implements Appendable {
 
+    /** The single instance of NullAppendable. */
     public static final NullAppendable INSTANCE = new NullAppendable();
 
     private NullAppendable() {
     }
 
+    /**
+     * Ignores the given character sequence.
+     *
+     * @param  csq
+     *         The character sequence to append.
+     *
+     * @return  A reference to this <tt>Appendable</tt>
+     */
     @Override
-    public Appendable append(CharSequence csq) throws IOException {
+    public Appendable append(CharSequence csq) {
         return this;
     }
 
+    /**
+     * Ignores the given character sequence.
+     *
+     * @param  csq
+     *         The character sequence from which a subsequence will be
+     *         appended.
+     *
+     * @param  start
+     *         The index of the first character in the subsequence
+     *
+     * @param  end
+     *         The index of the character following the last character in the
+     *         subsequence
+     *
+     * @return  A reference to this <tt>Appendable</tt>
+     *
+     */
     @Override
-    public Appendable append(CharSequence csq, int start, int end) throws IOException {
+    public Appendable append(CharSequence csq, int start, int end) {
         return this;
     }
 
+    /**
+     * Ignores the specified character.
+     *
+     * @param  c
+     *         The character to append
+     *
+     * @return  A reference to this <tt>Appendable</tt>
+     */
     @Override
-    public Appendable append(char c) throws IOException {
+    public Appendable append(char c) {
         return this;
     }
 }

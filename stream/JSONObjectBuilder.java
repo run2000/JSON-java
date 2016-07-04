@@ -36,7 +36,7 @@ import java.nio.charset.Charset;
 /**
  * Builds a JSON object model using events supplied from {@link JSONStreamReader}.
  * This uses less stack space than parsing via {@link org.json.JSONTokener},
- * since only one stack frame is allocated per object or array.
+ * since only one stack frame is allocated per nested object or array.
  *
  * @author JSON.org
  * @version 2016-6-30
@@ -46,18 +46,79 @@ public final class JSONObjectBuilder {
     private JSONObjectBuilder() {
     }
 
+    /**
+     * Build a JSON value from a {@code Reader}. The value may be one of:
+     * <ul>
+     *     <li>{@code JSONObject.NULL}</li>
+     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     *     <li>A {@code String}</li>
+     *     <li>A {@code JSONObject}</li>
+     *     <li>A {@code JSONArray}</li>
+     * </ul>
+     *
+     * @param reader     A reader.
+     * @return a JSON value of the type defined above
+     */
     public static Object buildJSONValue(Reader reader) throws JSONException {
         return buildJSONValue(new JSONStreamReader(reader));
     }
 
-    public static Object buildJSONValue(InputStream stream, Charset cs) throws JSONException {
-        return buildJSONValue(new JSONStreamReader(stream, cs));
+    /**
+     * Build a JSON value from a {@code InputStream} and supplied
+     * {@code Charset}. The value may be one of:
+     * <ul>
+     *     <li>{@code JSONObject.NULL}</li>
+     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     *     <li>A {@code String}</li>
+     *     <li>A {@code JSONObject}</li>
+     *     <li>A {@code JSONArray}</li>
+     * </ul>
+     *
+     * @param inputStream   the input stream containing the JSON data
+     * @param charset       the character set with which to interpret the
+     *                      input stream
+     * @return a JSON value of the type defined above
+     */
+    public static Object buildJSONValue(InputStream inputStream, Charset charset)
+            throws JSONException {
+        return buildJSONValue(new JSONStreamReader(inputStream, charset));
     }
 
+    /**
+     * Build a JSON value from a {@code String}. The value may be one of:
+     * <ul>
+     *     <li>{@code JSONObject.NULL}</li>
+     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     *     <li>A {@code String}</li>
+     *     <li>A {@code JSONObject}</li>
+     *     <li>A {@code JSONArray}</li>
+     * </ul>
+     *
+     * @param s     A source string.
+     * @return a JSON value of the type defined above
+     */
     public static Object buildJSONValue(String s) throws JSONException {
         return buildJSONValue(new JSONStreamReader(s));
     }
 
+    /**
+     * Build a JSON value from a {@code JSONStreamReader}. The value may be one
+     * of:
+     * <ul>
+     *     <li>{@code JSONObject.NULL}</li>
+     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     *     <li>A {@code String}</li>
+     *     <li>A {@code JSONObject}</li>
+     *     <li>A {@code JSONArray}</li>
+     * </ul>
+     *
+     * @param parser    A source stream.
+     * @return a JSON value of the type defined above
+     */
     public static Object buildJSONValue(JSONStreamReader parser) throws JSONException {
         ParseState state = parser.nextState();
 
@@ -92,18 +153,46 @@ public final class JSONObjectBuilder {
         return result;
     }
 
+    /**
+     * Build a JSONObject from a {@code Reader}.
+     *
+     * @param reader     A reader.
+     * @return a JSONObject value
+     */
     public static JSONObject buildJSONObject(Reader reader) throws JSONException {
         return buildJSONObject(new JSONStreamReader(reader));
     }
 
-    public static JSONObject buildJSONObject(InputStream stream, Charset cs) throws JSONException {
-        return buildJSONObject(new JSONStreamReader(stream, cs));
+    /**
+     * Build a JSONObject from a {@code InputStream} and supplied
+     * {@code Charset}.
+     *
+     * @param inputStream   the input stream containing the JSON data
+     * @param charset       the character set with which to interpret the
+     *                      input stream
+     * @return a JSONObject value
+     */
+    public static JSONObject buildJSONObject(InputStream inputStream, Charset charset)
+            throws JSONException {
+        return buildJSONObject(new JSONStreamReader(inputStream, charset));
     }
 
+    /**
+     * Build a JSONObject from a {@code String}.
+     *
+     * @param s     A source string.
+     * @return a JSONObject value
+     */
     public static JSONObject buildJSONObject(String s) throws JSONException {
         return buildJSONObject(new JSONStreamReader(s));
     }
 
+    /**
+     * Build a JSONObject from a {@code JSONStreamReader}.
+     *
+     * @param parser    A source stream.
+     * @return a JSONObject value
+     */
     public static JSONObject buildJSONObject(JSONStreamReader parser) throws JSONException {
         ParseState state = parser.nextState();
 
@@ -130,18 +219,46 @@ public final class JSONObjectBuilder {
         return result;
     }
 
+    /**
+     * Build a JSONArray from a {@code Reader}.
+     *
+     * @param reader     A reader.
+     * @return a JSONArray value
+     */
     public static JSONArray buildJSONArray(Reader reader) throws JSONException {
         return buildJSONArray(new JSONStreamReader(reader));
     }
 
-    public static JSONArray buildJSONArray(InputStream stream, Charset cs) throws JSONException {
-        return buildJSONArray(new JSONStreamReader(stream, cs));
+    /**
+     * Build a JSONArray from a {@code InputStream} and supplied
+     * {@code Charset}.
+     *
+     * @param inputStream   the input stream containing the JSON data
+     * @param charset       the character set with which to interpret the
+     *                      input stream
+     * @return a JSONArray value
+     */
+    public static JSONArray buildJSONArray(InputStream inputStream, Charset charset)
+            throws JSONException {
+        return buildJSONArray(new JSONStreamReader(inputStream, charset));
     }
 
+    /**
+     * Build a JSONArray from a {@code String}.
+     *
+     * @param s     A source string.
+     * @return a JSONArray value
+     */
     public static JSONArray buildJSONArray(String s) throws JSONException {
         return buildJSONArray(new JSONStreamReader(s));
     }
 
+    /**
+     * Build a JSONArray from a {@code JSONStreamReader}.
+     *
+     * @param parser    A source stream.
+     * @return a JSONArray value
+     */
     public static JSONArray buildJSONArray(JSONStreamReader parser) throws JSONException {
         ParseState state = parser.nextState();
 

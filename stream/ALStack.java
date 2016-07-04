@@ -37,14 +37,28 @@ import java.util.EmptyStackException;
 public final class ALStack<E> {
     private final ArrayList<E> elements;
 
+    /**
+     * Create a new stack object.
+     */
     public ALStack() {
         elements = new ArrayList<E>();
     }
 
+    /**
+     * Push an element onto the stack.
+     *
+     * @param elem the element to be pushed
+     */
     public void push(E elem) {
         elements.add(elem);
     }
 
+    /**
+     * Pop the most recent element off the stack.
+     *
+     * @return the most recent element
+     * @throws EmptyStackException there are no elements on the stack
+     */
     public E pop() throws EmptyStackException {
         final int size = elements.size();
         if(size == 0) {
@@ -53,6 +67,12 @@ public final class ALStack<E> {
         return elements.remove(size - 1);
     }
 
+    /**
+     * Returns the most recent element on the stack without removing it.
+     *
+     * @return the most recent element
+     * @throws EmptyStackException there are no elements on the stack
+     */
     public E peek() throws EmptyStackException {
         final int size = elements.size();
         if(size == 0) {
@@ -61,14 +81,29 @@ public final class ALStack<E> {
         return elements.get(size - 1);
     }
 
+    /**
+     * Determine whether the stack is currently empty.
+     *
+     * @return {@code true} if the stack is empty, otherwise {@code false}
+     */
     public boolean isEmpty() {
         return elements.isEmpty();
     }
 
+    /**
+     * Determine the number of elements on the stack.
+     *
+     * @return the number of elements on the stack
+     */
     public int size() {
         return elements.size();
     }
 
+    /**
+     * Returns a string representing all the elements on the stack.
+     *
+     * @return a string value of the stack elements
+     */
     @Override
     public String toString() {
         return elements.toString();
