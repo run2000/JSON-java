@@ -1,7 +1,5 @@
 package org.json.stream;
 
-import java.io.IOException;
-
 /**
  * A dummy sink into which Appendable content may be sent. This is used
  * for skipping over value content which needs to be parsed, but not emitted.
