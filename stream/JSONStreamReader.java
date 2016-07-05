@@ -459,7 +459,7 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
      * grammar, a JSONException will be thrown.
      * </p>
      *
-     * @return a Boolean value
+     * @return a boolean value
      */
     public boolean nextBooleanValue() throws JSONException {
         if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
