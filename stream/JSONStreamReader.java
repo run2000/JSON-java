@@ -452,7 +452,7 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
 
     /**
      * If the ParseState was {@link ParseState#VALUE}, and ValueType was
-     * {@link ValueType#BOOLEAN_VALUE}, return the value as a Boolean.
+     * {@link ValueType#BOOLEAN_VALUE}, return the value as a boolean.
      * This advances the parser onto the next state.
      * <p>
      * If the JSON value is not parseable as a boolean, as defined by the JSON
