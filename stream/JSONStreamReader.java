@@ -485,6 +485,33 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
 
     /**
      * If the ParseState was {@link ParseState#VALUE}, and ValueType was
+     * {@link ValueType#NUMBER_VALUE}, return the value as a Number.
+     * This method advances the parser onto the next state.
+     *
+     * @return a value that is a subclass of the {@code Number} class
+     */
+    public Number nextNumberValue() throws JSONException {
+        if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
+            throw lexer.syntaxError("Invalid state");
+        }
+
+        Token token = objectStack.pop();
+        switch(token) {
+            case NUMBER_VALUE:
+                state = ParseState.VALUE_SEPARATOR;
+                return lexer.nextNumber();
+            case NULL_VALUE:
+            case TRUE_VALUE:
+            case FALSE_VALUE:
+            case STRING_VALUE:
+                throw lexer.syntaxError("Invalid value type");
+            default:
+                throw lexer.syntaxError("Invalid state");
+        }
+    }
+
+    /**
+     * If the ParseState was {@link ParseState#VALUE}, and ValueType was
      * {@link ValueType#NUMBER_VALUE}, return the value as a double.
      * This advances the parser onto the next state.
      *
