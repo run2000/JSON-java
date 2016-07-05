@@ -223,6 +223,10 @@ public final class JSONLexer {
      * Backslash processing is done. The formal JSON format only allows
      * strings in double quotes.
      *
+     * @param sb the Appendable to which the String value is appended
+     * @param <T> a subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
+     * @return the supplied Appendable object
      * @throws JSONException Unterminated string.
      */
     public <T extends Appendable> T nextString(T sb) throws JSONException {
@@ -318,6 +322,8 @@ public final class JSONLexer {
     /**
      * Parse a number strictly according to the JSON specification.
      *
+     * @param sb The Appendable to which the parsed character sequence is
+     *           appended
      * @return {@code true} if the number is a floating point value, otherwise
      * {@code false} to indicate an integer value
      */
@@ -391,7 +397,7 @@ public final class JSONLexer {
      *
      * @return the number represented by the token sequence
      */
-    public Number nextNumber() {
+    public Number nextNumber() throws JSONException {
         StringBuilder sb = new StringBuilder();
         boolean dbl = nextNumber(sb);
 
@@ -420,7 +426,7 @@ public final class JSONLexer {
      *
      * @return the number represented by the token sequence
      */
-    public double nextDouble() {
+    public double nextDouble() throws JSONException {
         StringBuilder sb = new StringBuilder();
         boolean dbl = nextNumber(sb);
 
@@ -446,7 +452,7 @@ public final class JSONLexer {
      *
      * @return the number represented by the token sequence
      */
-    public int nextInt() {
+    public int nextInt() throws JSONException {
         StringBuilder sb = new StringBuilder();
         boolean dbl = nextNumber(sb);
 
@@ -467,7 +473,7 @@ public final class JSONLexer {
      *
      * @return the number represented by the token sequence
      */
-    public long nextLong() {
+    public long nextLong() throws JSONException {
         StringBuilder sb = new StringBuilder();
         boolean dbl = nextNumber(sb);
 

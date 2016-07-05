@@ -29,7 +29,7 @@ import java.util.Iterator;
 /**
  * This provides static methods to convert an XML text into a JSONObject, and to
  * covert a JSONObject into an XML text.
- * 
+ *
  * @author JSON.org
  * @version 2016-01-30
  */
@@ -48,7 +48,7 @@ public class XML {
     /** The Character '='. */
     public static final Character EQ = '=';
 
-    /** The Character '>'. */
+    /** The Character '&gt;'. */
     public static final Character GT = '>';
 
     /** The Character '&lt;'. */
@@ -65,14 +65,14 @@ public class XML {
 
     /**
      * Replace special characters with XML escapes:
-     * 
-     * <pre>
-     * &amp; <small>(ampersand)</small> is replaced by &amp;amp;
-     * &lt; <small>(less than)</small> is replaced by &amp;lt;
-     * &gt; <small>(greater than)</small> is replaced by &amp;gt;
-     * &quot; <small>(double quote)</small> is replaced by &amp;quot;
-     * </pre>
-     * 
+     *
+     * <ul>
+     * <li>{@code &} <small>(ampersand)</small> is replaced by {@code &amp;}</li>
+     * <li>{@code <} <small>(less than)</small> is replaced by {@code &lt;}</li>
+     * <li>{@code >} <small>(greater than)</small> is replaced by {@code &gt;}</li>
+     * <li>{@code "} <small>(double quote)</small> is replaced by {@code &quot;}</li>
+     * </ul>
+     *
      * @param string
      *            The string to be escaped.
      * @return The escaped string.
@@ -107,7 +107,7 @@ public class XML {
     /**
      * Throw an exception if the string contains whitespace. Whitespace is not
      * allowed in tagNames and attributes.
-     * 
+     *
      * @param string
      *            A string.
      * @throws JSONException
@@ -127,7 +127,7 @@ public class XML {
 
     /**
      * Scan the content following the named tag, attaching it to the context.
-     * 
+     *
      * @param x
      *            The XMLTokener containing the source string.
      * @param context
@@ -295,11 +295,11 @@ public class XML {
             }
         }
     }
-    
+
     /**
      * This method has been deprecated in favor of the
-     * {@link JSONObject.stringToValue(String)} method. Use it instead.
-     * 
+     * {@link JSONObject#stringToValue(String)} method. Use it instead.
+     *
      * @deprecated Use {@link JSONObject#stringToValue(String)} instead.
      * @param string
      * @return JSON value of this string or the string
@@ -316,9 +316,9 @@ public class XML {
      * name/value pairs and arrays of values. JSON does not does not like to
      * distinguish between elements and attributes. Sequences of similar
      * elements are represented as JSONArrays. Content text may be placed in a
-     * "content" member. Comments, prologs, DTDs, and <code>&lt;[ [ ]]></code>
+     * "content" member. Comments, prologs, DTDs, and <code>&lt;[ [ ]]&gt;</code>
      * are ignored.
-     * 
+     *
      * @param string
      *            The source string.
      * @return A JSONObject containing the structured data from the XML string.
@@ -335,7 +335,7 @@ public class XML {
 
     /**
      * Convert a JSONObject into a well-formed, element-normal XML string.
-     * 
+     *
      * @param object
      *            A JSONObject.
      * @return A string.
@@ -347,7 +347,7 @@ public class XML {
 
     /**
      * Convert a JSONObject into a well-formed, element-normal XML string.
-     * 
+     *
      * @param object
      *            A JSONObject.
      * @param tagName

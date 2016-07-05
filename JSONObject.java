@@ -90,7 +90,7 @@ import java.util.Set;
  * <code>{ } [ ] / \ : , = ; #</code> and if they do not look like numbers and
  * if they are not the reserved words <code>true</code>, <code>false</code>,
  * or <code>null</code>.</li>
- * <li>Keys can be followed by <code>=</code> or <code>=></code> as well as by
+ * <li>Keys can be followed by <code>=</code> or <code>=&gt;</code> as well as by
  * <code>:</code>.</li>
  * <li>Values can be followed by <code>;</code> <small>(semicolon)</small> as
  * well as by <code>,</code> <small>(comma)</small>.</li>
@@ -1388,7 +1388,7 @@ public class JSONObject {
 
     /**
      * Produce a string in double quotes with backslash sequences in all the
-     * right places. A backslash will be inserted within </, producing <\/,
+     * right places. A backslash will be inserted within &lt;/, producing &lt;\/,
      * allowing JSON text to be delivered in HTML. In JSON text, a string cannot
      * contain a control character or an unescaped quote or backslash.
      *
@@ -1406,6 +1406,23 @@ public class JSONObject {
         }
     }
 
+    /**
+     * Produce a string in double quotes with backslash sequences in all the
+     * right places. A backslash will be inserted within &lt;/, producing &lt;\/,
+     * allowing JSON text to be delivered in HTML. In JSON text, a string cannot
+     * contain a control character or an unescaped quote or backslash.
+     *
+     * @param string
+     *            A character sequence to be quoted
+     * @param w
+     *            the Appendable to which the quoted character sequence will be
+     *            written
+     * @param <T>
+     *            A subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
+     * @return A String correctly formatted for insertion in a JSON text.
+     * @throws IOException there was a problem writing to the Appendable
+     */
     public static <T extends Appendable> T quote(CharSequence string, T w) throws IOException {
         if (string == null || string.length() == 0) {
             w.append("\"\"");
@@ -1744,6 +1761,11 @@ public class JSONObject {
      * <p>
      * Warning: This method assumes that the data structure is acyclical.
      *
+     * @param writer
+     *            Writes the serialized JSON
+     * @param <T>
+     *            a subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
      * @return The writer.
      * @throws JSONException
      */
@@ -1818,6 +1840,9 @@ public class JSONObject {
      *            The number of spaces to add to each level of indentation.
      * @param indent
      *            The indention of the top level.
+     * @param <T>
+     *            A subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
      * @return The writer.
      * @throws JSONException
      */

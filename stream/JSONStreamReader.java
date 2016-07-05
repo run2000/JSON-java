@@ -30,6 +30,8 @@ import org.json.stream.JSONLexer.Token;
 
 import java.io.InputStream;
 import java.io.Reader;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 //import java.util.Iterator;
 
@@ -334,7 +336,9 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
 
     /**
      * If the ParseState was {@link ParseState#KEY}, return the text of the
-     * key name. This advances the parser onto the next state.
+     * key name.
+     * <p>
+     * This method advances the parser onto the next state.</p>
      *
      * @return the parsed text of the key
      * @throws JSONException there was a problem with the source stream
@@ -357,10 +361,11 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
     /**
      * If the ParseState was {@link ParseState#VALUE}, return the value type of
      * the next value. If the value is an object, array, or other structural
-     * element, {@link ValueType#NOT_A_VALUE} is returned. This does
-     * <em>not</em> advance the parser state.
+     * element, {@link ValueType#NOT_A_VALUE} is returned.
      * <p>
      * Does not distinguish between int, long, and double number value types.</p>
+     * <p>
+     * This does <em>not</em> advance the parser state.</p>
      *
      * @return one of the {@code ValueType} values
      */
@@ -392,7 +397,8 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
      *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
      *     <li>A {@code String}</li>
      * </ul>
-     * This advances the parser onto the next state.
+     * <p>
+     * This method advances the parser onto the next state.</p>
      *
      * @return an Object of the type described above
      */
@@ -426,7 +432,8 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
     /**
      * If the ParseState was {@link ParseState#VALUE}, and ValueType was
      * {@link ValueType#STRING_VALUE}, return the value as a String.
-     * This advances the parser onto the next state.
+     * <p>
+     * This method advances the parser onto the next state.</p>
      *
      * @return a String value
      */
@@ -453,11 +460,11 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
     /**
      * If the ParseState was {@link ParseState#VALUE}, and ValueType was
      * {@link ValueType#BOOLEAN_VALUE}, return the value as a boolean.
-     * This advances the parser onto the next state.
      * <p>
      * If the JSON value is not parseable as a boolean, as defined by the JSON
-     * grammar, a JSONException will be thrown.
-     * </p>
+     * grammar, a JSONException will be thrown.</p>
+     * <p>
+     * This method advances the parser onto the next state.</p>
      *
      * @return a boolean value
      */
@@ -486,7 +493,15 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
     /**
      * If the ParseState was {@link ParseState#VALUE}, and ValueType was
      * {@link ValueType#NUMBER_VALUE}, return the value as a Number.
-     * This method advances the parser onto the next state.
+     * <p>
+     * The number type returned is one of:</p>
+     * <ul>
+     *     <li>A {@code Double}</li>
+     *     <li>A {@code Long}</li>
+     *     <li>An {@code Integer}</li>
+     * </ul>
+     * <p>
+     * This method advances the parser onto the next state.</p>
      *
      * @return a value that is a subclass of the {@code Number} class
      */
@@ -512,8 +527,84 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
 
     /**
      * If the ParseState was {@link ParseState#VALUE}, and ValueType was
+     * {@link ValueType#NUMBER_VALUE}, return the value as a BigDecimal.
+     * <p>
+     * This method advances the parser onto the next state.</p>
+     *
+     * @return a number value as a {@code BigDecimal} class
+     */
+    public BigDecimal nextBigDecimalValue() throws JSONException {
+        if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
+            throw lexer.syntaxError("Invalid state");
+        }
+
+        Token token = objectStack.pop();
+        switch(token) {
+            case NUMBER_VALUE: {
+                state = ParseState.VALUE_SEPARATOR;
+                StringBuilder builder = new StringBuilder();
+                lexer.nextNumber(builder);
+                try {
+                    return new BigDecimal(builder.toString());
+                } catch (Exception exception) {
+                    // fall through
+                }
+            }
+            case NULL_VALUE:
+            case TRUE_VALUE:
+            case FALSE_VALUE:
+            case STRING_VALUE:
+                throw lexer.syntaxError("Invalid value type");
+            default:
+                throw lexer.syntaxError("Invalid state");
+        }
+    }
+
+    /**
+     * If the ParseState was {@link ParseState#VALUE}, and ValueType was
+     * {@link ValueType#NUMBER_VALUE}, return the value as a BigInteger.
+     * <p>
+     * If the JSON value is not parseable as a big integer, as defined by the
+     * JSON grammar, a JSONException will be thrown.</p>
+     * <p>
+     * This method advances the parser onto the next state.</p>
+     *
+     * @return a number value as a {@code BigInteger} class
+     */
+    public BigInteger nextBigIntegerValue() throws JSONException {
+        if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
+            throw lexer.syntaxError("Invalid state");
+        }
+
+        Token token = objectStack.pop();
+        switch(token) {
+            case NUMBER_VALUE: {
+                state = ParseState.VALUE_SEPARATOR;
+                StringBuilder builder = new StringBuilder();
+                boolean dbl = lexer.nextNumber(builder);
+                if(!dbl) {
+                    try {
+                        return new BigInteger(builder.toString());
+                    } catch (Exception exception) {
+                        // fall through
+                    }
+                }
+            }
+            case NULL_VALUE:
+            case TRUE_VALUE:
+            case FALSE_VALUE:
+            case STRING_VALUE:
+                throw lexer.syntaxError("Invalid value type");
+            default:
+                throw lexer.syntaxError("Invalid state");
+        }
+    }
+
+    /**
+     * If the ParseState was {@link ParseState#VALUE}, and ValueType was
      * {@link ValueType#NUMBER_VALUE}, return the value as a double.
-     * This advances the parser onto the next state.
+     * <p>
+     * This method advances the parser onto the next state.</p>
      *
      * @return a double value
      */
@@ -540,11 +631,11 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
     /**
      * If the ParseState was {@link ParseState#VALUE}, and ValueType was
      * {@link ValueType#NUMBER_VALUE}, return the value as an int.
-     * This advances the parser onto the next state.
      * <p>
      * If the JSON value is not parseable as an int, as defined by the JSON
-     * grammar, a JSONException will be thrown.
-     * </p>
+     * grammar, a JSONException will be thrown.</p>
+     * <p>
+     * This method advances the parser onto the next state.</p>
      *
      * @return an int value
      */
@@ -571,11 +662,11 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
     /**
      * If the ParseState was {@link ParseState#VALUE}, and ValueType was
      * {@link ValueType#NUMBER_VALUE}, return the value as a long.
-     * This advances the parser onto the next state.
      * <p>
      * If the JSON value is not parseable as a long, as defined by the JSON
-     * grammar, a JSONException will be thrown.
-     * </p>
+     * grammar, a JSONException will be thrown.</p>
+     * <p>
+     * This method advances the parser onto the next state.</p>
      *
      * @return a long value
      */
@@ -638,6 +729,7 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
      * Create a JSONException given the current stream position.
      *
      * @param message the exception message
+     * @return a new JSONException object with the given message
      */
     public JSONException syntaxError(String message) {
         return lexer.syntaxError(message);
@@ -648,6 +740,7 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
      *
      * @param message the exception message
      * @param t the underlying exception
+     * @return a new JSONException object with the given message and cause
      */
     public JSONException syntaxError(String message, Throwable t) {
         return lexer.syntaxError(message, t);
@@ -657,6 +750,7 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
      * Create a JSONException given the current stream position.
      *
      * @param t the underlying exception
+     * @return a new JSONException object with the given cause
      */
     public JSONException syntaxError(Throwable t) {
         return lexer.syntaxError(t);

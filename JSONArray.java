@@ -1127,6 +1127,8 @@ public class JSONArray implements Iterable<Object> {
      *
      * @param writer
      *            Writes the serialized JSON
+     * @param <T> a subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
      * @return The writer.
      * @throws JSONException
      */
@@ -1146,6 +1148,8 @@ public class JSONArray implements Iterable<Object> {
      *            The number of spaces to add to each level of indentation.
      * @param indent
      *            The indention of the top level.
+     * @param <T> a subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
      * @return The writer.
      * @throws JSONException
      */

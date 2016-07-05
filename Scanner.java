@@ -70,6 +70,10 @@ public class Scanner {
 
     /**
      * Construct a Scanner from an InputStream and supplied Charset.
+     *
+     * @param inputStream   the input stream
+     * @param charset       the character set with which to interpret the
+     *                      input stream
      */
     public Scanner(InputStream inputStream, Charset charset) {
         this(new InputStreamReader(inputStream, charset));
