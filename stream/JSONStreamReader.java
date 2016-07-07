@@ -459,6 +459,40 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
 
     /**
      * If the ParseState was {@link ParseState#VALUE}, and ValueType was
+     * {@link ValueType#STRING_VALUE}, append the decoded value to the given
+     * {@code Appendable}.
+     * <p>
+     * This method is suitable for cases where very long String data is
+     * expected, for instance for base-64 encoded data.</p>
+     * <p>
+     * This method advances the parser onto the next state.</p>
+     *
+     * @param <T> the type of Appendable, returned to the caller
+     * @param writer the writer to which the String value will be written
+     * @return the given Appendable object
+     */
+    public <T extends Appendable> T appendNextStringValue(T writer) throws JSONException {
+        if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
+            throw lexer.syntaxError("Invalid state");
+        }
+
+        Token token = objectStack.pop();
+        switch(token) {
+            case STRING_VALUE:
+                state = ParseState.VALUE_SEPARATOR;
+                return lexer.nextString(writer);
+            case NULL_VALUE:
+            case TRUE_VALUE:
+            case FALSE_VALUE:
+            case NUMBER_VALUE:
+                throw lexer.syntaxError("Invalid value type");
+            default:
+                throw lexer.syntaxError("Invalid state");
+        }
+    }
+
+    /**
+     * If the ParseState was {@link ParseState#VALUE}, and ValueType was
      * {@link ValueType#BOOLEAN_VALUE}, return the value as a boolean.
      * <p>
      * If the JSON value is not parseable as a boolean, as defined by the JSON
