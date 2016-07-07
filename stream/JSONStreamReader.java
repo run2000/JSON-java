@@ -475,6 +475,9 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
         if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
             throw lexer.syntaxError("Invalid state");
         }
+        if(writer == null) {
+            throw new JSONException("writer is null");
+        }
 
         Token token = objectStack.pop();
         switch(token) {
