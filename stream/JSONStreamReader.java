@@ -28,12 +28,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.stream.JSONLexer.Token;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
-//import java.util.Iterator;
 
 /**
  * Reads a JSON document as a stream of JSON events. Uses an iterator model
@@ -42,7 +42,7 @@ import java.nio.charset.Charset;
  * @author JSON.org
  * @version 2016-06-26
  */
-public final class JSONStreamReader /*implements Iterator<JSONStreamReader.ParseState>*/ {
+public final class JSONStreamReader {
 
     /**
      * States of the internal state machine. Tokens returned from the parser
@@ -111,6 +111,7 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
     private final JSONLexer lexer;
     private final ALStack<Token> objectStack = new ALStack<Token>(); // START_ARRAY, START_OBJECT, or one of the _VALUEs
     private ParseState state = ParseState.INIT;
+    private BufferedAppendable bufferedAppender;
 
     /**
      * Construct a JSONStreamReader from a {@code Reader}.
@@ -119,6 +120,7 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
      */
     public JSONStreamReader(Reader reader) {
         lexer = new JSONLexer(reader);
+        bufferedAppender = new BufferedAppendable();
     }
 
     /**
@@ -131,6 +133,7 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
      */
     public JSONStreamReader(InputStream inputStream, Charset charset) {
         lexer = new JSONLexer(inputStream, charset);
+        bufferedAppender = new BufferedAppendable();
     }
 
     /**
@@ -482,8 +485,18 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
         Token token = objectStack.pop();
         switch(token) {
             case STRING_VALUE:
+            try {
                 state = ParseState.VALUE_SEPARATOR;
-                return lexer.nextString(writer);
+                BufferedAppendable buff = bufferedAppender.with(writer);
+                try {
+                    lexer.nextString(buff);
+                } finally {
+                    buff.close();
+                }
+                return writer;
+            } catch(IOException e) {
+                throw new JSONException("Error parsing string value", e);
+            }
             case NULL_VALUE:
             case TRUE_VALUE:
             case FALSE_VALUE:
@@ -792,18 +805,6 @@ public final class JSONStreamReader /*implements Iterator<JSONStreamReader.Parse
     public JSONException syntaxError(Throwable t) {
         return lexer.syntaxError(t);
     }
-
-/*
-    @Override
-    public ParseState next() throws JSONException {
-        return nextState();
-    }
-
-    @Override
-    public void remove() throws UnsupportedOperationException {
-        throw new UnsupportedOperationException();
-    }
-*/
 
     /**
      * Returns a string representation of the stream reader, including its
