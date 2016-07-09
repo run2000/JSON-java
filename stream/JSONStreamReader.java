@@ -110,8 +110,8 @@ public final class JSONStreamReader {
 
     private final JSONLexer lexer;
     private final ALStack<Token> objectStack = new ALStack<Token>(); // START_ARRAY, START_OBJECT, or one of the _VALUEs
+    private final BufferedAppendable bufferedAppender;
     private ParseState state = ParseState.INIT;
-    private BufferedAppendable bufferedAppender;
 
     /**
      * Construct a JSONStreamReader from a {@code Reader}.
@@ -143,6 +143,7 @@ public final class JSONStreamReader {
      */
     public JSONStreamReader(String s) {
         lexer = new JSONLexer(s);
+        bufferedAppender = new BufferedAppendable();
     }
 
     /**
