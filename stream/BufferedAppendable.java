@@ -79,8 +79,8 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
      * appendable. Any existing buffered output is flushed to the old
      * Appendable first.
      * <p>
-     * This resets the state of thie buffered reader to the open state
-     * if the new appendable is non-null, otherwise resets the state to
+     * This resets the state of the buffered reader to the open state
+     * if the new appendable is non-{@code null}, otherwise resets the state to
      * closed.</p>
      *
      * @param newAppendable the new Appendable to buffer
