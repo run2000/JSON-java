@@ -550,6 +550,8 @@ public final class JSONStreamReader {
      *     <li>A {@code Double}</li>
      *     <li>A {@code Long}</li>
      *     <li>An {@code Integer}</li>
+     *     <li>A {@code BigDecimal}</li>
+     *     <li>A {@code BigInteger}</li>
      * </ul>
      * <p>
      * This method advances the parser onto the next state.</p>
@@ -591,16 +593,9 @@ public final class JSONStreamReader {
 
         Token token = objectStack.pop();
         switch(token) {
-            case NUMBER_VALUE: {
+            case NUMBER_VALUE:
                 state = ParseState.VALUE_SEPARATOR;
-                StringBuilder builder = new StringBuilder();
-                lexer.nextNumber(builder);
-                try {
-                    return new BigDecimal(builder.toString());
-                } catch (Exception exception) {
-                    // fall through
-                }
-            }
+                return lexer.nextBigDecimal();
             case NULL_VALUE:
             case TRUE_VALUE:
             case FALSE_VALUE:
@@ -629,18 +624,9 @@ public final class JSONStreamReader {
 
         Token token = objectStack.pop();
         switch(token) {
-            case NUMBER_VALUE: {
+            case NUMBER_VALUE:
                 state = ParseState.VALUE_SEPARATOR;
-                StringBuilder builder = new StringBuilder();
-                boolean dbl = lexer.nextNumber(builder);
-                if(!dbl) {
-                    try {
-                        return new BigInteger(builder.toString());
-                    } catch (Exception exception) {
-                        // fall through
-                    }
-                }
-            }
+                return lexer.nextBigInteger();
             case NULL_VALUE:
             case TRUE_VALUE:
             case FALSE_VALUE:

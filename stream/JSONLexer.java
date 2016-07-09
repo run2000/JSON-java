@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 
 /**
@@ -400,25 +402,85 @@ public final class JSONLexer {
     public Number nextNumber() throws JSONException {
         StringBuilder sb = new StringBuilder();
         boolean dbl = nextNumber(sb);
+        String val = sb.toString();
 
-        try {
-            if (dbl) {
-                Double d = Double.valueOf(sb.toString());
-                if ((!d.isInfinite()) && (!d.isNaN())) {
+        if (dbl) {
+            try {
+                Double d = Double.valueOf(val);
+                if(d.isInfinite()) {
+                    try {
+                        BigDecimal bd = new BigDecimal(val);
+                        return bd;
+                    } catch (Exception e) {
+                        // fall through
+                    }
+                } else if (!d.isNaN()) {
                     return d;
                 }
-            } else {
-                Long myLong = Long.valueOf(sb.toString());
+            } catch (Exception ignore) {
+                try {
+                    BigDecimal bd = new BigDecimal(val);
+                    return bd;
+                } catch (Exception e) {
+                    // fall through
+                }
+            }
+        } else {
+            try {
+                Long myLong = Long.valueOf(val);
                 if (myLong.longValue() == myLong.intValue()) {
                     return Integer.valueOf(myLong.intValue());
                 } else {
                     return myLong;
                 }
+            } catch (Exception ignore) {
+                try {
+                    BigInteger bi = new BigInteger(val);
+                    return bi;
+                } catch(Exception e) {
+                    // fall through
+                }
             }
-        } catch (Exception ignore) {
-            // fall through
         }
         throw scanner.syntaxError("Could not parse number");
+    }
+
+    /**
+     * Parse a number as a big decimal strictly according to the JSON
+     * specification.
+     *
+     * @return the number represented by the token sequence
+     */
+    public BigDecimal nextBigDecimal() throws JSONException {
+        StringBuilder builder = new StringBuilder();
+        nextNumber(builder);
+
+        try {
+            return new BigDecimal(builder.toString());
+        } catch (Exception exception) {
+            // fall through
+        }
+        throw scanner.syntaxError("Could not parse big decimal");
+    }
+
+    /**
+     * Parse a number as a big integer strictly according to the JSON
+     * specification.
+     *
+     * @return the number represented by the token sequence
+     */
+    public BigInteger nextBigInteger() throws JSONException {
+        StringBuilder builder = new StringBuilder();
+        boolean dbl = nextNumber(builder);
+
+        if(!dbl) {
+            try {
+                return new BigInteger(builder.toString());
+            } catch (Exception exception) {
+                // fall through
+            }
+        }
+        throw scanner.syntaxError("Could not parse big integer");
     }
 
     /**
