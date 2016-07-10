@@ -407,23 +407,17 @@ public final class JSONLexer {
         if (dbl) {
             try {
                 Double d = Double.valueOf(val);
-                if(d.isInfinite()) {
-                    try {
-                        BigDecimal bd = new BigDecimal(val);
-                        return bd;
-                    } catch (Exception e) {
-                        // fall through
-                    }
-                } else if (!d.isNaN()) {
+                if (!d.isInfinite() && !d.isNaN()) {
                     return d;
                 }
             } catch (Exception ignore) {
-                try {
-                    BigDecimal bd = new BigDecimal(val);
-                    return bd;
-                } catch (Exception e) {
-                    // fall through
-                }
+                // fall through
+            }
+            try {
+                BigDecimal bd = new BigDecimal(val);
+                return bd;
+            } catch (Exception e) {
+                // fall through
             }
         } else {
             try {
@@ -434,12 +428,13 @@ public final class JSONLexer {
                     return myLong;
                 }
             } catch (Exception ignore) {
-                try {
-                    BigInteger bi = new BigInteger(val);
-                    return bi;
-                } catch(Exception e) {
-                    // fall through
-                }
+                // fall through
+            }
+            try {
+                BigInteger bi = new BigInteger(val);
+                return bi;
+            } catch(Exception e) {
+                // fall through
             }
         }
         throw scanner.syntaxError("Could not parse number");
