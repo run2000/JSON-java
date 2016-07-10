@@ -37,6 +37,11 @@ import java.nio.charset.Charset;
  * Builds a JSON object model using events supplied from {@link JSONStreamReader}.
  * This uses less stack space than parsing via {@link org.json.JSONTokener},
  * since only one stack frame is allocated per nested object or array.
+ * <p>
+ * A simple example of how to use this class:</p>
+ * <pre>
+ * JSONObject jsonObject = JSONObjectBuilder.buildJSONObject(JSON_TEXT);
+ * </pre>
  *
  * @author JSON.org
  * @version 2016-6-30
@@ -51,7 +56,8 @@ public final class JSONObjectBuilder {
      * <ul>
      *     <li>{@code JSONObject.NULL}</li>
      *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     *     <li>A {@code Double}, {@code Long}, {@code Integer},
+     *         {@code BigDecimal}, or {@code BigInteger}</li>
      *     <li>A {@code String}</li>
      *     <li>A {@code JSONObject}</li>
      *     <li>A {@code JSONArray}</li>
@@ -70,7 +76,8 @@ public final class JSONObjectBuilder {
      * <ul>
      *     <li>{@code JSONObject.NULL}</li>
      *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     *     <li>A {@code Double}, {@code Long}, {@code Integer},
+     *         {@code BigDecimal}, or {@code BigInteger}</li>
      *     <li>A {@code String}</li>
      *     <li>A {@code JSONObject}</li>
      *     <li>A {@code JSONArray}</li>
@@ -91,7 +98,8 @@ public final class JSONObjectBuilder {
      * <ul>
      *     <li>{@code JSONObject.NULL}</li>
      *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     *     <li>A {@code Double}, {@code Long}, {@code Integer},
+     *         {@code BigDecimal}, or {@code BigInteger}</li>
      *     <li>A {@code String}</li>
      *     <li>A {@code JSONObject}</li>
      *     <li>A {@code JSONArray}</li>
@@ -110,7 +118,8 @@ public final class JSONObjectBuilder {
      * <ul>
      *     <li>{@code JSONObject.NULL}</li>
      *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     *     <li>A {@code Double}, {@code Long}, {@code Integer},
+     *         {@code BigDecimal}, or {@code BigInteger}</li>
      *     <li>A {@code String}</li>
      *     <li>A {@code JSONObject}</li>
      *     <li>A {@code JSONArray}</li>

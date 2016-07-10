@@ -37,7 +37,32 @@ import java.nio.charset.Charset;
 
 /**
  * Reads a JSON document as a stream of JSON events. Uses an iterator model
- * to produce each event.
+ * to produce each event. Similar to a StAX event model in XML processing.
+ * <p>
+ * A simple example of how to use this class:</p>
+ * <pre>
+ * JSONStreamReader reader = new JSONStreamReader(JSON_TEXT);
+ *
+ * while(reader.hasNext()) {
+ *     ParseState state = reader.nextState();
+ *     switch(state) {
+ *         case KEY:
+ *             System.out.println("KEY = " + reader.nextKey() );
+ *             break;
+ *         case VALUE: {
+ *             ValueType valueType = reader.getValueType();
+ *             System.out.println("VALUE = " + reader.nextValue()
+ *                     + " (type = " + valueType + ")");
+ *             break;
+ *         }
+ *         default:
+ *             System.out.println(state);
+ *     }
+ * }
+ * </pre>
+ * <p>
+ * A more complete example can be found by reading the {@link JSONObjectBuilder}
+ * source code.</p>
  *
  * @author JSON.org
  * @version 2016-06-26
@@ -734,6 +759,15 @@ public final class JSONStreamReader {
      */
     public int getStackDepth() {
         return objectStack.size();
+    }
+
+    /**
+     * Indicates the current position of the stream.
+     *
+     * @return a String of the current position
+     */
+    public String getPosition() {
+        return lexer.position();
     }
 
     /**
