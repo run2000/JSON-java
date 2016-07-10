@@ -223,10 +223,13 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
     public void flush() throws IOException {
         final int pos = buffer.position();
         if (pos > 0) {
-            assertOpen();
-            buffer.rewind();
-            appendable.append(buffer, 0, pos);
-            buffer.clear();
+            try {
+                assertOpen();
+                buffer.rewind();
+                appendable.append(buffer, 0, pos);
+            } finally {
+                buffer.clear();
+            }
         }
     }
 
