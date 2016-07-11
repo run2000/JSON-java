@@ -45,8 +45,8 @@ import java.nio.CharBuffer;
  * @version 2016-7-8
  */
 public final class BufferedAppendable implements Appendable, Flushable, Closeable {
-    /** The default buffer size. */
-    public static final int BUFFER_SIZE = 2048;
+    /** The default buffer size, if none is specified. */
+    public static final int DEFAULT_BUFFER_SIZE = 1024;
     private static final String NULL_SEQ = "null";
     private final CharBuffer buffer;
     private Appendable appendable;
@@ -57,7 +57,7 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
      * @throws NullPointerException the supplied Appendable is null
      */
     public BufferedAppendable() {
-        this.buffer = CharBuffer.allocate(BUFFER_SIZE);
+        this.buffer = CharBuffer.allocate(DEFAULT_BUFFER_SIZE);
     }
 
     /**
