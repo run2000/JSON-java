@@ -34,7 +34,7 @@ import java.nio.CharBuffer;
  * {@code java.io.BufferedWriter}. In addition, the Appendable is supplied
  * using the {@link #with(Appendable)} method, rather than at construction
  * time. This allows the buffer to be reused for several different
- * operations requiring buffering.
+ * operations requiring buffering. Any reuse must occur synchronously.
  * <p>
  * Uses {@code java.nio.CharBuffer.allocate()} to create the backing buffer.</p>
  * <p>
