@@ -31,8 +31,8 @@ import java.nio.CharBuffer;
 
 /**
  * A simple buffering {@code Appendable}, without the synchronization of
- * {@code java.io.BufferedWriter}. This implies that all operations on a
- * BufferedAppendable object must be performed synchronously.
+ * {@code java.io.BufferedWriter}. This means that all operations on a
+ * {@code BufferedAppendable} object must be performed synchronously.
  * <p>
  * In addition, the {@code Appendable} to be buffered is supplied using the
  * {@link #with(Appendable)} method, rather than at construction time. This
@@ -48,7 +48,7 @@ import java.nio.CharBuffer;
  * @version 2016-7-8
  */
 public final class BufferedAppendable implements Appendable, Flushable, Closeable {
-    /** The default buffer size, if none is specified. */
+    /** The default buffer size of 1024 characters, if none is specified. */
     public static final int DEFAULT_BUFFER_SIZE = 1024;
     private static final String NULL_SEQ = "null";
     private final CharBuffer buffer;
@@ -100,7 +100,8 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
     }
 
     /**
-     * Appends the specified character sequence to this buffered appendable.
+     * Appends the specified character sequence to this
+     * {@code BufferedAppendable}.
      *
      * @param csq the character sequence to be appended
      * @return this BufferedAppendable
@@ -119,9 +120,12 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
             } else {
                 final int pos = buffer.position();
                 if (pos > 0) {
-                    buffer.rewind();
-                    appendable.append(buffer, 0, pos);
-                    buffer.clear();
+                    try {
+                        buffer.rewind();
+                        appendable.append(buffer, 0, pos);
+                    } finally {
+                        buffer.clear();
+                    }
                 }
                 if (csq.length() < buffer.length()) {
                     buffer.append(csq);
@@ -135,7 +139,7 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
 
     /**
      * Appends a subsequence of the specified character sequence to this
-     * buffered appendable.
+     * {@code BufferedAppendable}.
      *
      * @param csq   The character sequence from which a subsequence will be
      *              appended.
@@ -166,9 +170,12 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
             } else {
                 final int pos = buffer.position();
                 if (pos > 0) {
-                    buffer.rewind();
-                    appendable.append(buffer, 0, pos);
-                    buffer.clear();
+                    try {
+                        buffer.rewind();
+                        appendable.append(buffer, 0, pos);
+                    } finally {
+                        buffer.clear();
+                    }
                 }
                 if (len < buffer.length()) {
                     buffer.append(csq, start, end);
@@ -181,7 +188,7 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
     }
 
     /**
-     * Appends the specified character to this buffered appendable.
+     * Appends the specified character to this {@code BufferedAppendable}.
      *
      * @param c The character to append
      * @return this BufferedAppendable
@@ -194,9 +201,12 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
         if (buffer.remaining() < 1) {
             final int pos = buffer.position();
             if (pos > 0) {
-                buffer.rewind();
-                appendable.append(buffer, 0, pos);
-                buffer.clear();
+                try {
+                    buffer.rewind();
+                    appendable.append(buffer, 0, pos);
+                } finally {
+                    buffer.clear();
+                }
             }
         }
         buffer.append(c);
@@ -215,7 +225,7 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
     }
 
     /**
-     * Flush the buffer of this BufferedAppendable.
+     * Flush the buffer of this {@code BufferedAppendable}.
      *
      * @throws IOException there was a problem appending to the underlying
      *                     appendable
@@ -235,7 +245,7 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
     }
 
     /**
-     * Flush and close the buffer of this buffered appendable.
+     * Flush and close the buffer of this {@code BufferedAppendable}.
      *
      * @throws IOException there was a problem appending to the underlying
      *                     appendable

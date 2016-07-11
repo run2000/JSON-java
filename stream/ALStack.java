@@ -29,7 +29,7 @@ import java.util.EmptyStackException;
 
 /**
  * A simple unsynchronized stack implementation, used by {@link JSONStreamReader}.
- * The stack is backed by an array list.
+ * The stack is backed by an {@code ArrayList}.
  *
  * @author JSON.org
  * @version 2016-6-30

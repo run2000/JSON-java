@@ -118,7 +118,8 @@ public final class JSONStreamReader {
 
     /**
      * The type of the current value in the stream. Arrays and Objects are
-     * represented as {@link ParseState} values.
+     * represented as {@link ParseState#ARRAY} and {@link ParseState#OBJECT}
+     * values.
      */
     public enum ValueType {
         /** The {@code JSONObject.Null} value */
@@ -139,7 +140,7 @@ public final class JSONStreamReader {
     private ParseState state = ParseState.INIT;
 
     /**
-     * Construct a JSONStreamReader from a {@code Reader}.
+     * Construct a {@code JSONStreamReader} from a {@code Reader}.
      *
      * @param reader     A reader.
      */
@@ -149,8 +150,8 @@ public final class JSONStreamReader {
     }
 
     /**
-     * Construct a JSONStreamReader from an {@code InputStream} and supplied
-     * {@code Charset}.
+     * Construct a {@code JSONStreamReader} from an {@code InputStream} and
+     * a supplied {@code Charset}.
      *
      * @param inputStream   the input stream containing the JSON data
      * @param charset       the character set with which to interpret the
@@ -162,7 +163,7 @@ public final class JSONStreamReader {
     }
 
     /**
-     * Construct a JSONStreamReader from a {@code String}.
+     * Construct a {@code JSONStreamReader} from a {@code String}.
      *
      * @param s     A source string.
      */
@@ -392,7 +393,7 @@ public final class JSONStreamReader {
      * the next value. If the value is an object, array, or other structural
      * element, {@link ValueType#NOT_A_VALUE} is returned.
      * <p>
-     * Does not distinguish between int, long, and double number value types.</p>
+     * Does not distinguish between the various number value types.</p>
      * <p>
      * This does <em>not</em> advance the parser state.</p>
      *
@@ -419,11 +420,12 @@ public final class JSONStreamReader {
 
     /**
      * If the ParseState was {@link ParseState#VALUE}, return the value as
-     * an Object. The values that can be returned here are:
+     * an {@code Object}. The values that can be returned here are:
      * <ul>
      *     <li>{@code JSONObject.NULL}</li>
      *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     *     <li>A {@code Double}, {@code Long}, {@code Integer},
+     *     {@code BigInteger}, or {@code BigDecimal}</li>
      *     <li>A {@code String}</li>
      * </ul>
      * <p>
@@ -460,7 +462,7 @@ public final class JSONStreamReader {
 
     /**
      * If the ParseState was {@link ParseState#VALUE}, and ValueType was
-     * {@link ValueType#STRING_VALUE}, return the value as a String.
+     * {@link ValueType#STRING_VALUE}, return the value as a {@code String}.
      * <p>
      * This method advances the parser onto the next state.</p>
      *
@@ -568,7 +570,7 @@ public final class JSONStreamReader {
 
     /**
      * If the ParseState was {@link ParseState#VALUE}, and ValueType was
-     * {@link ValueType#NUMBER_VALUE}, return the value as a Number.
+     * {@link ValueType#NUMBER_VALUE}, return the value as a {@code Number}.
      * <p>
      * The number type returned is one of:</p>
      * <ul>
@@ -605,7 +607,7 @@ public final class JSONStreamReader {
 
     /**
      * If the ParseState was {@link ParseState#VALUE}, and ValueType was
-     * {@link ValueType#NUMBER_VALUE}, return the value as a BigDecimal.
+     * {@link ValueType#NUMBER_VALUE}, return the value as a {@code BigDecimal}.
      * <p>
      * This method advances the parser onto the next state.</p>
      *
@@ -633,7 +635,7 @@ public final class JSONStreamReader {
 
     /**
      * If the ParseState was {@link ParseState#VALUE}, and ValueType was
-     * {@link ValueType#NUMBER_VALUE}, return the value as a BigInteger.
+     * {@link ValueType#NUMBER_VALUE}, return the value as a {@code BigInteger}.
      * <p>
      * If the JSON value is not parseable as a big integer, as defined by the
      * JSON grammar, a JSONException will be thrown.</p>
@@ -695,7 +697,7 @@ public final class JSONStreamReader {
      * {@link ValueType#NUMBER_VALUE}, return the value as an int.
      * <p>
      * If the JSON value is not parseable as an int, as defined by the JSON
-     * grammar, a JSONException will be thrown.</p>
+     * grammar, a {@code JSONException} will be thrown.</p>
      * <p>
      * This method advances the parser onto the next state.</p>
      *
@@ -726,7 +728,7 @@ public final class JSONStreamReader {
      * {@link ValueType#NUMBER_VALUE}, return the value as a long.
      * <p>
      * If the JSON value is not parseable as a long, as defined by the JSON
-     * grammar, a JSONException will be thrown.</p>
+     * grammar, a {@code JSONException} will be thrown.</p>
      * <p>
      * This method advances the parser onto the next state.</p>
      *
@@ -797,7 +799,7 @@ public final class JSONStreamReader {
     }
 
     /**
-     * Create a JSONException given the current stream position.
+     * Create a {@code JSONException} given the current stream position.
      *
      * @param message the exception message
      * @return a new JSONException object with the given message
@@ -807,7 +809,7 @@ public final class JSONStreamReader {
     }
 
     /**
-     * Create a JSONException given the current stream position.
+     * Create a {@code JSONException} given the current stream position.
      *
      * @param message the exception message
      * @param t the underlying exception
@@ -818,7 +820,7 @@ public final class JSONStreamReader {
     }
 
     /**
-     * Create a JSONException given the current stream position.
+     * Create a {@code JSONException} given the current stream position.
      *
      * @param t the underlying exception
      * @return a new JSONException object with the given cause

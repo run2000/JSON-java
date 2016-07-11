@@ -163,7 +163,7 @@ public final class JSONObjectBuilder {
     }
 
     /**
-     * Build a JSONObject from a {@code Reader}.
+     * Build a {@code JSONObject} from a {@code Reader}.
      *
      * @param reader     A reader.
      * @return a JSONObject value
@@ -173,7 +173,7 @@ public final class JSONObjectBuilder {
     }
 
     /**
-     * Build a JSONObject from a {@code InputStream} and supplied
+     * Build a {@code JSONObject} from a {@code InputStream} and a supplied
      * {@code Charset}.
      *
      * @param inputStream   the input stream containing the JSON data
@@ -187,7 +187,7 @@ public final class JSONObjectBuilder {
     }
 
     /**
-     * Build a JSONObject from a {@code String}.
+     * Build a {@code JSONObject} from a {@code String}.
      *
      * @param s     A source string.
      * @return a JSONObject value
@@ -197,7 +197,7 @@ public final class JSONObjectBuilder {
     }
 
     /**
-     * Build a JSONObject from a {@code JSONStreamReader}.
+     * Build a {@code JSONObject} from a {@code JSONStreamReader}.
      *
      * @param parser    A source stream.
      * @return a JSONObject value
@@ -229,7 +229,7 @@ public final class JSONObjectBuilder {
     }
 
     /**
-     * Build a JSONArray from a {@code Reader}.
+     * Build a {@code JSONArray} from a {@code Reader}.
      *
      * @param reader     A reader.
      * @return a JSONArray value
@@ -239,7 +239,7 @@ public final class JSONObjectBuilder {
     }
 
     /**
-     * Build a JSONArray from a {@code InputStream} and supplied
+     * Build a {@code JSONArray} from a {@code InputStream} and a supplied
      * {@code Charset}.
      *
      * @param inputStream   the input stream containing the JSON data
@@ -253,7 +253,7 @@ public final class JSONObjectBuilder {
     }
 
     /**
-     * Build a JSONArray from a {@code String}.
+     * Build a {@code JSONArray} from a {@code String}.
      *
      * @param s     A source string.
      * @return a JSONArray value
@@ -263,7 +263,7 @@ public final class JSONObjectBuilder {
     }
 
     /**
-     * Build a JSONArray from a {@code JSONStreamReader}.
+     * Build a {@code JSONArray} from a {@code JSONStreamReader}.
      *
      * @param parser    A source stream.
      * @return a JSONArray value

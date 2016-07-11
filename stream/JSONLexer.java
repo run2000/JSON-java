@@ -36,7 +36,7 @@ import java.math.BigInteger;
 import java.nio.charset.Charset;
 
 /**
- * A JSONLexer takes a source stream and extracts characters and tokens
+ * A {@code JSONLexer} takes a source stream and extracts characters and tokens
  * from it. It does not perform any sanity checks on the order that
  * tokens appear. It is used by {@link JSONStreamReader} class to tokenise
  * JSON source streams.
@@ -69,7 +69,7 @@ public final class JSONLexer {
     private final Scanner scanner;
 
     /**
-     * Construct a JSONLexer from a {@code Reader}.
+     * Construct a {@code JSONLexer} from a {@code Reader}.
      *
      * @param reader     A reader.
      */
@@ -78,7 +78,7 @@ public final class JSONLexer {
     }
 
     /**
-     * Construct a JSONLexer from an {@code InputStream} and supplied
+     * Construct a {@code JSONLexer} from an {@code InputStream} and a supplied
      * {@code Charset}.
      *
      * @param inputStream   the input stream containing the JSON data
@@ -90,7 +90,7 @@ public final class JSONLexer {
     }
 
     /**
-     * Construct a JSONLexer from a {@code String}.
+     * Construct a {@code JSONLexer} from a {@code String}.
      *
      * @param s     A source string.
      */
@@ -159,7 +159,7 @@ public final class JSONLexer {
 
     /**
      * Get the type of the next token in the stream, skipping whitespace.
-     * This parses the literal separators only.
+     * This parses the literal tokens and separators only.
      *
      * @return the Token type representing the next token type
      */
@@ -222,8 +222,8 @@ public final class JSONLexer {
 
     /**
      * Return the characters up to the next close quote character.
-     * Backslash processing is done. The formal JSON format only allows
-     * strings in double quotes.
+     * Backslash escape sequences are processed. The formal JSON format only
+     * allows string values within double quotes.
      *
      * @param sb the Appendable to which the String value is appended
      * @param <T> a subtype of {@code Appendable}, returned to the caller
@@ -396,6 +396,15 @@ public final class JSONLexer {
 
     /**
      * Parse a number strictly according to the JSON specification.
+     * <p>
+     * The number type returned is one of:</p>
+     * <ul>
+     *     <li>A {@code Double}</li>
+     *     <li>A {@code Long}</li>
+     *     <li>An {@code Integer}</li>
+     *     <li>A {@code BigDecimal}</li>
+     *     <li>A {@code BigInteger}</li>
+     * </ul>
      *
      * @return the number represented by the token sequence
      */
@@ -441,7 +450,7 @@ public final class JSONLexer {
     }
 
     /**
-     * Parse a number as a big decimal strictly according to the JSON
+     * Parse a number as a {@code BigDecimal} strictly according to the JSON
      * specification.
      *
      * @return the number represented by the token sequence
@@ -459,7 +468,7 @@ public final class JSONLexer {
     }
 
     /**
-     * Parse a number as a big integer strictly according to the JSON
+     * Parse a number as a {@code BigInteger} strictly according to the JSON
      * specification.
      *
      * @return the number represented by the token sequence
@@ -525,7 +534,7 @@ public final class JSONLexer {
     }
 
     /**
-     * Parse a number as an int strictly according to the JSON specification.
+     * Parse a number as a long strictly according to the JSON specification.
      * No coercion of double values.
      *
      * @return the number represented by the token sequence
@@ -545,14 +554,33 @@ public final class JSONLexer {
         throw scanner.syntaxError("Could not parse int");
     }
 
+    /**
+     * Make a {@code JSONException} to signal a syntax error.
+     *
+     * @param message The error message.
+     * @return  A JSONException object, suitable for throwing
+     */
     public JSONException syntaxError(String message) {
         return scanner.syntaxError(message);
     }
 
-    public JSONException syntaxError(String message, Throwable t) {
-        return scanner.syntaxError(message, t);
+    /**
+     * Make a {@code JSONException} to signal a syntax error.
+     *
+     * @param message The error message.
+     * @param cause The underlying cause.
+     * @return  A JSONException object, suitable for throwing
+     */
+    public JSONException syntaxError(String message, Throwable cause) {
+        return scanner.syntaxError(message, cause);
     }
 
+    /**
+     * Make a {@code JSONException} to signal a syntax error.
+     *
+     * @param cause The underlying cause.
+     * @return  A JSONException object, suitable for throwing
+     */
     public JSONException syntaxError(Throwable cause) {
         return scanner.syntaxError(cause);
     }
@@ -567,7 +595,7 @@ public final class JSONLexer {
     }
 
     /**
-     * Make a printable string of this JSONLexer.
+     * Make a printable string of this {@code JSONLexer}.
      *
      * @return "JSONLexer at {index} [character {character} line {line}]"
      */

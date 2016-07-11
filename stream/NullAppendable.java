@@ -1,7 +1,7 @@
 package org.json.stream;
 
 /**
- * A dummy sink into which Appendable content may be sent. This is used
+ * A dummy sink into which {@code Appendable} content may be sent. This is used
  * for skipping over value content which needs to be parsed, but not emitted.
  *
  * @author JSON.org
@@ -9,7 +9,7 @@ package org.json.stream;
  */
 public final class NullAppendable implements Appendable {
 
-    /** The single instance of NullAppendable. */
+    /** The single instance of {@code NullAppendable}. */
     public static final NullAppendable INSTANCE = new NullAppendable();
 
     private NullAppendable() {
@@ -21,7 +21,7 @@ public final class NullAppendable implements Appendable {
      * @param  csq
      *         The character sequence to append.
      *
-     * @return  A reference to this <tt>Appendable</tt>
+     * @return  A reference to this {@code NullAppendable}
      */
     @Override
     public Appendable append(CharSequence csq) {
@@ -42,7 +42,7 @@ public final class NullAppendable implements Appendable {
      *         The index of the character following the last character in the
      *         subsequence
      *
-     * @return  A reference to this <tt>Appendable</tt>
+     * @return  A reference to this {@code NullAppendable}
      *
      */
     @Override
@@ -56,7 +56,7 @@ public final class NullAppendable implements Appendable {
      * @param  c
      *         The character to append
      *
-     * @return  A reference to this <tt>Appendable</tt>
+     * @return  A reference to this {@code NullAppendable}
      */
     @Override
     public Appendable append(char c) {
