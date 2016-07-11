@@ -31,10 +31,13 @@ import java.nio.CharBuffer;
 
 /**
  * A simple buffering {@code Appendable}, without the synchronization of
- * {@code java.io.BufferedWriter}. In addition, the Appendable is supplied
- * using the {@link #with(Appendable)} method, rather than at construction
- * time. This allows the buffer to be reused for several different
- * operations requiring buffering. Any reuse must occur synchronously.
+ * {@code java.io.BufferedWriter}. This implies that all operations on a
+ * BufferedAppendable object must be performed synchronously.
+ * <p>
+ * In addition, the {@code Appendable} to be buffered is supplied using the
+ * {@link #with(Appendable)} method, rather than at construction time. This
+ * allows the buffer to be reused for several different operations requiring
+ * buffering.</p>
  * <p>
  * Uses {@code java.nio.CharBuffer.allocate()} to create the backing buffer.</p>
  * <p>
