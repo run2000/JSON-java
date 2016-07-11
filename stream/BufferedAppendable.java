@@ -188,17 +188,15 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
     @Override
     public Appendable append(char c) throws IOException {
         assertOpen();
-        if (buffer.remaining() >= 1) {
-            buffer.append(c);
-        } else {
+        if (buffer.remaining() < 1) {
             final int pos = buffer.position();
             if (pos > 0) {
                 buffer.rewind();
                 appendable.append(buffer, 0, pos);
                 buffer.clear();
             }
-            buffer.append(c);
         }
+        buffer.append(c);
         return this;
     }
 
