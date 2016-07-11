@@ -521,7 +521,7 @@ public final class JSONStreamReader {
                 }
                 return writer;
             } catch(IOException e) {
-                throw new JSONException("Error parsing string value", e);
+                throw lexer.syntaxError("Error parsing string value", e);
             }
             case NULL_VALUE:
             case TRUE_VALUE:
