@@ -352,4 +352,42 @@ public final class JSONObjectBuilder {
         }
         return object;
     }
+
+    /**
+     * If the given JSONStreamReader's ParseState was {@link ParseState#OBJECT},
+     * return the entire subtree as a JSONObject value. This method advances the
+     * parser onto the {@link ParseState#END_OBJECT} state.
+     * <p>
+     * If the JSON stream is not parseable as an object, a JSONException
+     * will be thrown.
+     * </p>
+     *
+     * @return a JSONObject representing the subtree starting at the current
+     * OBJECT state
+     */
+    public static JSONObject buildObjectSubTree(JSONStreamReader reader) throws JSONException {
+        if((reader.currentState() != ParseState.OBJECT) || (reader.getStackDepth() == 0)) {
+            throw reader.syntaxError("Expected OBJECT state");
+        }
+        return JSONObjectBuilder.parseObject(reader);
+    }
+
+    /**
+     * If the given JSONStreamReader's ParseState was {@link ParseState#ARRAY},
+     * return the entire subtree as a JSONArray value. This method advances the
+     * parser onto the {@link ParseState#END_ARRAY} state.
+     * <p>
+     * If the JSON stream is not parseable as an array, a JSONException
+     * will be thrown.
+     * </p>
+     *
+     * @return a JSONArray representing the subtree starting at the current
+     * ARRAY state
+     */
+    public static JSONArray buildArraySubTree(JSONStreamReader reader) throws JSONException {
+        if((reader.currentState() != ParseState.ARRAY) || (reader.getStackDepth() == 0)) {
+            throw reader.syntaxError("Expected ARRAY state");
+        }
+        return JSONObjectBuilder.parseArray(reader);
+    }
 }
