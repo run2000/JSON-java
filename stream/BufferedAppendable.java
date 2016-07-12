@@ -214,7 +214,7 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
     }
 
     /**
-     * Check that this buffer has not been closed.
+     * Check that this buffer is currently open.
      *
      * @throws IOException the buffered appendable has been closed
      */
