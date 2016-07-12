@@ -124,6 +124,7 @@ public final class JSONObjectBuilder {
      *     <li>A {@code JSONObject}</li>
      *     <li>A {@code JSONArray}</li>
      * </ul>
+     * <p> The reader must be at the beginning of the document.</p>
      *
      * @param parser    A source stream.
      * @return a JSON value of the type defined above
@@ -197,7 +198,8 @@ public final class JSONObjectBuilder {
     }
 
     /**
-     * Build a {@code JSONObject} from a {@code JSONStreamReader}.
+     * Build a {@code JSONObject} from a {@code JSONStreamReader}. The reader must be
+     * at the beginning of the document.
      *
      * @param parser    A source stream.
      * @return a JSONObject value
@@ -263,7 +265,8 @@ public final class JSONObjectBuilder {
     }
 
     /**
-     * Build a {@code JSONArray} from a {@code JSONStreamReader}.
+     * Build a {@code JSONArray} from a {@code JSONStreamReader}. The reader must be
+     * at the beginning of the document.
      *
      * @param parser    A source stream.
      * @return a JSONArray value
