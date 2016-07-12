@@ -262,27 +262,7 @@ public final class JSONStreamReader {
                     break;
 
                 case VALUE:
-                    if(objectStack.isEmpty()) {
-                        throw lexer.syntaxError("Invalid state");
-                    }
-                    token = objectStack.pop();
-                    switch(token) {
-                        case NULL_VALUE:
-                        case TRUE_VALUE:
-                        case FALSE_VALUE:
-                            state = ParseState.VALUE_SEPARATOR;
-                            break;
-                        case STRING_VALUE:
-                            state = ParseState.VALUE_SEPARATOR;
-                            lexer.nextString(NullAppendable.INSTANCE);
-                            break;
-                        case NUMBER_VALUE:
-                            state = ParseState.VALUE_SEPARATOR;
-                            lexer.nextNumber(NullAppendable.INSTANCE);
-                            break;
-                        default:
-                            throw lexer.syntaxError("Invalid state");
-                    }
+                    skipValue();
                     break;
 
                 case VALUE_SEPARATOR:
@@ -340,8 +320,8 @@ public final class JSONStreamReader {
     }
 
     private void parseStartValue() throws JSONException {
-        Token token;
-        token = lexer.nextTokenType();
+        Token token = lexer.nextTokenType();
+
         switch(token) {
             case START_ARRAY:
                 objectStack.push(token);
@@ -361,6 +341,32 @@ public final class JSONStreamReader {
                 break;
             default:
                 throw lexer.syntaxError("Invalid token");
+        }
+    }
+
+    private void skipValue() {
+        if(objectStack.isEmpty() || (state != ParseState.VALUE)) {
+            throw lexer.syntaxError("Invalid state");
+        }
+
+        Token token = objectStack.pop();
+
+        switch(token) {
+            case NULL_VALUE:
+            case TRUE_VALUE:
+            case FALSE_VALUE:
+                state = ParseState.VALUE_SEPARATOR;
+                break;
+            case STRING_VALUE:
+                state = ParseState.VALUE_SEPARATOR;
+                lexer.nextString(NullAppendable.INSTANCE);
+                break;
+            case NUMBER_VALUE:
+                state = ParseState.VALUE_SEPARATOR;
+                lexer.nextNumber(NullAppendable.INSTANCE);
+                break;
+            default:
+                throw lexer.syntaxError("Invalid state");
         }
     }
 
@@ -785,25 +791,32 @@ public final class JSONStreamReader {
     /**
      * Skip over the content of the current object or array, including any
      * nested objects or arrays.
+     * <p>
+     * Will throw a {@code JSONException} if the parser is at the start of
+     * end of a JSON document.</p>
      *
      * @return the closing ParseState of the object or array
      */
     public ParseState skipToEndObject() throws JSONException {
-        if(objectStack.isEmpty()) {
-            throw lexer.syntaxError("Invalid state");
+        if(state == ParseState.VALUE) {
+            skipValue();
         }
 
-        int stackDepth = getStackDepth();
+        final int stackDepth = getStackDepth();
 
-        switch(objectStack.peek()) {
-            case START_OBJECT:
-            case START_ARRAY:
-                while(hasNext() && (objectStack.size() >= stackDepth)) {
-                    nextState();
-                }
-                break;
-            default:
-                throw lexer.syntaxError("Invalid state");
+        if(stackDepth == 0) {
+            state = ParseState.END_DOCUMENT;
+        } else {
+            switch(objectStack.peek()) {
+                case START_OBJECT:
+                case START_ARRAY:
+                    while(hasNext() && (objectStack.size() >= stackDepth)) {
+                        nextState();
+                    }
+                    break;
+                default:
+                    throw lexer.syntaxError("Invalid state");
+            }
         }
         return state;
     }
