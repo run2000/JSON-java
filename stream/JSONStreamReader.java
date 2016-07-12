@@ -773,6 +773,16 @@ public final class JSONStreamReader {
     }
 
     /**
+     * Return the <em>current</em> state of the parser, including any of the
+     * internal states. Only required in exceptional circumstances.
+     *
+     * @return the current {@link ParseState}
+     */
+    public ParseState currentState() {
+        return state;
+    }
+
+    /**
      * Skip over the content of the current object or array, including any
      * nested objects or arrays.
      *
