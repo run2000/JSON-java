@@ -26,6 +26,8 @@ SOFTWARE.
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONParseException;
+import org.json.ParsePosition;
 import org.json.stream.JSONLexer.Token;
 
 import java.io.IOException;
@@ -226,7 +228,8 @@ public final class JSONStreamReader {
                             state = ParseState.VALUE;
                             break;
                         default:
-                            throw lexer.syntaxError("Unexpected token");
+                            throw new JSONParseException("Unexpected token",
+                                    lexer.parsePosition());
                     }
                     break;
 
@@ -241,19 +244,22 @@ public final class JSONStreamReader {
                             state = ParseState.KEY;
                             break;
                         default:
-                            throw lexer.syntaxError("Unexpected token");
+                            throw new JSONParseException("Unexpected token",
+                                    lexer.parsePosition());
                     }
                     break;
 
                 case KEY:
                     if(objectStack.isEmpty()) {
-                        throw lexer.syntaxError("Invalid state");
+                        throw new JSONParseException("Invalid state",
+                                lexer.parsePosition());
                     }
                     lexer.nextString(NullAppendable.INSTANCE);
                     state = ParseState.KEY_SEPARATOR;
 
                     if(lexer.nextTokenType() != Token.KEY_SEPARATOR) {
-                        throw lexer.syntaxError("Expected key separator");
+                        throw new JSONParseException("Expected key separator",
+                                lexer.parsePosition());
                     }
                     break;
 
@@ -281,32 +287,37 @@ public final class JSONStreamReader {
                                     if (token == Token.STRING_VALUE) {
                                         state = ParseState.KEY;
                                     } else {
-                                        throw lexer.syntaxError("Unexpected token");
+                                        throw new JSONParseException("Unexpected token",
+                                                lexer.parsePosition());
                                     }
                                     break;
                                 case START_ARRAY:
                                     parseStartValue();
                                     break;
                                 default:
-                                    throw lexer.syntaxError("Invalid state");
+                                    throw new JSONParseException("Invalid state",
+                                            lexer.parsePosition());
                             }
                             break;
                         case END_ARRAY:
                             if(objectStack.pop() == Token.START_ARRAY) {
                                 state = ParseState.END_ARRAY;
                             } else {
-                                throw lexer.syntaxError("Invalid state");
+                                throw new JSONParseException("Invalid state",
+                                        lexer.parsePosition());
                             }
                             break;
                         case END_OBJECT:
                             if(objectStack.pop() == Token.START_OBJECT) {
                                 state = ParseState.END_OBJECT;
                             } else {
-                                throw lexer.syntaxError("Invalid state");
+                                throw new JSONParseException("Invalid state",
+                                        lexer.parsePosition());
                             }
                             break;
                         default:
-                            throw lexer.syntaxError("Invalid token");
+                            throw new JSONParseException("Invalid token",
+                                    lexer.parsePosition());
                     }
                     break;
 
@@ -340,13 +351,13 @@ public final class JSONStreamReader {
                 state = ParseState.VALUE;
                 break;
             default:
-                throw lexer.syntaxError("Invalid token");
+                throw new JSONParseException("Invalid token", lexer.parsePosition());
         }
     }
 
     private void skipValue() {
         if(objectStack.isEmpty() || (state != ParseState.VALUE)) {
-            throw lexer.syntaxError("Invalid state");
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
@@ -366,7 +377,7 @@ public final class JSONStreamReader {
                 lexer.nextNumber(NullAppendable.INSTANCE);
                 break;
             default:
-                throw lexer.syntaxError("Invalid state");
+                throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
@@ -381,14 +392,14 @@ public final class JSONStreamReader {
      */
     public String nextKey() throws JSONException {
         if(state != ParseState.KEY) {
-            throw lexer.syntaxError("Invalid state");
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         StringBuilder builder = lexer.nextString(new StringBuilder());
         state = ParseState.KEY_SEPARATOR;
 
         if(lexer.nextTokenType() != Token.KEY_SEPARATOR) {
-            throw lexer.syntaxError("Expected key separator");
+            throw new JSONParseException("Expected key separator", lexer.parsePosition());
         }
 
         return builder.toString();
@@ -441,7 +452,7 @@ public final class JSONStreamReader {
      */
     public Object nextValue() throws JSONException {
         if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
-            throw lexer.syntaxError("Invalid state");
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
@@ -462,7 +473,7 @@ public final class JSONStreamReader {
                 state = ParseState.VALUE_SEPARATOR;
                 return lexer.nextNumber();
             default:
-                throw lexer.syntaxError("Invalid state");
+                throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
@@ -476,7 +487,7 @@ public final class JSONStreamReader {
      */
     public String nextStringValue() throws JSONException {
         if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
-            throw lexer.syntaxError("Invalid state");
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
@@ -488,9 +499,9 @@ public final class JSONStreamReader {
             case TRUE_VALUE:
             case FALSE_VALUE:
             case NUMBER_VALUE:
-                throw lexer.syntaxError("Invalid value type");
+                throw new JSONParseException("Invalid value type", lexer.parsePosition());
             default:
-                throw lexer.syntaxError("Invalid state");
+                throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
@@ -510,7 +521,7 @@ public final class JSONStreamReader {
      */
     public <T extends Appendable> T appendNextStringValue(T writer) throws JSONException {
         if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
-            throw lexer.syntaxError("Invalid state");
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
         if(writer == null) {
             throw new JSONException("writer is null");
@@ -529,15 +540,16 @@ public final class JSONStreamReader {
                 }
                 return writer;
             } catch(IOException e) {
-                throw lexer.syntaxError("Error parsing string value", e);
+                throw new JSONParseException("Error parsing string value", e,
+                        lexer.parsePosition());
             }
             case NULL_VALUE:
             case TRUE_VALUE:
             case FALSE_VALUE:
             case NUMBER_VALUE:
-                throw lexer.syntaxError("Invalid value type");
+                throw new JSONParseException("Invalid value type", lexer.parsePosition());
             default:
-                throw lexer.syntaxError("Invalid state");
+                throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
@@ -554,7 +566,7 @@ public final class JSONStreamReader {
      */
     public boolean nextBooleanValue() throws JSONException {
         if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
-            throw lexer.syntaxError("Invalid state");
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
@@ -568,9 +580,9 @@ public final class JSONStreamReader {
             case NULL_VALUE:
             case STRING_VALUE:
             case NUMBER_VALUE:
-                throw lexer.syntaxError("Invalid value type");
+                throw new JSONParseException("Invalid value type", lexer.parsePosition());
             default:
-                throw lexer.syntaxError("Invalid state");
+                throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
@@ -593,7 +605,7 @@ public final class JSONStreamReader {
      */
     public Number nextNumberValue() throws JSONException {
         if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
-            throw lexer.syntaxError("Invalid state");
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
@@ -605,9 +617,9 @@ public final class JSONStreamReader {
             case TRUE_VALUE:
             case FALSE_VALUE:
             case STRING_VALUE:
-                throw lexer.syntaxError("Invalid value type");
+                throw new JSONParseException("Invalid value type", lexer.parsePosition());
             default:
-                throw lexer.syntaxError("Invalid state");
+                throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
@@ -621,7 +633,7 @@ public final class JSONStreamReader {
      */
     public BigDecimal nextBigDecimalValue() throws JSONException {
         if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
-            throw lexer.syntaxError("Invalid state");
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
@@ -633,9 +645,9 @@ public final class JSONStreamReader {
             case TRUE_VALUE:
             case FALSE_VALUE:
             case STRING_VALUE:
-                throw lexer.syntaxError("Invalid value type");
+                throw new JSONParseException("Invalid value type", lexer.parsePosition());
             default:
-                throw lexer.syntaxError("Invalid state");
+                throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
@@ -652,7 +664,7 @@ public final class JSONStreamReader {
      */
     public BigInteger nextBigIntegerValue() throws JSONException {
         if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
-            throw lexer.syntaxError("Invalid state");
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
@@ -664,9 +676,9 @@ public final class JSONStreamReader {
             case TRUE_VALUE:
             case FALSE_VALUE:
             case STRING_VALUE:
-                throw lexer.syntaxError("Invalid value type");
+                throw new JSONParseException("Invalid value type", lexer.parsePosition());
             default:
-                throw lexer.syntaxError("Invalid state");
+                throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
@@ -680,7 +692,7 @@ public final class JSONStreamReader {
      */
     public double nextDoubleValue() throws JSONException {
         if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
-            throw lexer.syntaxError("Invalid state");
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
@@ -692,9 +704,9 @@ public final class JSONStreamReader {
             case TRUE_VALUE:
             case FALSE_VALUE:
             case STRING_VALUE:
-                throw lexer.syntaxError("Invalid value type");
+                throw new JSONParseException("Invalid value type", lexer.parsePosition());
             default:
-                throw lexer.syntaxError("Invalid state");
+                throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
@@ -711,7 +723,7 @@ public final class JSONStreamReader {
      */
     public int nextIntValue() throws JSONException {
         if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
-            throw lexer.syntaxError("Invalid state");
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
@@ -723,9 +735,9 @@ public final class JSONStreamReader {
             case TRUE_VALUE:
             case FALSE_VALUE:
             case STRING_VALUE:
-                throw lexer.syntaxError("Invalid value type");
+                throw new JSONParseException("Invalid value type", lexer.parsePosition());
             default:
-                throw lexer.syntaxError("Invalid state");
+                throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
@@ -742,7 +754,7 @@ public final class JSONStreamReader {
      */
     public long nextLongValue() throws JSONException {
         if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
-            throw lexer.syntaxError("Invalid state");
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
@@ -754,9 +766,9 @@ public final class JSONStreamReader {
             case TRUE_VALUE:
             case FALSE_VALUE:
             case STRING_VALUE:
-                throw lexer.syntaxError("Invalid value type");
+                throw new JSONParseException("Invalid value type", lexer.parsePosition());
             default:
-                throw lexer.syntaxError("Invalid state");
+                throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
@@ -770,12 +782,13 @@ public final class JSONStreamReader {
     }
 
     /**
-     * Indicates the current position of the stream.
+     * Indicates the current position of the scanner.
      *
-     * @return a String of the current position
+     * @return a {@code ParsePosition} representing the current location of
+     * the scanner
      */
-    public String getPosition() {
-        return lexer.position();
+    public ParsePosition getParsePosition() {
+        return lexer.parsePosition();
     }
 
     /**
@@ -797,7 +810,7 @@ public final class JSONStreamReader {
      *
      * @return the closing ParseState of the object or array
      */
-    public ParseState skipToEndObject() throws JSONException {
+    public ParseState skipToEndStructure() throws JSONException {
         if(state == ParseState.VALUE) {
             skipValue();
         }
@@ -815,41 +828,10 @@ public final class JSONStreamReader {
                     }
                     break;
                 default:
-                    throw lexer.syntaxError("Invalid state");
+                    throw new JSONParseException("Invalid state", lexer.parsePosition());
             }
         }
         return state;
-    }
-
-    /**
-     * Create a {@code JSONException} given the current stream position.
-     *
-     * @param message the exception message
-     * @return a new JSONException object with the given message
-     */
-    public JSONException syntaxError(String message) {
-        return lexer.syntaxError(message);
-    }
-
-    /**
-     * Create a {@code JSONException} given the current stream position.
-     *
-     * @param message the exception message
-     * @param t the underlying exception
-     * @return a new JSONException object with the given message and cause
-     */
-    public JSONException syntaxError(String message, Throwable t) {
-        return lexer.syntaxError(message, t);
-    }
-
-    /**
-     * Create a {@code JSONException} given the current stream position.
-     *
-     * @param t the underlying exception
-     * @return a new JSONException object with the given cause
-     */
-    public JSONException syntaxError(Throwable t) {
-        return lexer.syntaxError(t);
     }
 
     /**
@@ -858,6 +840,6 @@ public final class JSONStreamReader {
      */
     @Override
     public String toString() {
-        return "JSONStreamReader" + lexer.position();
+        return "JSONStreamReader " + lexer.parsePosition().getPositionDetails();
     }
 }

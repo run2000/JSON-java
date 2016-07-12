@@ -317,7 +317,7 @@ public class Scanner {
      * @return  A JSONException object, suitable for throwing
      */
     public JSONException syntaxError(String message) {
-        return new JSONParseException(message, index, character, line, previous);
+        return new JSONParseException(message, parsePosition());
     }
 
 
@@ -328,7 +328,7 @@ public class Scanner {
      * @return  A JSONException object, suitable for throwing
      */
     public JSONException syntaxError(Throwable cause) {
-        return new JSONParseException(cause, index, character, line, previous);
+        return new JSONParseException(cause, parsePosition());
     }
 
 
@@ -340,7 +340,19 @@ public class Scanner {
      * @return  A JSONException object, suitable for throwing
      */
     public JSONException syntaxError(String message, Throwable cause) {
-        return new JSONParseException(message, cause, index, character, line, previous);
+        return new JSONParseException(message, cause, parsePosition());
+    }
+
+
+    /**
+     * Get an object representing the current parse position. The object
+     * represents a point-in-time during the parse.
+     *
+     * @return a {@code ParsePosition} representing the current location of
+     * the scanner
+     */
+    public ParsePosition parsePosition() {
+        return new ParsePosition(index, character, line, previous);
     }
 
 

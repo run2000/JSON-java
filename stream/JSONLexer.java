@@ -25,6 +25,8 @@ SOFTWARE.
 */
 
 import org.json.JSONException;
+import org.json.JSONParseException;
+import org.json.ParsePosition;
 import org.json.Scanner;
 
 import java.io.IOException;
@@ -114,7 +116,7 @@ public final class JSONLexer {
                     if (scanner.end()) {
                         return c;
                     } else {
-                        throw scanner.syntaxError("Illegal control code");
+                        throw new JSONParseException("Illegal control code", scanner.parsePosition());
                     }
                 case (char)1:
                 case (char)2:
@@ -144,7 +146,7 @@ public final class JSONLexer {
                 case (char)29:
                 case (char)30:
                 case (char)31:
-                    throw scanner.syntaxError("Illegal control code");
+                    throw new JSONParseException("Illegal control code", scanner.parsePosition());
                 case (char)9: // \t
                 case (char)10: // \n
                 case (char)13: // \r
@@ -216,7 +218,7 @@ public final class JSONLexer {
                 scanner.back();
                 return Token.NUMBER_VALUE;
             default:
-                throw scanner.syntaxError("Unexpected value");
+                throw new JSONParseException("Unexpected value", scanner.parsePosition());
         }
     }
 
@@ -244,7 +246,7 @@ public final class JSONLexer {
                     case (char)0:
                     case (char)10: // \n
                     case (char)13: // \r
-                        throw scanner.syntaxError("Unterminated string");
+                        throw new JSONParseException("Unterminated string", scanner.parsePosition());
                     case (char)1:
                     case (char)2:
                     case (char)3:
@@ -274,7 +276,7 @@ public final class JSONLexer {
                     case (char)29:
                     case (char)30:
                     case (char)31:
-                        throw scanner.syntaxError("Unescaped control code");
+                        throw new JSONParseException("Unescaped control code", scanner.parsePosition());
                     case '\\':
                         c = scanner.next();
                         switch (c) {
@@ -306,7 +308,7 @@ public final class JSONLexer {
                                 sb.append(c);
                                 break;
                             default:
-                                throw scanner.syntaxError("Illegal escape");
+                                throw new JSONParseException("Illegal escape", scanner.parsePosition());
                         }
                         break;
                     case '"':
@@ -352,7 +354,7 @@ public final class JSONLexer {
                     c = scanner.next();
                 }
             } else {
-                throw scanner.syntaxError("Expected number");
+                throw new JSONParseException("Expected number", scanner.parsePosition());
             }
 
             if(c == '.') {
@@ -380,7 +382,7 @@ public final class JSONLexer {
                     sb.append(c);
                     c = scanner.next();
                 } else {
-                    throw scanner.syntaxError("Expected exponent value");
+                    throw new JSONParseException("Expected exponent value", scanner.parsePosition());
                 }
                 while((c >= '0') && (c <= '9')) {
                     sb.append(c);
@@ -446,7 +448,7 @@ public final class JSONLexer {
                 // fall through
             }
         }
-        throw scanner.syntaxError("Could not parse number");
+        throw new JSONParseException("Could not parse number", scanner.parsePosition());
     }
 
     /**
@@ -464,7 +466,7 @@ public final class JSONLexer {
         } catch (Exception exception) {
             // fall through
         }
-        throw scanner.syntaxError("Could not parse big decimal");
+        throw new JSONParseException("Could not parse big decimal", scanner.parsePosition());
     }
 
     /**
@@ -484,7 +486,7 @@ public final class JSONLexer {
                 // fall through
             }
         }
-        throw scanner.syntaxError("Could not parse big integer");
+        throw new JSONParseException("Could not parse big integer", scanner.parsePosition());
     }
 
     /**
@@ -509,7 +511,7 @@ public final class JSONLexer {
         } catch (Exception ignore) {
             // fall through
         }
-        throw scanner.syntaxError("Could not parse double");
+        throw new JSONParseException("Could not parse double", scanner.parsePosition());
     }
 
     /**
@@ -530,7 +532,7 @@ public final class JSONLexer {
         } catch (Exception ignore) {
             // fall through
         }
-        throw scanner.syntaxError("Could not parse int");
+        throw new JSONParseException("Could not parse int", scanner.parsePosition());
     }
 
     /**
@@ -551,47 +553,17 @@ public final class JSONLexer {
         } catch (Exception ignore) {
             // fall through
         }
-        throw scanner.syntaxError("Could not parse int");
+        throw new JSONParseException("Could not parse int", scanner.parsePosition());
     }
 
     /**
-     * Make a {@code JSONException} to signal a syntax error.
+     * Indicates the current position of the scanner.
      *
-     * @param message The error message.
-     * @return  A JSONException object, suitable for throwing
+     * @return a {@code ParsePosition} representing the current location of
+     * the scanner
      */
-    public JSONException syntaxError(String message) {
-        return scanner.syntaxError(message);
-    }
-
-    /**
-     * Make a {@code JSONException} to signal a syntax error.
-     *
-     * @param message The error message.
-     * @param cause The underlying cause.
-     * @return  A JSONException object, suitable for throwing
-     */
-    public JSONException syntaxError(String message, Throwable cause) {
-        return scanner.syntaxError(message, cause);
-    }
-
-    /**
-     * Make a {@code JSONException} to signal a syntax error.
-     *
-     * @param cause The underlying cause.
-     * @return  A JSONException object, suitable for throwing
-     */
-    public JSONException syntaxError(Throwable cause) {
-        return scanner.syntaxError(cause);
-    }
-
-    /**
-     * Indicates the current position of the lexer.
-     *
-     * @return a String of the current position
-     */
-    public String position() {
-        return scanner.toString();
+    public ParsePosition parsePosition() {
+        return scanner.parsePosition();
     }
 
     /**
@@ -601,6 +573,6 @@ public final class JSONLexer {
      */
     @Override
     public String toString() {
-        return "JSONLexer" + scanner.toString();
+        return "JSONLexer " + scanner.parsePosition().getPositionDetails();
     }
 }

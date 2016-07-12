@@ -33,54 +33,28 @@ SOFTWARE.
  */
 public class JSONParseException extends JSONException {
     private static final long serialVersionUID = 8010183095901970945L;
+    private final ParsePosition position;
 
-    private final long position;
-    private final long column;
-    private final long line;
-    private final char character;
-
-    public JSONParseException(String message, long position, long column, long line, char character) {
-        super(message + getPositionDetails(position, column, line));
-        this.position = position;
-        this.column = column;
-        this.line = line;
-        this.character = character;
+    public JSONParseException(String message, ParsePosition pos) {
+        super(message + ' ' + pos.getPositionDetails());
+        this.position = pos;
     }
 
-    public JSONParseException(String message, Throwable cause, long position, long column, long line, char character) {
-        super(message + getPositionDetails(position, column, line), cause);
-        this.position = position;
-        this.column = column;
-        this.line = line;
-        this.character = character;
+    public JSONParseException(String message, Throwable cause, ParsePosition pos) {
+        super(message + ' ' + pos.getPositionDetails(), cause);
+        this.position = pos;
     }
 
-    public JSONParseException(Throwable cause, long position, long column, long line, char character) {
-        super(getPositionDetails(position, column, line), cause);
-        this.position = position;
-        this.column = column;
-        this.line = line;
-        this.character = character;
+    public JSONParseException(Throwable cause, ParsePosition pos) {
+        super(pos.getPositionDetails(), cause);
+        this.position = pos;
     }
 
-    private static String getPositionDetails(long position, long column, long line) {
-        return " at " + position + " [character " + column + " line " +
-                line + ']';
-    }
-
-    public long getPosition() {
+    public ParsePosition getPosition() {
         return position;
     }
 
-    public long getColumn() {
-        return column;
-    }
-
-    public long getLine() {
-        return line;
-    }
-
-    public char getCharacter() {
-        return character;
+    public String getPositionDetails() {
+        return position.getPositionDetails();
     }
 }
