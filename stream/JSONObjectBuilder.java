@@ -150,7 +150,10 @@ public final class JSONObjectBuilder {
                 result = parseArrayTree(reader);
                 break;
 
-            case VALUE:
+            case NULL_VALUE:
+            case BOOLEAN_VALUE:
+            case NUMBER_VALUE:
+            case STRING_VALUE:
                 result = reader.nextValue();
                 break;
 
@@ -311,7 +314,10 @@ public final class JSONObjectBuilder {
 
         while (state != ParseState.END_ARRAY) {
             switch(state) {
-                case VALUE:
+                case NULL_VALUE:
+                case BOOLEAN_VALUE:
+                case NUMBER_VALUE:
+                case STRING_VALUE:
                     value = parser.nextValue();
                     break;
                 case ARRAY:
@@ -344,7 +350,10 @@ public final class JSONObjectBuilder {
 
             state = parser.nextState();
             switch(state) {
-                case VALUE:
+                case NULL_VALUE:
+                case BOOLEAN_VALUE:
+                case NUMBER_VALUE:
+                case STRING_VALUE:
                     value = parser.nextValue();
                     break;
                 case ARRAY:

@@ -51,12 +51,12 @@ import java.nio.charset.Charset;
  *         case KEY:
  *             System.out.println("KEY = " + reader.nextKey() );
  *             break;
- *         case VALUE: {
- *             ValueType valueType = reader.getValueType();
- *             System.out.println("VALUE = " + reader.nextValue()
- *                     + " (type = " + valueType + ")");
+ *         case NULL_VALUE:
+ *         case BOOLEAN_VALUE:
+ *         case NUMBER_VALUE:
+ *         case STRING_VALUE:
+ *             System.out.println(state + " = " + reader.nextValue());
  *             break;
- *         }
  *         default:
  *             System.out.println(state);
  *     }
@@ -94,8 +94,14 @@ public final class JSONStreamReader {
         VALUE_SEPARATOR(true),
         /** A key of a JSON object */
         KEY,
-        /** A value of a JSON object or JSON array. See {@link ValueType} for possible value types. */
-        VALUE,
+        /** The {@code JSONObject.Null} value */
+        NULL_VALUE,
+        /** The {@code Boolean.TRUE} or {@code Boolean.FALSE} value */
+        BOOLEAN_VALUE,
+        /** A {@code Number} value */
+        NUMBER_VALUE,
+        /** A {@code String} value */
+        STRING_VALUE,
         /** End a JSON document */
         END_DOCUMENT;
 
@@ -116,24 +122,6 @@ public final class JSONStreamReader {
         boolean isInternalState() {
             return internalState;
         }
-    }
-
-    /**
-     * The type of the current value in the stream. Arrays and Objects are
-     * represented as {@link ParseState#ARRAY} and {@link ParseState#OBJECT}
-     * values.
-     */
-    public enum ValueType {
-        /** The {@code JSONObject.Null} value */
-        NULL_VALUE,
-        /** The {@code Boolean.TRUE} or {@code Boolean.FALSE} value */
-        BOOLEAN_VALUE,
-        /** An {@code Integer}, {@code Long}, or {@code Double} value */
-        NUMBER_VALUE,
-        /** A {@code String} value */
-        STRING_VALUE,
-        /** Non-value, such as a key, object, array, or other structure type */
-        NOT_A_VALUE
     }
 
     private final JSONLexer lexer;
@@ -220,12 +208,21 @@ public final class JSONStreamReader {
                             state = ParseState.OBJECT;
                             break;
                         case NULL_VALUE:
+                            objectStack.push(token);
+                            state = ParseState.NULL_VALUE;
+                            break;
                         case TRUE_VALUE:
                         case FALSE_VALUE:
+                            objectStack.push(token);
+                            state = ParseState.BOOLEAN_VALUE;
+                            break;
                         case NUMBER_VALUE:
+                            objectStack.push(token);
+                            state = ParseState.NUMBER_VALUE;
+                            break;
                         case STRING_VALUE:
                             objectStack.push(token);
-                            state = ParseState.VALUE;
+                            state = ParseState.STRING_VALUE;
                             break;
                         default:
                             throw new JSONParseException("Unexpected token",
@@ -267,7 +264,10 @@ public final class JSONStreamReader {
                     parseStartValue();
                     break;
 
-                case VALUE:
+                case NULL_VALUE:
+                case BOOLEAN_VALUE:
+                case NUMBER_VALUE:
+                case STRING_VALUE:
                     skipValue();
                     break;
 
@@ -343,12 +343,21 @@ public final class JSONStreamReader {
                 state = ParseState.OBJECT;
                 break;
             case NULL_VALUE:
+                objectStack.push(token);
+                state = ParseState.NULL_VALUE;
+                break;
             case TRUE_VALUE:
             case FALSE_VALUE:
+                objectStack.push(token);
+                state = ParseState.BOOLEAN_VALUE;
+                break;
             case NUMBER_VALUE:
+                objectStack.push(token);
+                state = ParseState.NUMBER_VALUE;
+                break;
             case STRING_VALUE:
                 objectStack.push(token);
-                state = ParseState.VALUE;
+                state = ParseState.STRING_VALUE;
                 break;
             default:
                 throw new JSONParseException("Invalid token", lexer.parsePosition());
@@ -356,8 +365,17 @@ public final class JSONStreamReader {
     }
 
     private void skipValue() {
-        if(objectStack.isEmpty() || (state != ParseState.VALUE)) {
-            throw new JSONParseException("Invalid state", lexer.parsePosition());
+        switch(state) {
+            case NULL_VALUE:
+            case BOOLEAN_VALUE:
+            case NUMBER_VALUE:
+            case STRING_VALUE:
+                if (objectStack.isEmpty()) {
+                    throw new JSONParseException("Invalid state", lexer.parsePosition());
+                }
+                break;
+            default:
+                throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
@@ -406,38 +424,10 @@ public final class JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#VALUE}, return the value type of
-     * the next value. If the value is an object, array, or other structural
-     * element, {@link ValueType#NOT_A_VALUE} is returned.
-     * <p>
-     * Does not distinguish between the various number value types.</p>
-     * <p>
-     * This does <em>not</em> advance the parser state.</p>
-     *
-     * @return one of the {@code ValueType} values
-     */
-    public ValueType getValueType() {
-        if(objectStack.isEmpty()) {
-            return ValueType.NOT_A_VALUE;
-        }
-        switch(objectStack.peek()) {
-            case NULL_VALUE:
-                return ValueType.NULL_VALUE;
-            case TRUE_VALUE:
-            case FALSE_VALUE:
-                return ValueType.BOOLEAN_VALUE;
-            case NUMBER_VALUE:
-                return ValueType.NUMBER_VALUE;
-            case STRING_VALUE:
-                return ValueType.STRING_VALUE;
-            default:
-                return ValueType.NOT_A_VALUE;
-        }
-    }
-
-    /**
-     * If the ParseState was {@link ParseState#VALUE}, return the value as
-     * an {@code Object}. The values that can be returned here are:
+     * If the ParseState was {@link ParseState#NULL_VALUE},
+     * {@link ParseState#BOOLEAN_VALUE}, {@link ParseState#NUMBER_VALUE}, or
+     * {@link ParseState#STRING_VALUE}, return the value as an {@code Object}.
+     * The values that can be returned here are:
      * <ul>
      *     <li>{@code JSONObject.NULL}</li>
      *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
@@ -451,7 +441,16 @@ public final class JSONStreamReader {
      * @return an Object of the type described above
      */
     public Object nextValue() throws JSONException {
-        if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
+        switch(state) {
+            case NULL_VALUE:
+            case BOOLEAN_VALUE:
+            case NUMBER_VALUE:
+            case STRING_VALUE:
+                break;
+            default:
+                throw new JSONParseException("Invalid state", lexer.parsePosition());
+        }
+        if (objectStack.isEmpty()) {
             throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
@@ -481,37 +480,30 @@ public final class JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#VALUE}, and ValueType was
-     * {@link ValueType#STRING_VALUE}, return the value as a {@code String}.
+     * If the ParseState was {@link ParseState#STRING_VALUE},
+     * return the value as a {@code String}.
      * <p>
      * This method advances the parser onto the next state.</p>
      *
      * @return a String value
      */
     public String nextStringValue() throws JSONException {
-        if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
+        if ((state != ParseState.STRING_VALUE) || (objectStack.isEmpty())) {
             throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
-        switch(token) {
-            case STRING_VALUE:
-                state = ParseState.VALUE_SEPARATOR;
-                return lexer.nextString(new StringBuilder()).toString();
-            case NULL_VALUE:
-            case TRUE_VALUE:
-            case FALSE_VALUE:
-            case NUMBER_VALUE:
-                throw new JSONParseException("Invalid value type", lexer.parsePosition());
-            default:
-                throw new JSONParseException("Invalid state", lexer.parsePosition());
+        if (token == Token.STRING_VALUE) {
+            state = ParseState.VALUE_SEPARATOR;
+            return lexer.nextString(new StringBuilder()).toString();
+        } else {
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
     /**
-     * If the ParseState was {@link ParseState#VALUE}, and ValueType was
-     * {@link ValueType#STRING_VALUE}, append the decoded value to the given
-     * {@code Appendable}.
+     * If the ParseState was {@link ParseState#STRING_VALUE},
+     * append the decoded value to the given {@code Appendable}.
      * <p>
      * This method is suitable for cases where very long String data is
      * expected, for instance for base-64 encoded data.</p>
@@ -523,7 +515,7 @@ public final class JSONStreamReader {
      * @return the given Appendable object
      */
     public <T extends Appendable> T appendNextStringValue(T writer) throws JSONException {
-        if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
+        if ((state != ParseState.STRING_VALUE) || (objectStack.isEmpty())) {
             throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
         if(writer == null) {
@@ -531,8 +523,7 @@ public final class JSONStreamReader {
         }
 
         Token token = objectStack.pop();
-        switch(token) {
-            case STRING_VALUE:
+        if (token == Token.STRING_VALUE) {
             try {
                 state = ParseState.VALUE_SEPARATOR;
                 BufferedAppendable buff = bufferedAppender.with(writer);
@@ -542,23 +533,18 @@ public final class JSONStreamReader {
                     buff.close();
                 }
                 return writer;
-            } catch(IOException e) {
+            } catch (IOException e) {
                 throw new JSONParseException("Error parsing string value", e,
                         lexer.parsePosition());
             }
-            case NULL_VALUE:
-            case TRUE_VALUE:
-            case FALSE_VALUE:
-            case NUMBER_VALUE:
-                throw new JSONParseException("Invalid value type", lexer.parsePosition());
-            default:
-                throw new JSONParseException("Invalid state", lexer.parsePosition());
+        } else {
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
     /**
-     * If the ParseState was {@link ParseState#VALUE}, and ValueType was
-     * {@link ValueType#BOOLEAN_VALUE}, return the value as a boolean.
+     * If the ParseState was {@link ParseState#BOOLEAN_VALUE},
+     * return the value as a boolean.
      * <p>
      * If the JSON value is not parseable as a boolean, as defined by the JSON
      * grammar, a JSONException will be thrown.</p>
@@ -568,7 +554,7 @@ public final class JSONStreamReader {
      * @return a boolean value
      */
     public boolean nextBooleanValue() throws JSONException {
-        if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
+        if ((state != ParseState.BOOLEAN_VALUE) || (objectStack.isEmpty())) {
             throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
@@ -580,18 +566,14 @@ public final class JSONStreamReader {
             case FALSE_VALUE:
                 state = ParseState.VALUE_SEPARATOR;
                 return false;
-            case NULL_VALUE:
-            case STRING_VALUE:
-            case NUMBER_VALUE:
-                throw new JSONParseException("Invalid value type", lexer.parsePosition());
             default:
                 throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
     /**
-     * If the ParseState was {@link ParseState#VALUE}, and ValueType was
-     * {@link ValueType#NUMBER_VALUE}, return the value as a {@code Number}.
+     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * return the value as a {@code Number}.
      * <p>
      * The number type returned is one of:</p>
      * <ul>
@@ -607,32 +589,24 @@ public final class JSONStreamReader {
      * @return a value that is a subclass of the {@code Number} class
      */
     public Number nextNumberValue() throws JSONException {
-        if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
+        if ((state != ParseState.NUMBER_VALUE) || (objectStack.isEmpty())) {
             throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
-        switch(token) {
-            case NUMBER_VALUE: {
-                state = ParseState.VALUE_SEPARATOR;
-                StringBuilder sb = new StringBuilder();
-                boolean isDbl = lexer.nextNumber(sb);
-                return decodeNumber(sb.toString(), isDbl);
-            }
-            case NULL_VALUE:
-            case TRUE_VALUE:
-            case FALSE_VALUE:
-            case STRING_VALUE:
-                throw new JSONParseException("Invalid value type", lexer.parsePosition());
-            default:
-                throw new JSONParseException("Invalid state", lexer.parsePosition());
+        if (token == Token.NUMBER_VALUE) {
+            state = ParseState.VALUE_SEPARATOR;
+            StringBuilder sb = new StringBuilder();
+            boolean isDbl = lexer.nextNumber(sb);
+            return decodeNumber(sb.toString(), isDbl);
+        } else {
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
     /**
-     * If the ParseState was {@link ParseState#VALUE}, and ValueType was
-     * {@link ValueType#NUMBER_VALUE}, append the number sequence to the given
-     * {@code Appendable}.
+     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * append the number sequence to the given {@code Appendable}.
      * <p>
      * This method is suitable for cases where the caller wishes to perform
      * their own conversion of number values into a corresponding Object type.
@@ -645,60 +619,47 @@ public final class JSONStreamReader {
      * @return the given Appendable object
      */
     public <T extends Appendable> T appendNextNumberValue(T writer) throws JSONException {
-        if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
+        if ((state != ParseState.NUMBER_VALUE) || (objectStack.isEmpty())) {
             throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
-        switch(token) {
-            case NUMBER_VALUE:
-                state = ParseState.VALUE_SEPARATOR;
-                lexer.nextNumber(writer);
-                return writer;
-            case NULL_VALUE:
-            case TRUE_VALUE:
-            case FALSE_VALUE:
-            case STRING_VALUE:
-                throw new JSONParseException("Invalid value type", lexer.parsePosition());
-            default:
-                throw new JSONParseException("Invalid state", lexer.parsePosition());
+        if (token == Token.NUMBER_VALUE) {
+            state = ParseState.VALUE_SEPARATOR;
+            lexer.nextNumber(writer);
+            return writer;
+        } else {
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
     /**
-     * If the ParseState was {@link ParseState#VALUE}, and ValueType was
-     * {@link ValueType#NUMBER_VALUE}, return the value as a {@code BigDecimal}.
+     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * return the value as a {@code BigDecimal}.
      * <p>
      * This method advances the parser onto the next state.</p>
      *
      * @return a number value as a {@code BigDecimal} class
      */
     public BigDecimal nextBigDecimalValue() throws JSONException {
-        if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
+        if ((state != ParseState.NUMBER_VALUE) || (objectStack.isEmpty())) {
             throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
-        switch(token) {
-            case NUMBER_VALUE: {
-                state = ParseState.VALUE_SEPARATOR;
-                StringBuilder sb = new StringBuilder();
-                boolean isDbl = lexer.nextNumber(sb);
-                return decodeBigDecimal(sb.toString());
-            }
-            case NULL_VALUE:
-            case TRUE_VALUE:
-            case FALSE_VALUE:
-            case STRING_VALUE:
-                throw new JSONParseException("Invalid value type", lexer.parsePosition());
-            default:
-                throw new JSONParseException("Invalid state", lexer.parsePosition());
+        if (token == Token.NUMBER_VALUE) {
+            state = ParseState.VALUE_SEPARATOR;
+            StringBuilder sb = new StringBuilder();
+            lexer.nextNumber(sb);
+            return decodeBigDecimal(sb.toString());
+        } else {
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
     /**
-     * If the ParseState was {@link ParseState#VALUE}, and ValueType was
-     * {@link ValueType#NUMBER_VALUE}, return the value as a {@code BigInteger}.
+     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * return the value as a {@code BigInteger}.
      * <p>
      * If the JSON value is not parseable as a big integer, as defined by the
      * JSON grammar, a JSONException will be thrown.</p>
@@ -708,62 +669,48 @@ public final class JSONStreamReader {
      * @return a number value as a {@code BigInteger} class
      */
     public BigInteger nextBigIntegerValue() throws JSONException {
-        if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
+        if ((state != ParseState.NUMBER_VALUE) || (objectStack.isEmpty())) {
             throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
-        switch(token) {
-            case NUMBER_VALUE: {
-                state = ParseState.VALUE_SEPARATOR;
-                StringBuilder sb = new StringBuilder();
-                boolean isDbl = lexer.nextNumber(sb);
-                return decodeBigInteger(sb.toString(), isDbl);
-            }
-            case NULL_VALUE:
-            case TRUE_VALUE:
-            case FALSE_VALUE:
-            case STRING_VALUE:
-                throw new JSONParseException("Invalid value type", lexer.parsePosition());
-            default:
-                throw new JSONParseException("Invalid state", lexer.parsePosition());
+        if (token == Token.NUMBER_VALUE) {
+            state = ParseState.VALUE_SEPARATOR;
+            StringBuilder sb = new StringBuilder();
+            boolean isDbl = lexer.nextNumber(sb);
+            return decodeBigInteger(sb.toString(), isDbl);
+        } else {
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
     /**
-     * If the ParseState was {@link ParseState#VALUE}, and ValueType was
-     * {@link ValueType#NUMBER_VALUE}, return the value as a double.
+     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * return the value as a double.
      * <p>
      * This method advances the parser onto the next state.</p>
      *
      * @return a double value
      */
     public double nextDoubleValue() throws JSONException {
-        if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
+        if ((state != ParseState.NUMBER_VALUE) || (objectStack.isEmpty())) {
             throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
-        switch(token) {
-            case NUMBER_VALUE: {
-                state = ParseState.VALUE_SEPARATOR;
-                StringBuilder sb = new StringBuilder();
-                boolean isDbl = lexer.nextNumber(sb);
-                return decodeDouble(sb.toString(), isDbl);
-            }
-            case NULL_VALUE:
-            case TRUE_VALUE:
-            case FALSE_VALUE:
-            case STRING_VALUE:
-                throw new JSONParseException("Invalid value type", lexer.parsePosition());
-            default:
-                throw new JSONParseException("Invalid state", lexer.parsePosition());
+        if (token == Token.NUMBER_VALUE) {
+            state = ParseState.VALUE_SEPARATOR;
+            StringBuilder sb = new StringBuilder();
+            boolean isDbl = lexer.nextNumber(sb);
+            return decodeDouble(sb.toString(), isDbl);
+        } else {
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
     /**
-     * If the ParseState was {@link ParseState#VALUE}, and ValueType was
-     * {@link ValueType#NUMBER_VALUE}, return the value as an int.
+     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * return the value as an int.
      * <p>
      * If the JSON value is not parseable as an int, as defined by the JSON
      * grammar, a {@code JSONException} will be thrown.</p>
@@ -773,31 +720,24 @@ public final class JSONStreamReader {
      * @return an int value
      */
     public int nextIntValue() throws JSONException {
-        if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
+        if ((state != ParseState.NUMBER_VALUE) || (objectStack.isEmpty())) {
             throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
-        switch(token) {
-            case NUMBER_VALUE: {
-                state = ParseState.VALUE_SEPARATOR;
-                StringBuilder sb = new StringBuilder();
-                boolean isDbl = lexer.nextNumber(sb);
-                return decodeInt(sb.toString(), isDbl);
-            }
-            case NULL_VALUE:
-            case TRUE_VALUE:
-            case FALSE_VALUE:
-            case STRING_VALUE:
-                throw new JSONParseException("Invalid value type", lexer.parsePosition());
-            default:
-                throw new JSONParseException("Invalid state", lexer.parsePosition());
+        if (token == Token.NUMBER_VALUE) {
+            state = ParseState.VALUE_SEPARATOR;
+            StringBuilder sb = new StringBuilder();
+            boolean isDbl = lexer.nextNumber(sb);
+            return decodeInt(sb.toString(), isDbl);
+        } else {
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
     /**
-     * If the ParseState was {@link ParseState#VALUE}, and ValueType was
-     * {@link ValueType#NUMBER_VALUE}, return the value as a long.
+     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * return the value as a long.
      * <p>
      * If the JSON value is not parseable as a long, as defined by the JSON
      * grammar, a {@code JSONException} will be thrown.</p>
@@ -807,25 +747,18 @@ public final class JSONStreamReader {
      * @return a long value
      */
     public long nextLongValue() throws JSONException {
-        if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
+        if ((state != ParseState.NUMBER_VALUE) || (objectStack.isEmpty())) {
             throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
-        switch(token) {
-            case NUMBER_VALUE: {
-                state = ParseState.VALUE_SEPARATOR;
-                StringBuilder sb = new StringBuilder();
-                boolean isDbl = lexer.nextNumber(sb);
-                return decodeLong(sb.toString(), isDbl);
-            }
-            case NULL_VALUE:
-            case TRUE_VALUE:
-            case FALSE_VALUE:
-            case STRING_VALUE:
-                throw new JSONParseException("Invalid value type", lexer.parsePosition());
-            default:
-                throw new JSONParseException("Invalid state", lexer.parsePosition());
+        if (token == Token.NUMBER_VALUE) {
+            state = ParseState.VALUE_SEPARATOR;
+            StringBuilder sb = new StringBuilder();
+            boolean isDbl = lexer.nextNumber(sb);
+            return decodeLong(sb.toString(), isDbl);
+        } else {
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
     }
 
@@ -865,8 +798,13 @@ public final class JSONStreamReader {
      * @return the closing ParseState of the object or array
      */
     public ParseState skipToEndStructure() throws JSONException {
-        if(state == ParseState.VALUE) {
-            skipValue();
+        switch(state) {
+            case NULL_VALUE:
+            case BOOLEAN_VALUE:
+            case NUMBER_VALUE:
+            case STRING_VALUE:
+                skipValue();
+                break;
         }
 
         final int stackDepth = getStackDepth();
