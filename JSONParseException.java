@@ -32,7 +32,7 @@ SOFTWARE.
  * @version 2016-06-17
  */
 public class JSONParseException extends JSONException {
-    private static final long serialVersionUID = 8010183095901970945L;
+    private static final long serialVersionUID = -8888012828082291221L;
     private final ParsePosition position;
 
     /**
