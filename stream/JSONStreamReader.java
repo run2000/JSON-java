@@ -469,9 +469,12 @@ public final class JSONStreamReader {
             case STRING_VALUE:
                 state = ParseState.VALUE_SEPARATOR;
                 return lexer.nextString(new StringBuilder()).toString();
-            case NUMBER_VALUE:
+            case NUMBER_VALUE: {
                 state = ParseState.VALUE_SEPARATOR;
-                return lexer.nextNumber();
+                StringBuilder sb = new StringBuilder();
+                boolean isDbl = lexer.nextNumber(sb);
+                return decodeNumber(sb.toString(), isDbl);
+            }
             default:
                 throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
@@ -610,9 +613,48 @@ public final class JSONStreamReader {
 
         Token token = objectStack.pop();
         switch(token) {
+            case NUMBER_VALUE: {
+                state = ParseState.VALUE_SEPARATOR;
+                StringBuilder sb = new StringBuilder();
+                boolean isDbl = lexer.nextNumber(sb);
+                return decodeNumber(sb.toString(), isDbl);
+            }
+            case NULL_VALUE:
+            case TRUE_VALUE:
+            case FALSE_VALUE:
+            case STRING_VALUE:
+                throw new JSONParseException("Invalid value type", lexer.parsePosition());
+            default:
+                throw new JSONParseException("Invalid state", lexer.parsePosition());
+        }
+    }
+
+    /**
+     * If the ParseState was {@link ParseState#VALUE}, and ValueType was
+     * {@link ValueType#NUMBER_VALUE}, append the number sequence to the given
+     * {@code Appendable}.
+     * <p>
+     * This method is suitable for cases where the caller wishes to perform
+     * their own conversion of number values into a corresponding Object type.
+     * </p>
+     * <p>
+     * This method advances the parser onto the next state.</p>
+     *
+     * @param <T> the type of Appendable, returned to the caller
+     * @param writer the writer to which the number sequence will be written
+     * @return the given Appendable object
+     */
+    public <T extends Appendable> T appendNextNumberValue(T writer) throws JSONException {
+        if((state != ParseState.VALUE) || (objectStack.isEmpty())) {
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
+        }
+
+        Token token = objectStack.pop();
+        switch(token) {
             case NUMBER_VALUE:
                 state = ParseState.VALUE_SEPARATOR;
-                return lexer.nextNumber();
+                lexer.nextNumber(writer);
+                return writer;
             case NULL_VALUE:
             case TRUE_VALUE:
             case FALSE_VALUE:
@@ -638,9 +680,12 @@ public final class JSONStreamReader {
 
         Token token = objectStack.pop();
         switch(token) {
-            case NUMBER_VALUE:
+            case NUMBER_VALUE: {
                 state = ParseState.VALUE_SEPARATOR;
-                return lexer.nextBigDecimal();
+                StringBuilder sb = new StringBuilder();
+                boolean isDbl = lexer.nextNumber(sb);
+                return decodeBigDecimal(sb.toString());
+            }
             case NULL_VALUE:
             case TRUE_VALUE:
             case FALSE_VALUE:
@@ -669,9 +714,12 @@ public final class JSONStreamReader {
 
         Token token = objectStack.pop();
         switch(token) {
-            case NUMBER_VALUE:
+            case NUMBER_VALUE: {
                 state = ParseState.VALUE_SEPARATOR;
-                return lexer.nextBigInteger();
+                StringBuilder sb = new StringBuilder();
+                boolean isDbl = lexer.nextNumber(sb);
+                return decodeBigInteger(sb.toString(), isDbl);
+            }
             case NULL_VALUE:
             case TRUE_VALUE:
             case FALSE_VALUE:
@@ -697,9 +745,12 @@ public final class JSONStreamReader {
 
         Token token = objectStack.pop();
         switch(token) {
-            case NUMBER_VALUE:
+            case NUMBER_VALUE: {
                 state = ParseState.VALUE_SEPARATOR;
-                return lexer.nextDouble();
+                StringBuilder sb = new StringBuilder();
+                boolean isDbl = lexer.nextNumber(sb);
+                return decodeDouble(sb.toString(), isDbl);
+            }
             case NULL_VALUE:
             case TRUE_VALUE:
             case FALSE_VALUE:
@@ -728,9 +779,12 @@ public final class JSONStreamReader {
 
         Token token = objectStack.pop();
         switch(token) {
-            case NUMBER_VALUE:
+            case NUMBER_VALUE: {
                 state = ParseState.VALUE_SEPARATOR;
-                return lexer.nextInt();
+                StringBuilder sb = new StringBuilder();
+                boolean isDbl = lexer.nextNumber(sb);
+                return decodeInt(sb.toString(), isDbl);
+            }
             case NULL_VALUE:
             case TRUE_VALUE:
             case FALSE_VALUE:
@@ -759,9 +813,12 @@ public final class JSONStreamReader {
 
         Token token = objectStack.pop();
         switch(token) {
-            case NUMBER_VALUE:
+            case NUMBER_VALUE: {
                 state = ParseState.VALUE_SEPARATOR;
-                return lexer.nextLong();
+                StringBuilder sb = new StringBuilder();
+                boolean isDbl = lexer.nextNumber(sb);
+                return decodeLong(sb.toString(), isDbl);
+            }
             case NULL_VALUE:
             case TRUE_VALUE:
             case FALSE_VALUE:
@@ -829,6 +886,142 @@ public final class JSONStreamReader {
             }
         }
         return state;
+    }
+
+    /**
+     * Decode a number strictly according to the JSON specification.
+     *
+     * @return the number represented by the token sequence
+     */
+    private Number decodeNumber(String val, boolean isDbl) throws JSONException {
+
+        if (isDbl) {
+            try {
+                Double d = Double.valueOf(val);
+                if (!d.isInfinite() && !d.isNaN()) {
+                    return d;
+                }
+            } catch (Exception ignore) {
+                // fall through
+            }
+            try {
+                BigDecimal bd = new BigDecimal(val);
+                return bd;
+            } catch (Exception e) {
+                // fall through
+            }
+        } else {
+            try {
+                Long myLong = Long.valueOf(val);
+                if (myLong.longValue() == myLong.intValue()) {
+                    return Integer.valueOf(myLong.intValue());
+                } else {
+                    return myLong;
+                }
+            } catch (Exception ignore) {
+                // fall through
+            }
+            try {
+                BigInteger bi = new BigInteger(val);
+                return bi;
+            } catch(Exception e) {
+                // fall through
+            }
+        }
+        throw new JSONParseException("Could not parse number", lexer.parsePosition());
+    }
+
+    /**
+     * Decode a number as a double strictly according to the JSON specification.
+     *
+     * @return the number represented by the token sequence
+     */
+    private double decodeDouble(String val, boolean isDbl) throws JSONException {
+
+        try {
+            if(isDbl) {
+                double d = Double.parseDouble(val);
+                if ((!Double.isInfinite(d)) && (!Double.isNaN(d))) {
+                    return d;
+                }
+            } else {
+                long l = Long.parseLong(val);
+                return (double)l;
+            }
+        } catch (Exception ignore) {
+            // fall through
+        }
+        throw new JSONParseException("Could not parse double", lexer.parsePosition());
+    }
+
+    /**
+     * Parse a number as an int strictly according to the JSON specification.
+     * No coercion of double or long values.
+     *
+     * @return the number represented by the token sequence
+     */
+    private int decodeInt(String val, boolean isDbl) throws JSONException {
+        try {
+            if (!isDbl) {
+                int i = Integer.parseInt(val);
+                return i;
+            }
+        } catch (Exception ignore) {
+            // fall through
+        }
+        throw new JSONParseException("Could not parse int", lexer.parsePosition());
+    }
+
+    /**
+     * Parse a number as a long strictly according to the JSON specification.
+     * No coercion of double values.
+     *
+     * @return the number represented by the token sequence
+     */
+    private long decodeLong(String val, boolean isDbl) throws JSONException {
+        try {
+            if (!isDbl) {
+                long l = Long.parseLong(val);
+                return l;
+            }
+        } catch (Exception ignore) {
+            // fall through
+        }
+        throw new JSONParseException("Could not parse int", lexer.parsePosition());
+    }
+
+    /**
+     * Parse a number as a {@code BigDecimal} strictly according to the JSON
+     * specification.
+     *
+     * @return the number represented by the token sequence
+     */
+    private BigDecimal decodeBigDecimal(String val) throws JSONException {
+
+        try {
+            return new BigDecimal(val);
+        } catch (Exception exception) {
+            // fall through
+        }
+        throw new JSONParseException("Could not parse big decimal", lexer.parsePosition());
+    }
+
+    /**
+     * Parse a number as a {@code BigInteger} strictly according to the JSON
+     * specification.
+     *
+     * @return the number represented by the token sequence
+     */
+    private BigInteger decodeBigInteger(String val, boolean isDbl) throws JSONException {
+
+        if(!isDbl) {
+            try {
+                return new BigInteger(val);
+            } catch (Exception exception) {
+                // fall through
+            }
+        }
+        throw new JSONParseException("Could not parse big integer", lexer.parsePosition());
     }
 
     /**
