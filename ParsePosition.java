@@ -24,6 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+import java.io.Serializable;
+
 /**
  * Represents location information for the current location of the
  * {@code Scanner}. This is immutable position data, so represents a
@@ -32,8 +34,8 @@ SOFTWARE.
  * @author JSON.org
  * @version 2016-7-12
  */
-public class ParsePosition {
-
+public class ParsePosition implements Serializable {
+    private static final long serialVersionUID = -2189874685522042862L;
     private final long position;
     private final long column;
     private final long line;
