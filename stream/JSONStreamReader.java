@@ -432,6 +432,9 @@ public final class JSONStreamReader {
      * @return an Object of the type described above
      */
     public Object nextValue() throws JSONException {
+        if (objectStack.isEmpty()) {
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
+        }
         switch(state) {
             case NULL_VALUE:
             case BOOLEAN_VALUE:
@@ -440,9 +443,6 @@ public final class JSONStreamReader {
                 break;
             default:
                 throw new JSONParseException("Invalid state", lexer.parsePosition());
-        }
-        if (objectStack.isEmpty()) {
-            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
