@@ -72,11 +72,12 @@ import java.nio.charset.Charset;
 public final class JSONStreamReader {
 
     /**
-     * States of the internal state machine. Tokens returned from the parser
-     * are a subset of these states.
+     * States of the internal state machine. Tokens returned from the
+     * {@link JSONStreamReader#nextState() nextState()} loop are a subset of
+     * these states.
      */
     public enum ParseState {
-        /** <em>Internal, not exposed</em> */
+        /** <em>Internal state</em> -- before the DOCUMENT state */
         INIT(true),
         /** Start a JSON document */
         DOCUMENT,
@@ -88,9 +89,9 @@ public final class JSONStreamReader {
         ARRAY,
         /** End a JSON array */
         END_ARRAY,
-        /** <em>Internal, not exposed</em> */
+        /** <em>Internal state</em> -- between a KEY and *_VALUE state */
         KEY_SEPARATOR(true),
-        /** <em>Internal, not exposed</em> */
+        /** <em>Internal state</em> -- after a *_VALUE state */
         VALUE_SEPARATOR(true),
         /** A key of a JSON object */
         KEY,
