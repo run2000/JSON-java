@@ -276,40 +276,40 @@ public final class JSONObjectBuilder {
      * Build a {@code JSONArray} from a {@code JSONStreamReader}. The reader must be
      * at the beginning of the document.
      *
-     * @param parser    A source stream.
+     * @param reader    A source stream.
      * @return a JSONArray value
      */
-    public static JSONArray buildJSONArray(JSONStreamReader parser) throws JSONException {
-        ParseState state = parser.nextState();
+    public static JSONArray buildJSONArray(JSONStreamReader reader) throws JSONException {
+        ParseState state = reader.nextState();
 
         if(state != ParseState.DOCUMENT) {
             throw new JSONParseException("JSON parser should be at the beginning",
-                    parser.getParsePosition());
+                    reader.getParsePosition());
         }
 
         JSONArray result;
-        state = parser.nextState();
+        state = reader.nextState();
 
         switch(state) {
             case ARRAY:
-                result = parseArrayTree(parser);
+                result = parseArrayTree(reader);
                 break;
 
             default:
-                throw new JSONParseException("Expected array", parser.getParsePosition());
+                throw new JSONParseException("Expected array", reader.getParsePosition());
         }
 
-        if(parser.nextState() != ParseState.END_DOCUMENT) {
+        if(reader.nextState() != ParseState.END_DOCUMENT) {
             throw new JSONParseException("JSON parser in an unexpected state",
-                    parser.getParsePosition());
+                    reader.getParsePosition());
         }
 
         return result;
     }
 
-    private static JSONArray parseArrayTree(JSONStreamReader parser) throws JSONException {
+    private static JSONArray parseArrayTree(JSONStreamReader reader) throws JSONException {
         JSONArray array = new JSONArray();
-        ParseState state = parser.nextState();
+        ParseState state = reader.nextState();
         Object value;
 
         while (state != ParseState.END_ARRAY) {
@@ -318,56 +318,56 @@ public final class JSONObjectBuilder {
                 case BOOLEAN_VALUE:
                 case NUMBER_VALUE:
                 case STRING_VALUE:
-                    value = parser.nextValue();
+                    value = reader.nextValue();
                     break;
                 case ARRAY:
-                    value = parseArrayTree(parser);
+                    value = parseArrayTree(reader);
                     break;
                 case OBJECT:
-                    value = parseObjectTree(parser);
+                    value = parseObjectTree(reader);
                     break;
                 default:
-                    throw new JSONParseException("Expected value", parser.getParsePosition());
+                    throw new JSONParseException("Expected value", reader.getParsePosition());
             }
             array.put(value);
-            state = parser.nextState();
+            state = reader.nextState();
         }
         return array;
     }
 
-    private static JSONObject parseObjectTree(JSONStreamReader parser) throws JSONException {
+    private static JSONObject parseObjectTree(JSONStreamReader reader) throws JSONException {
         JSONObject object = new JSONObject();
-        ParseState state = parser.nextState();
+        ParseState state = reader.nextState();
         String key;
         Object value;
 
         while (state != ParseState.END_OBJECT) {
             if(state == ParseState.KEY) {
-                key = parser.nextKey();
+                key = reader.nextKey();
             } else {
-                throw new JSONParseException("Expected key", parser.getParsePosition());
+                throw new JSONParseException("Expected key", reader.getParsePosition());
             }
 
-            state = parser.nextState();
+            state = reader.nextState();
             switch(state) {
                 case NULL_VALUE:
                 case BOOLEAN_VALUE:
                 case NUMBER_VALUE:
                 case STRING_VALUE:
-                    value = parser.nextValue();
+                    value = reader.nextValue();
                     break;
                 case ARRAY:
-                    value = parseArrayTree(parser);
+                    value = parseArrayTree(reader);
                     break;
                 case OBJECT:
-                    value = parseObjectTree(parser);
+                    value = parseObjectTree(reader);
                     break;
                 default:
-                    throw new JSONParseException("Expected value", parser.getParsePosition());
+                    throw new JSONParseException("Expected value", reader.getParsePosition());
             }
 
             object.putOnce(key, value);
-            state = parser.nextState();
+            state = reader.nextState();
         }
         return object;
     }

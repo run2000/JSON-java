@@ -365,17 +365,8 @@ public final class JSONStreamReader {
     }
 
     private void skipValue() {
-        switch(state) {
-            case NULL_VALUE:
-            case BOOLEAN_VALUE:
-            case NUMBER_VALUE:
-            case STRING_VALUE:
-                if (objectStack.isEmpty()) {
-                    throw new JSONParseException("Invalid state", lexer.parsePosition());
-                }
-                break;
-            default:
-                throw new JSONParseException("Invalid state", lexer.parsePosition());
+        if (objectStack.isEmpty()) {
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
