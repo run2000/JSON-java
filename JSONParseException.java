@@ -48,9 +48,6 @@ public class JSONParseException extends JSONException {
     public JSONParseException(String message, ParsePosition pos) {
         super(message + ' ' + pos.getPositionDetails());
         this.position = pos;
-        if(position == null) {
-            throw new NullPointerException("parse position is null");
-        }
     }
 
     /**
@@ -68,9 +65,6 @@ public class JSONParseException extends JSONException {
     public JSONParseException(String message, Throwable cause, ParsePosition pos) {
         super(message + ' ' + pos.getPositionDetails(), cause);
         this.position = pos;
-        if(position == null) {
-            throw new NullPointerException("parse position is null");
-        }
     }
 
     /**
@@ -86,9 +80,6 @@ public class JSONParseException extends JSONException {
     public JSONParseException(Throwable cause, ParsePosition pos) {
         super(pos.getPositionDetails(), cause);
         this.position = pos;
-        if(position == null) {
-            throw new NullPointerException("parse position is null");
-        }
     }
 
     /**
