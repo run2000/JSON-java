@@ -804,9 +804,6 @@ public final class JSONStreamReader {
     /**
      * Skip over the content of the current object or array, including any
      * nested objects or arrays.
-     * <p>
-     * Will throw a {@code JSONException} if the parser is at the start or
-     * end of a JSON document.</p>
      *
      * @return the closing ParseState of the object or array
      */
