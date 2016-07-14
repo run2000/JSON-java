@@ -35,25 +35,78 @@ public class JSONParseException extends JSONException {
     private static final long serialVersionUID = 8010183095901970945L;
     private final ParsePosition position;
 
+    /**
+     * Constructs a JSONParseException with an explanatory message and
+     * parse position.
+     *
+     * @param message
+     *            Detail about the reason for the exception.
+     * @param pos
+     *            the current position of the {@code Scanner} where the
+     *            error occurred
+     */
     public JSONParseException(String message, ParsePosition pos) {
         super(message + ' ' + pos.getPositionDetails());
         this.position = pos;
+        if(position == null) {
+            throw new NullPointerException("parse position is null");
+        }
     }
 
+    /**
+     * Constructs a JSONParseException with an explanatory message, cause,
+     * and parse position.
+     *
+     * @param message
+     *            Detail about the reason for the exception.
+     * @param cause
+     *            The cause.
+     * @param pos
+     *            the current position of the {@code Scanner} where the
+     *            error occurred
+     */
     public JSONParseException(String message, Throwable cause, ParsePosition pos) {
         super(message + ' ' + pos.getPositionDetails(), cause);
         this.position = pos;
+        if(position == null) {
+            throw new NullPointerException("parse position is null");
+        }
     }
 
+    /**
+     * Constructs a new JSONParseException with the specified cause and
+     * parse position.
+     *
+     * @param cause
+     *            The cause.
+     * @param pos
+     *            the current position of the {@code Scanner} where the
+     *            error occurred
+     */
     public JSONParseException(Throwable cause, ParsePosition pos) {
         super(pos.getPositionDetails(), cause);
         this.position = pos;
+        if(position == null) {
+            throw new NullPointerException("parse position is null");
+        }
     }
 
+    /**
+     * Return the parse position where the error occured as a
+     * {@code ParsePosition} object.
+     *
+     * @return the ParsePosition object containing location information
+     */
     public ParsePosition getPosition() {
         return position;
     }
 
+    /**
+     * Get a String representation of the parse position where the error
+     * occurred.
+     *
+     * @return the parse position as a String
+     */
     public String getPositionDetails() {
         return position.getPositionDetails();
     }
