@@ -567,6 +567,31 @@ public final class JSONStreamReader {
     }
 
     /**
+     * If the ParseState was {@link ParseState#NULL_VALUE},
+     * return the value as a NULL object.
+     * <p>
+     * If the JSON value is not parseable as a null, as defined by the JSON
+     * grammar, a JSONException will be thrown.</p>
+     * <p>
+     * This method advances the parser onto the next state.</p>
+     *
+     * @return the JSONObject.NULL value
+     */
+    public Object nextNullValue() throws JSONException {
+        if((state != ParseState.NULL_VALUE) || (objectStack.isEmpty())) {
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
+        }
+
+        Token token = objectStack.pop();
+        if(token == Token.NULL_VALUE) {
+            state = ParseState.VALUE_SEPARATOR;
+            return JSONObject.NULL;
+        } else {
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
+        }
+    }
+
+    /**
      * If the ParseState was {@link ParseState#NUMBER_VALUE},
      * return the value as a {@code Number}.
      * <p>
