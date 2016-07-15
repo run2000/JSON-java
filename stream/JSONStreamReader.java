@@ -78,7 +78,7 @@ public final class JSONStreamReader {
      */
     public enum ParseState {
         /** <em>Internal state</em> -- before the DOCUMENT state */
-        INIT(true),
+        INIT,
         /** Start a JSON document */
         DOCUMENT,
         /** Start a JSON object */
@@ -90,9 +90,9 @@ public final class JSONStreamReader {
         /** End a JSON array */
         END_ARRAY,
         /** <em>Internal state</em> -- between a KEY and *_VALUE state */
-        KEY_SEPARATOR(true),
+        KEY_SEPARATOR,
         /** <em>Internal state</em> -- after a *_VALUE state */
-        VALUE_SEPARATOR(true),
+        VALUE_SEPARATOR,
         /** A key of a JSON object */
         KEY,
         /** The {@code JSONObject.Null} value */
@@ -106,22 +106,25 @@ public final class JSONStreamReader {
         /** End a JSON document */
         END_DOCUMENT;
 
-        /**
-         * Indicates the state should not be visible outside the internal
-         * parse loop. Keep looping until we find a public state.
-         */
-        private final boolean internalState;
-
         ParseState() {
-            this.internalState = false;
         }
 
-        ParseState(boolean internalState) {
-            this.internalState = internalState;
+        public boolean isInternal() {
+            return this == INIT || this == KEY_SEPARATOR
+                    || this == VALUE_SEPARATOR;
         }
 
-        boolean isInternalState() {
-            return internalState;
+        public boolean isValue() {
+            return this == NULL_VALUE || this == BOOLEAN_VALUE
+                    || this == NUMBER_VALUE || this == STRING_VALUE;
+        }
+
+        public boolean isBeginStructure() {
+            return this == OBJECT || this == ARRAY;
+        }
+
+        public boolean isEndStructure() {
+            return this == END_OBJECT || this == END_ARRAY;
         }
     }
 
@@ -326,7 +329,7 @@ public final class JSONStreamReader {
                     break;
 
             }
-        } while (state.isInternalState());
+        } while (state.isInternal());
 
         return state;
     }
