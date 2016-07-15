@@ -71,6 +71,12 @@ import java.nio.charset.Charset;
  */
 public final class JSONStreamReader {
 
+    private static final int NONE = 0;
+    private static final int INTERNAL = 1;
+    private static final int VALUE = 2;
+    private static final int BEGIN_STRUCTURE = 4;
+    private static final int END_STRUCTURE = 8;
+
     /**
      * States of the internal state machine. Tokens returned from the
      * {@link JSONStreamReader#nextState() nextState()} loop are a subset of
@@ -78,53 +84,54 @@ public final class JSONStreamReader {
      */
     public enum ParseState {
         /** <em>Internal state</em> -- before the DOCUMENT state */
-        INIT,
+        INIT(INTERNAL),
         /** Start a JSON document */
-        DOCUMENT,
+        DOCUMENT(NONE),
         /** Start a JSON object */
-        OBJECT,
+        OBJECT(BEGIN_STRUCTURE),
         /** End a JSON object */
-        END_OBJECT,
+        END_OBJECT(END_STRUCTURE),
         /** Start a JSON array */
-        ARRAY,
+        ARRAY(BEGIN_STRUCTURE),
         /** End a JSON array */
-        END_ARRAY,
+        END_ARRAY(END_STRUCTURE),
         /** <em>Internal state</em> -- between a KEY and *_VALUE state */
-        KEY_SEPARATOR,
+        KEY_SEPARATOR(INTERNAL),
         /** <em>Internal state</em> -- after a *_VALUE state */
-        VALUE_SEPARATOR,
+        VALUE_SEPARATOR(INTERNAL),
         /** A key of a JSON object */
-        KEY,
+        KEY(NONE),
         /** The {@code JSONObject.Null} value */
-        NULL_VALUE,
+        NULL_VALUE(VALUE),
         /** The {@code Boolean.TRUE} or {@code Boolean.FALSE} value */
-        BOOLEAN_VALUE,
+        BOOLEAN_VALUE(VALUE),
         /** A {@code Number} value */
-        NUMBER_VALUE,
+        NUMBER_VALUE(VALUE),
         /** A {@code String} value */
-        STRING_VALUE,
+        STRING_VALUE(VALUE),
         /** End a JSON document */
-        END_DOCUMENT;
+        END_DOCUMENT(NONE);
 
-        ParseState() {
+        private final int type;
+
+        ParseState(int type) {
+            this.type = type;
         }
 
         public boolean isInternal() {
-            return this == INIT || this == KEY_SEPARATOR
-                    || this == VALUE_SEPARATOR;
+            return this.type == INTERNAL;
         }
 
         public boolean isValue() {
-            return this == NULL_VALUE || this == BOOLEAN_VALUE
-                    || this == NUMBER_VALUE || this == STRING_VALUE;
+            return this.type == VALUE;
         }
 
         public boolean isBeginStructure() {
-            return this == OBJECT || this == ARRAY;
+            return this.type == BEGIN_STRUCTURE;
         }
 
         public boolean isEndStructure() {
-            return this == END_OBJECT || this == END_ARRAY;
+            return this.type == END_STRUCTURE;
         }
     }
 
@@ -436,17 +443,8 @@ public final class JSONStreamReader {
      * @return an Object of the type described above
      */
     public Object nextValue() throws JSONException {
-        if (objectStack.isEmpty()) {
+        if (objectStack.isEmpty() || !state.isValue()) {
             throw new JSONParseException("Invalid state", lexer.parsePosition());
-        }
-        switch(state) {
-            case NULL_VALUE:
-            case BOOLEAN_VALUE:
-            case NUMBER_VALUE:
-            case STRING_VALUE:
-                break;
-            default:
-                throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
 
         Token token = objectStack.pop();
@@ -818,13 +816,8 @@ public final class JSONStreamReader {
      * @return the closing ParseState of the object or array
      */
     public ParseState skipToEndStructure() throws JSONException {
-        switch(state) {
-            case NULL_VALUE:
-            case BOOLEAN_VALUE:
-            case NUMBER_VALUE:
-            case STRING_VALUE:
-                skipValue();
-                break;
+        if(state.isValue()) {
+            skipValue();
         }
 
         final int stackDepth = getStackDepth();
