@@ -74,12 +74,12 @@ public final class JSONStreamReader {
     private static final int NONE = 0;
     private static final int INTERNAL = 1;
     private static final int VALUE = 2;
-    private static final int BEGIN_STRUCTURE = 4;
-    private static final int END_STRUCTURE = 8;
-//    private static final int TEXT = 16;
-//    private static final int DOCUMENT_DELIMITER = 32;
-//    private static final int ARRAY_DELIMITER = 64;
-//    private static final int OBJECT_DELIMITER = 128;
+    private static final int TEXT = 4;
+    private static final int BEGIN_STRUCTURE = 8;
+    private static final int END_STRUCTURE = 16;
+    private static final int DOCUMENT_DELIMITER = 32;
+    private static final int ARRAY_DELIMITER = 64;
+    private static final int OBJECT_DELIMITER = 128;
 
     /**
      * States of the internal state machine. Tokens returned from the
@@ -90,21 +90,21 @@ public final class JSONStreamReader {
         /** <em>Internal state</em> -- before the DOCUMENT state */
         INIT(INTERNAL),
         /** Start a JSON document */
-        DOCUMENT(NONE),
+        DOCUMENT(BEGIN_STRUCTURE | DOCUMENT_DELIMITER),
         /** Start a JSON object */
-        OBJECT(BEGIN_STRUCTURE),
+        OBJECT(BEGIN_STRUCTURE | OBJECT_DELIMITER),
         /** End a JSON object */
-        END_OBJECT(END_STRUCTURE),
+        END_OBJECT(END_STRUCTURE | OBJECT_DELIMITER),
         /** Start a JSON array */
-        ARRAY(BEGIN_STRUCTURE),
+        ARRAY(BEGIN_STRUCTURE | ARRAY_DELIMITER),
         /** End a JSON array */
-        END_ARRAY(END_STRUCTURE),
+        END_ARRAY(END_STRUCTURE | ARRAY_DELIMITER),
         /** <em>Internal state</em> -- between a KEY and *_VALUE state */
         KEY_SEPARATOR(INTERNAL),
         /** <em>Internal state</em> -- after a *_VALUE state */
         VALUE_SEPARATOR(INTERNAL),
         /** A key of a JSON object */
-        KEY(NONE),
+        KEY(TEXT),
         /** The {@code JSONObject.Null} value */
         NULL_VALUE(VALUE),
         /** The {@code Boolean.TRUE} or {@code Boolean.FALSE} value */
@@ -112,9 +112,9 @@ public final class JSONStreamReader {
         /** A {@code Number} value */
         NUMBER_VALUE(VALUE),
         /** A {@code String} value */
-        STRING_VALUE(VALUE),
+        STRING_VALUE(VALUE | TEXT),
         /** End a JSON document */
-        END_DOCUMENT(NONE);
+        END_DOCUMENT(END_STRUCTURE | DOCUMENT_DELIMITER);
 
         private final int type;
 
@@ -123,19 +123,35 @@ public final class JSONStreamReader {
         }
 
         public boolean isInternal() {
-            return this.type == INTERNAL;
+            return (this.type & INTERNAL) != 0;
         }
 
         public boolean isValue() {
-            return this.type == VALUE;
+            return (this.type & VALUE) != 0;
         }
 
         public boolean isBeginStructure() {
-            return this.type == BEGIN_STRUCTURE;
+            return (this.type & BEGIN_STRUCTURE) != 0;
         }
 
         public boolean isEndStructure() {
-            return this.type == END_STRUCTURE;
+            return (this.type & END_STRUCTURE) != 0;
+        }
+
+        public boolean isText() {
+            return (this.type & TEXT) != 0;
+        }
+
+        public boolean isDocumentDelimiter() {
+            return (this.type & DOCUMENT_DELIMITER) != 0;
+        }
+
+        public boolean isObjectDelimiter() {
+            return (this.type & OBJECT_DELIMITER) != 0;
+        }
+
+        public boolean isArrayDelimiter() {
+            return (this.type & ARRAY_DELIMITER) != 0;
         }
     }
 
