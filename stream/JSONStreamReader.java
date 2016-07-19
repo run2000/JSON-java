@@ -123,35 +123,35 @@ public final class JSONStreamReader {
         }
 
         public boolean isInternal() {
-            return (this.type & INTERNAL) != 0;
+            return (this.type & INTERNAL) != NONE;
         }
 
         public boolean isValue() {
-            return (this.type & VALUE) != 0;
+            return (this.type & VALUE) != NONE;
         }
 
         public boolean isBeginStructure() {
-            return (this.type & BEGIN_STRUCTURE) != 0;
+            return (this.type & BEGIN_STRUCTURE) != NONE;
         }
 
         public boolean isEndStructure() {
-            return (this.type & END_STRUCTURE) != 0;
+            return (this.type & END_STRUCTURE) != NONE;
         }
 
         public boolean isText() {
-            return (this.type & TEXT) != 0;
+            return (this.type & TEXT) != NONE;
         }
 
         public boolean isDocumentDelimiter() {
-            return (this.type & DOCUMENT_DELIMITER) != 0;
+            return (this.type & DOCUMENT_DELIMITER) != NONE;
         }
 
         public boolean isObjectDelimiter() {
-            return (this.type & OBJECT_DELIMITER) != 0;
+            return (this.type & OBJECT_DELIMITER) != NONE;
         }
 
         public boolean isArrayDelimiter() {
-            return (this.type & ARRAY_DELIMITER) != 0;
+            return (this.type & ARRAY_DELIMITER) != NONE;
         }
     }
 
