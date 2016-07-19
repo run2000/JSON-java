@@ -76,6 +76,10 @@ public final class JSONStreamReader {
     private static final int VALUE = 2;
     private static final int BEGIN_STRUCTURE = 4;
     private static final int END_STRUCTURE = 8;
+//    private static final int TEXT = 16;
+//    private static final int DOCUMENT_DELIMITER = 32;
+//    private static final int ARRAY_DELIMITER = 64;
+//    private static final int OBJECT_DELIMITER = 128;
 
     /**
      * States of the internal state machine. Tokens returned from the
