@@ -80,6 +80,7 @@ public final class JSONStreamReader {
     private static final int DOCUMENT_DELIMITER = 32;
     private static final int ARRAY_DELIMITER = 64;
     private static final int OBJECT_DELIMITER = 128;
+    private static final int SEPARATOR = 256;
 
     /**
      * States of the internal state machine. Tokens returned from the
@@ -100,9 +101,9 @@ public final class JSONStreamReader {
         /** End a JSON array */
         END_ARRAY(END_STRUCTURE | ARRAY_DELIMITER),
         /** <em>Internal state</em> -- between a KEY and *_VALUE state */
-        KEY_SEPARATOR(INTERNAL),
+        KEY_SEPARATOR(INTERNAL | SEPARATOR),
         /** <em>Internal state</em> -- after a *_VALUE state */
-        VALUE_SEPARATOR(INTERNAL),
+        VALUE_SEPARATOR(INTERNAL | SEPARATOR),
         /** A key of a JSON object */
         KEY(TEXT),
         /** The {@code JSONObject.Null} value */
@@ -206,6 +207,16 @@ public final class JSONStreamReader {
          */
         public boolean isArrayDelimiter() {
             return (this.type & ARRAY_DELIMITER) != NONE;
+        }
+
+        /**
+         * Is this state a separator -- that is, either a {@code KEY_SEPARATOR}
+         * or a {@code VALUE_SEPARATOR}.
+         *
+         * @return {@code true} to indicate a separator, otherwise {@code false}
+         */
+        public boolean isSeparator() {
+            return (this.type & SEPARATOR) != NONE;
         }
     }
 
