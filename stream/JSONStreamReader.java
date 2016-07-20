@@ -122,34 +122,88 @@ public final class JSONStreamReader {
             this.type = type;
         }
 
+        /**
+         * Is this state an internal state -- that is, one that would not
+         * be returned from the {@link JSONStreamReader#nextState() nextState()}
+         * method.
+         *
+         * @return {@code true} to indicate an internal state, otherwise {@code false}
+         */
         public boolean isInternal() {
             return (this.type & INTERNAL) != NONE;
         }
 
+        /**
+         * Is this state a value state -- that is, one of {@code NULL_VALUE},
+         * {@code BOOLEAN_VALUE}, {@code NUMBER_VALUE}, or {@code STRING_VALUE}
+         *
+         * @return {@code true} to indicate a value state, otherwise {@code false}
+         */
         public boolean isValue() {
             return (this.type & VALUE) != NONE;
         }
 
+        /**
+         * Is this state a beginning of a JSON structure -- that is, one of
+         * {@code DOCUMENT}, {@code OBJECT}, or {@code ARRAY}.
+         *
+         * @return {@code true} to indicate a beginning of a JSON structure,
+         * otherwise {@code false}
+         */
         public boolean isBeginStructure() {
             return (this.type & BEGIN_STRUCTURE) != NONE;
         }
 
+        /**
+         * Is this state an end of a JSON structure -- that is, one of
+         * {@code END_DOCUMENT}, {@code END_OBJECT}, or {@code END_ARRAY}.
+         *
+         * @return {@code true} to indicate an end of a JSON structure,
+         * otherwise {@code false}
+         */
         public boolean isEndStructure() {
             return (this.type & END_STRUCTURE) != NONE;
         }
 
+        /**
+         * Is this state a text state -- that is, either a {@code KEY} or
+         * a {@code STRING_VALUE} state.
+         *
+         * @return {@code true} to indicate a text state, otherwise {@code false}
+         */
         public boolean isText() {
             return (this.type & TEXT) != NONE;
         }
 
+        /**
+         * Is this state a document delimiter -- that is, either a
+         * {@code DOCUMENT} or an {@code END_DOCUMENT} state.
+         *
+         * @return {@code true} to indicate a document delimiter state,
+         * otherwise {@code false}
+         */
         public boolean isDocumentDelimiter() {
             return (this.type & DOCUMENT_DELIMITER) != NONE;
         }
 
+        /**
+         * Is this state an object delimiter -- that is, either an
+         * {@code OBJECT} or an {@code END_OBJECT} state.
+         *
+         * @return {@code true} to indicate an object delimiter state,
+         * otherwise {@code false}
+         */
         public boolean isObjectDelimiter() {
             return (this.type & OBJECT_DELIMITER) != NONE;
         }
 
+        /**
+         * Is this state an array delimiter -- that is, either an
+         * {@code ARRAY} or an {@code END_ARRAY} state.
+         *
+         * @return {@code true} to indicate an array delimiter state,
+         * otherwise {@code false}
+         */
         public boolean isArrayDelimiter() {
             return (this.type & ARRAY_DELIMITER) != NONE;
         }
