@@ -181,7 +181,9 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
      */
     @Override
     public Appendable append(char c) throws IOException {
-        assertOpen();
+        if (appendable == null) {
+            throw new IOException("Buffered appendable is not open");
+        }
         if (buffer.remaining() < 1) {
             flushBuffer();
         }
