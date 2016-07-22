@@ -347,7 +347,7 @@ public final class JSONStreamReader {
                         throw new JSONParseException("Invalid state",
                                 lexer.parsePosition());
                     }
-                    lexer.nextString(NullAppendable.INSTANCE);
+                    lexer.skipString();
                     state = ParseState.KEY_SEPARATOR;
 
                     if(lexer.nextTokenType() != Token.KEY_SEPARATOR) {
@@ -475,11 +475,11 @@ public final class JSONStreamReader {
                 break;
             case STRING_VALUE:
                 state = ParseState.VALUE_SEPARATOR;
-                lexer.nextString(NullAppendable.INSTANCE);
+                lexer.skipString();
                 break;
             case NUMBER_VALUE:
                 state = ParseState.VALUE_SEPARATOR;
-                lexer.nextNumber(NullAppendable.INSTANCE);
+                lexer.skipNumber();
                 break;
             default:
                 throw new JSONParseException("Invalid state", lexer.parsePosition());
