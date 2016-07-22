@@ -232,14 +232,14 @@ public final class JSONLexer {
      * @throws JSONException Unterminated string.
      */
     public <T extends Appendable> T nextString(T sb) throws JSONException {
-        char quote = scanner.next();
+        char c = scanner.next();
 
-        if(quote != '"') {
+        if(c != '"') {
             throw new JSONException("Unexpected string delimiter");
         }
         try {
             for (;;) {
-                char c = scanner.next();
+                c = scanner.next();
                 switch (c) {
                     case (char)0:
                     case (char)10: // \n
