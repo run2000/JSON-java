@@ -216,7 +216,7 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
     /**
      * Check that this buffer is currently open.
      *
-     * @throws IOException the buffered appendable has been closed
+     * @throws IOException the buffered appendable is in a closed state
      */
     private void assertOpen() throws IOException {
         if (appendable == null) {
