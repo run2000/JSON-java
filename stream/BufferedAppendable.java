@@ -91,7 +91,7 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
      */
     public BufferedAppendable with(Appendable newAppendable) {
         try {
-            close();
+            flushBuffer();
         } catch (IOException e) {
             // don't care, just set the new appender
         }
@@ -118,15 +118,7 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
             if (csq.length() < buffer.remaining()) {
                 buffer.append(csq);
             } else {
-                final int pos = buffer.position();
-                if (pos > 0) {
-                    try {
-                        buffer.rewind();
-                        appendable.append(buffer, 0, pos);
-                    } finally {
-                        buffer.clear();
-                    }
-                }
+                flushBuffer();
                 if (csq.length() < buffer.length()) {
                     buffer.append(csq);
                 } else {
@@ -168,15 +160,7 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
             if (len < buffer.remaining()) {
                 buffer.append(csq, start, end);
             } else {
-                final int pos = buffer.position();
-                if (pos > 0) {
-                    try {
-                        buffer.rewind();
-                        appendable.append(buffer, 0, pos);
-                    } finally {
-                        buffer.clear();
-                    }
-                }
+                flushBuffer();
                 if (len < buffer.length()) {
                     buffer.append(csq, start, end);
                 } else {
@@ -197,17 +181,11 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
      */
     @Override
     public Appendable append(char c) throws IOException {
-        assertOpen();
+        if (appendable == null) {
+            throw new IOException("Buffered appendable is not open");
+        }
         if (buffer.remaining() < 1) {
-            final int pos = buffer.position();
-            if (pos > 0) {
-                try {
-                    buffer.rewind();
-                    appendable.append(buffer, 0, pos);
-                } finally {
-                    buffer.clear();
-                }
-            }
+            flushBuffer();
         }
         buffer.append(c);
         return this;
@@ -216,11 +194,32 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
     /**
      * Check that this buffer is currently open.
      *
-     * @throws IOException the buffered appendable has been closed
+     * @throws IOException the buffered appendable is in a closed state
      */
     private void assertOpen() throws IOException {
         if (appendable == null) {
             throw new IOException("Buffered appendable is not open");
+        }
+    }
+
+    /**
+     * Flushes and clears the internal buffer. An {@code assertOpen()} is
+     * called if the buffer needs to be written to the current
+     * {@code Appendable}.
+     *
+     * @throws IOException there was a problem flushing the buffer to the
+     *                     current {@code Appendable}
+     */
+    private void flushBuffer() throws IOException {
+        final int pos = buffer.position();
+        if(pos > 0) {
+            try {
+                assertOpen();
+                buffer.rewind();
+                appendable.append(buffer, 0, pos);
+            } finally {
+                buffer.clear();
+            }
         }
     }
 
@@ -232,16 +231,7 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
      */
     @Override
     public void flush() throws IOException {
-        final int pos = buffer.position();
-        if (pos > 0) {
-            try {
-                assertOpen();
-                buffer.rewind();
-                appendable.append(buffer, 0, pos);
-            } finally {
-                buffer.clear();
-            }
-        }
+        flushBuffer();
     }
 
     /**
@@ -254,7 +244,7 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
     public void close() throws IOException {
         if (appendable != null) {
             try {
-                flush();
+                flushBuffer();
             } finally {
                 appendable = null;
             }

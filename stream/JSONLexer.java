@@ -232,14 +232,14 @@ public final class JSONLexer {
      * @throws JSONException Unterminated string.
      */
     public <T extends Appendable> T nextString(T sb) throws JSONException {
-        char quote = scanner.next();
+        char c = scanner.next();
 
-        if(quote != '"') {
+        if(c != '"') {
             throw new JSONException("Unexpected string delimiter");
         }
         try {
             for (;;) {
-                char c = scanner.next();
+                c = scanner.next();
                 switch (c) {
                     case (char)0:
                     case (char)10: // \n
@@ -322,6 +322,90 @@ public final class JSONLexer {
     }
 
     /**
+     * Skip the characters up to the next close quote character.
+     * Backslash processing is done. The formal JSON format only allows
+     * strings in double quotes.
+     *
+     * @throws JSONException Unterminated string.
+     */
+    public void skipString() throws JSONException {
+        char c = scanner.next();
+
+        if(c != '"') {
+            throw new JSONException("Unexpected string delimiter");
+        }
+        for (;;) {
+            c = scanner.next();
+            switch (c) {
+                case (char)0:
+                case (char)10: // \n
+                case (char)13: // \r
+                    throw new JSONParseException("Unterminated string",
+                            scanner.parsePosition());
+                case (char)1:
+                case (char)2:
+                case (char)3:
+                case (char)4:
+                case (char)5:
+                case (char)6:
+                case (char)7:
+                case (char)8:
+                case (char)9:
+                case (char)11:
+                case (char)12:
+                case (char)14:
+                case (char)15:
+                case (char)16:
+                case (char)17:
+                case (char)18:
+                case (char)19:
+                case (char)20:
+                case (char)21:
+                case (char)22:
+                case (char)23:
+                case (char)24:
+                case (char)25:
+                case (char)26:
+                case (char)27:
+                case (char)28:
+                case (char)29:
+                case (char)30:
+                case (char)31:
+                    throw new JSONParseException("Unescaped control code",
+                            scanner.parsePosition());
+                case '\\':
+                    c = scanner.next();
+                    switch (c) {
+                        case 'b':
+                        case 't':
+                        case 'n':
+                        case 'f':
+                        case 'r':
+                        case '"':
+                        case '\\':
+                        case '/':
+                            break;
+                        case 'u':
+                            try {
+                                Integer.parseInt(scanner.next(4), 16);
+                            } catch (NumberFormatException e) {
+                                throw new JSONException("Illegal unicode escape");
+                            }
+                            break;
+                        default:
+                            throw new JSONParseException("Illegal escape",
+                                    scanner.parsePosition());
+                    }
+                    break;
+                case '"':
+                    return;
+                default:
+                    break;
+            }
+        }
+    }
+
+    /**
      * Parse a number strictly according to the JSON specification.
      *
      * @param sb The Appendable to which the parsed character sequence is
@@ -392,6 +476,55 @@ public final class JSONLexer {
             throw new JSONException("IO exception", e);
         }
         return dbl;
+    }
+
+    /**
+     * Skip a number strictly according to the JSON specification.
+     */
+    public void skipNumber() throws JSONException {
+        char c = scanner.next();
+
+        // likely digit
+        if(c == '-') {
+            c = scanner.next();
+        }
+        if(c == '0') {
+            c = scanner.next();
+        } else if((c >= '1') && (c <= '9')) {
+
+            // whole number values
+            c = scanner.next();
+            while((c >= '0') && (c <= '9')) {
+                c = scanner.next();
+            }
+        } else {
+            throw new JSONParseException("Expected number", scanner.parsePosition());
+        }
+
+        if(c == '.') {
+            // decimal place values
+            c = scanner.next();
+            while((c >= '0') && (c <= '9')) {
+                c = scanner.next();
+            }
+        }
+        if((c == 'e') || (c == 'E')) {
+            // exponent values
+            c = scanner.next();
+            if((c == '+') || (c == '-')) {
+                c = scanner.next();
+            }
+            if((c >= '0') && (c <= '9')) {
+                c = scanner.next();
+            } else {
+                throw new JSONParseException("Expected exponent value",
+                        scanner.parsePosition());
+            }
+            while((c >= '0') && (c <= '9')) {
+                c = scanner.next();
+            }
+        }
+        scanner.back();
     }
 
     /**
