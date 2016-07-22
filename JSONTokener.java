@@ -61,7 +61,7 @@ public class JSONTokener extends Scanner {
     /**
      * Terminating symbols for an unquoted key or value.
      */
-    private static final String UNQUOTED_DELIMITERS = ",:]}/\\\"[{;=#'";
+    private static final String UNQUOTED_DELIMITERS = ",:]}/\\\"[{;=#";
 
     /**
      * Construct a JSONTokener from a Reader.
