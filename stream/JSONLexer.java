@@ -114,7 +114,8 @@ public final class JSONLexer {
                     if (scanner.end()) {
                         return c;
                     } else {
-                        throw new JSONParseException("Illegal control code", scanner.parsePosition());
+                        throw new JSONParseException("Illegal control code",
+                                scanner.parsePosition());
                     }
                 case (char)1:
                 case (char)2:
@@ -144,7 +145,8 @@ public final class JSONLexer {
                 case (char)29:
                 case (char)30:
                 case (char)31:
-                    throw new JSONParseException("Illegal control code", scanner.parsePosition());
+                    throw new JSONParseException("Illegal control code",
+                            scanner.parsePosition());
                 case (char)9: // \t
                 case (char)10: // \n
                 case (char)13: // \r
@@ -244,7 +246,8 @@ public final class JSONLexer {
                     case (char)0:
                     case (char)10: // \n
                     case (char)13: // \r
-                        throw new JSONParseException("Unterminated string", scanner.parsePosition());
+                        throw new JSONParseException("Unterminated string",
+                                scanner.parsePosition());
                     case (char)1:
                     case (char)2:
                     case (char)3:
@@ -274,7 +277,8 @@ public final class JSONLexer {
                     case (char)29:
                     case (char)30:
                     case (char)31:
-                        throw new JSONParseException("Unescaped control code", scanner.parsePosition());
+                        throw new JSONParseException("Unescaped control code",
+                                scanner.parsePosition());
                     case '\\':
                         c = scanner.next();
                         switch (c) {
@@ -297,7 +301,8 @@ public final class JSONLexer {
                                 try {
                                     sb.append((char)Integer.parseInt(scanner.next(4), 16));
                                 } catch (NumberFormatException e) {
-                                    throw new JSONException("Illegal unicode escape");
+                                    throw new JSONParseException("Illegal unicode escape", e,
+                                            scanner.parsePosition());
                                 }
                                 break;
                             case '"':
@@ -306,7 +311,8 @@ public final class JSONLexer {
                                 sb.append(c);
                                 break;
                             default:
-                                throw new JSONParseException("Illegal escape", scanner.parsePosition());
+                                throw new JSONParseException("Illegal escape",
+                                        scanner.parsePosition());
                         }
                         break;
                     case '"':
@@ -389,7 +395,8 @@ public final class JSONLexer {
                             try {
                                 Integer.parseInt(scanner.next(4), 16);
                             } catch (NumberFormatException e) {
-                                throw new JSONException("Illegal unicode escape");
+                                throw new JSONParseException("Illegal unicode escape", e,
+                                        scanner.parsePosition());
                             }
                             break;
                         default:
@@ -464,7 +471,8 @@ public final class JSONLexer {
                     sb.append(c);
                     c = scanner.next();
                 } else {
-                    throw new JSONParseException("Expected exponent value", scanner.parsePosition());
+                    throw new JSONParseException("Expected exponent value",
+                            scanner.parsePosition());
                 }
                 while((c >= '0') && (c <= '9')) {
                     sb.append(c);
