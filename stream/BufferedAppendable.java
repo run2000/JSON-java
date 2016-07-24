@@ -109,7 +109,7 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
      *                     appendable
      */
     @Override
-    public Appendable append(CharSequence csq) throws IOException {
+    public BufferedAppendable append(CharSequence csq) throws IOException {
         if (csq == null) {
             csq = NULL_SEQ;
         }
@@ -143,7 +143,7 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
      *                     appendable
      */
     @Override
-    public Appendable append(CharSequence csq, int start, int end) throws IOException {
+    public BufferedAppendable append(CharSequence csq, int start, int end) throws IOException {
         final int len = end - start;
 
         if ((start < 0) || (len < 0)) {
@@ -180,7 +180,7 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
      *                     appendable
      */
     @Override
-    public Appendable append(char c) throws IOException {
+    public BufferedAppendable append(char c) throws IOException {
         if (appendable == null) {
             throw new IOException("Buffered appendable is not open");
         }
