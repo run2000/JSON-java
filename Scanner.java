@@ -229,7 +229,7 @@ public class Scanner {
             }
             pos += 1;
         }
-        return new String(chars);
+        return String.valueOf(chars);
     }
 
 
