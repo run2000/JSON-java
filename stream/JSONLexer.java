@@ -298,12 +298,7 @@ public final class JSONLexer {
                                 sb.append('\r');
                                 break;
                             case 'u':
-                                try {
-                                    sb.append((char)Integer.parseInt(scanner.next(4), 16));
-                                } catch (NumberFormatException e) {
-                                    throw new JSONParseException("Illegal unicode escape", e,
-                                            scanner.parsePosition());
-                                }
+                                sb.append((char) parseUnicodeEscape());
                                 break;
                             case '"':
                             case '\\':
@@ -392,12 +387,7 @@ public final class JSONLexer {
                         case '/':
                             break;
                         case 'u':
-                            try {
-                                Integer.parseInt(scanner.next(4), 16);
-                            } catch (NumberFormatException e) {
-                                throw new JSONParseException("Illegal unicode escape", e,
-                                        scanner.parsePosition());
-                            }
+                            parseUnicodeEscape();
                             break;
                         default:
                             throw new JSONParseException("Illegal escape",
@@ -409,6 +399,38 @@ public final class JSONLexer {
                 default:
                     break;
             }
+        }
+    }
+
+    /**
+     * Get the next 4 hexadecimal chars in the stream, and parse it as an
+     * int value. Any character outside the hexadecimal range is
+     * immediately rejected.
+     *
+     * @return  an int determined from the 4 hexadecimal characters
+     */
+    private int parseUnicodeEscape() throws JSONException {
+        char[] chars = new char[4];
+
+        for (int pos = 0; pos < 4; pos += 1) {
+            char c = scanner.next();
+            if (scanner.end()) {
+                throw new JSONParseException("Substring bounds error",
+                        scanner.parsePosition());
+            } else if((c >= '0' && c <= '9')
+                    || (c >= 'a' && c <= 'f')
+                    || (c >= 'A' && c <= 'F')) {
+                chars[pos] = c;
+            } else {
+                throw new JSONParseException("Illegal unicode escape",
+                        scanner.parsePosition());
+            }
+        }
+        try {
+            return Integer.parseInt(String.valueOf(chars), 16);
+        } catch (NumberFormatException e) {
+            throw new JSONParseException("Illegal unicode escape", e,
+                    scanner.parsePosition());
         }
     }
 
