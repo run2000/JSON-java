@@ -132,11 +132,6 @@ public class JSONTokener extends Scanner {
                 return JSONToken.END_ARRAY;
             case ':':
                 return JSONToken.KEY_SEPARATOR;
-            case '=':
-                if (this.next() != '>') {
-                    this.back();
-                }
-                return JSONToken.KEY_SEPARATOR;
             case ',':
             case ';':
                 return JSONToken.VALUE_SEPARATOR;
