@@ -1670,8 +1670,7 @@ public class JSONObject {
      *             If the object contains an invalid number.
      */
     public String toString(int indentFactor) throws JSONException {
-        StringBuilder w = new StringBuilder();
-        return this.write(w, indentFactor, 0).toString();
+        return this.write(new StringBuilder(), indentFactor, 0).toString();
     }
 
     /**
@@ -1699,7 +1698,23 @@ public class JSONObject {
      *             If the value is or contains an invalid number.
      */
     public static String valueToString(Object value) throws JSONException {
-        return writeValue(new StringBuilder(), value).toString();
+        String result;
+
+        if(value instanceof JSONString) {
+            try {
+                result = ((JSONString)value).toJSONString();
+            } catch (Exception e) {
+                throw new JSONException(e);
+            }
+            if(result == null) {
+                throw new JSONException("Bad value from toJSONString: " + result);
+            } else {
+                return result;
+            }
+        } else {
+            result = writeValue(new StringBuilder(), value).toString();
+        }
+        return result;
     }
 
     /**

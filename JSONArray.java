@@ -1115,8 +1115,7 @@ public class JSONArray implements Iterable<Object> {
      * @throws JSONException
      */
     public String toString(int indentFactor) throws JSONException {
-        StringBuilder sb = new StringBuilder();
-        return this.write(sb, indentFactor, 0).toString();
+        return this.write(new StringBuilder(), indentFactor, 0).toString();
     }
 
     /**
