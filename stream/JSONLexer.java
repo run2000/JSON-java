@@ -237,7 +237,8 @@ public final class JSONLexer {
         char c = scanner.next();
 
         if(c != '"') {
-            throw new JSONException("Unexpected string delimiter");
+            throw new JSONParseException("Unexpected string delimiter",
+                    scanner.parsePosition());
         }
         try {
             for (;;) {
@@ -323,7 +324,7 @@ public final class JSONLexer {
                 }
             }
         } catch (IOException e) {
-            throw new JSONException("IOException", e);
+            throw new JSONParseException("IOException", e, scanner.parsePosition());
         }
     }
 
@@ -338,7 +339,8 @@ public final class JSONLexer {
         char c = scanner.next();
 
         if(c != '"') {
-            throw new JSONException("Unexpected string delimiter");
+            throw new JSONParseException("Unexpected string delimiter",
+                    scanner.parsePosition());
         }
         for (;;) {
             c = scanner.next();
@@ -503,7 +505,7 @@ public final class JSONLexer {
             }
             scanner.back();
         } catch (IOException e) {
-            throw new JSONException("IO exception", e);
+            throw new JSONParseException("IO exception", e, scanner.parsePosition());
         }
         return dbl;
     }
