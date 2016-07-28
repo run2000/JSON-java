@@ -237,7 +237,8 @@ public final class JSONLexer {
         char c = scanner.next();
 
         if(c != '"') {
-            throw new JSONException("Unexpected string delimiter");
+            throw new JSONParseException("Unexpected string delimiter",
+                    scanner.parsePosition());
         }
         try {
             for (;;) {
@@ -298,7 +299,12 @@ public final class JSONLexer {
                                 sb.append('\r');
                                 break;
                             case 'u':
-                                sb.append((char) parseUnicodeEscape());
+                                try {
+                                    sb.append((char) Integer.parseInt(next4HexDigits(), 16));
+                                } catch (NumberFormatException e) {
+                                    throw new JSONParseException("Illegal unicode escape", e,
+                                            scanner.parsePosition());
+                                }
                                 break;
                             case '"':
                             case '\\':
@@ -318,7 +324,7 @@ public final class JSONLexer {
                 }
             }
         } catch (IOException e) {
-            throw new JSONException("IOException", e);
+            throw new JSONParseException("IOException", e, scanner.parsePosition());
         }
     }
 
@@ -333,7 +339,8 @@ public final class JSONLexer {
         char c = scanner.next();
 
         if(c != '"') {
-            throw new JSONException("Unexpected string delimiter");
+            throw new JSONParseException("Unexpected string delimiter",
+                    scanner.parsePosition());
         }
         for (;;) {
             c = scanner.next();
@@ -387,7 +394,7 @@ public final class JSONLexer {
                         case '/':
                             break;
                         case 'u':
-                            parseUnicodeEscape();
+                            next4HexDigits();
                             break;
                         default:
                             throw new JSONParseException("Illegal escape",
@@ -403,13 +410,13 @@ public final class JSONLexer {
     }
 
     /**
-     * Get the next 4 hexadecimal chars in the stream, and parse it as an
-     * int value. Any character outside the hexadecimal range is
+     * Get the next 4 hexadecimal chars in the stream, and return them as a
+     * String value. Any character outside the hexadecimal range is
      * immediately rejected.
      *
-     * @return  an int determined from the 4 hexadecimal characters
+     * @return  a String containing the 4 hexadecimal characters
      */
-    private int parseUnicodeEscape() throws JSONException {
+    private String next4HexDigits() throws JSONException {
         char[] chars = new char[4];
 
         for (int pos = 0; pos < 4; pos += 1) {
@@ -426,12 +433,7 @@ public final class JSONLexer {
                         scanner.parsePosition());
             }
         }
-        try {
-            return Integer.parseInt(String.valueOf(chars), 16);
-        } catch (NumberFormatException e) {
-            throw new JSONParseException("Illegal unicode escape", e,
-                    scanner.parsePosition());
-        }
+        return String.valueOf(chars);
     }
 
     /**
@@ -503,7 +505,7 @@ public final class JSONLexer {
             }
             scanner.back();
         } catch (IOException e) {
-            throw new JSONException("IO exception", e);
+            throw new JSONParseException("IO exception", e, scanner.parsePosition());
         }
         return dbl;
     }
