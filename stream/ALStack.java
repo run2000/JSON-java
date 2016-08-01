@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EmptyStackException;
 import java.util.Iterator;
 
@@ -118,6 +117,36 @@ public final class ALStack<E> implements Iterable<E> {
      */
     @Override
     public Iterator<E> iterator() {
-        return Collections.unmodifiableList(elements).iterator();
+        return new ALIterator<>(elements);
+    }
+
+    /**
+     * Iterator that operates over the backing array list. The list is
+     * unmodifiable from the iterator. The iterator propagates any
+     * concurrent modification exceptions thrown from the backing list.
+     *
+     * @param <E> the type of elements to be iterated over
+     */
+    private static final class ALIterator<E> implements Iterator<E> {
+        private final Iterator<E> iterator;
+
+        public ALIterator(ArrayList<E> backingList) {
+            this.iterator = backingList.iterator();
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public E next() {
+            return iterator.next();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return iterator.hasNext();
+        }
     }
 }
