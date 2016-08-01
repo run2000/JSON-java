@@ -25,7 +25,9 @@ SOFTWARE.
 */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EmptyStackException;
+import java.util.Iterator;
 
 /**
  * A simple unsynchronized stack implementation, used by {@link JSONStreamReader}.
@@ -34,7 +36,7 @@ import java.util.EmptyStackException;
  * @author JSON.org
  * @version 2016-6-30
  */
-public final class ALStack<E> {
+public final class ALStack<E> implements Iterable<E> {
     private final ArrayList<E> elements;
 
     /**
@@ -107,5 +109,15 @@ public final class ALStack<E> {
     @Override
     public String toString() {
         return elements.toString();
+    }
+
+    /**
+     * Returns an unmodifiable iterator over all the elements on the stack.
+     *
+     * @return an Iterator of elements on the stack
+     */
+    @Override
+    public Iterator<E> iterator() {
+        return Collections.unmodifiableList(elements).iterator();
     }
 }

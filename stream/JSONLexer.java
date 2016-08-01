@@ -329,6 +329,122 @@ public final class JSONLexer {
     }
 
     /**
+     * Return the characters up to the next close quote character.
+     * Backslash escape sequences are processed. The formal JSON format only
+     * allows string values within double quotes.
+     * <p>
+     * Most practical parsers will limit the length of a String to one
+     * expressible by a {@code String} object, or writable to a {@code File}.
+     * </p>
+     *
+     * @param sb the Appendable to which the String value is appended
+     * @param maxLen the maximum length of the decoded string value,
+     *               &lt;= 0 to limit to Long.MAX_VALUE
+     * @param <T> a subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
+     * @return the supplied Appendable object
+     * @throws JSONException Unterminated string.
+     */
+    public <T extends Appendable> T nextString(T sb, long maxLen) throws JSONException {
+        char c = scanner.next();
+        if (maxLen <= 0) {
+            maxLen = Long.MAX_VALUE;
+        }
+
+        if(c != '"') {
+            throw new JSONParseException("Unexpected string delimiter",
+                    scanner.parsePosition());
+        }
+        try {
+            for (long len = 0; len < maxLen; len++) {
+                c = scanner.next();
+                switch (c) {
+                    case (char)0:
+                    case (char)10: // \n
+                    case (char)13: // \r
+                        throw new JSONParseException("Unterminated string",
+                                scanner.parsePosition());
+                    case (char)1:
+                    case (char)2:
+                    case (char)3:
+                    case (char)4:
+                    case (char)5:
+                    case (char)6:
+                    case (char)7:
+                    case (char)8:
+                    case (char)9:
+                    case (char)11:
+                    case (char)12:
+                    case (char)14:
+                    case (char)15:
+                    case (char)16:
+                    case (char)17:
+                    case (char)18:
+                    case (char)19:
+                    case (char)20:
+                    case (char)21:
+                    case (char)22:
+                    case (char)23:
+                    case (char)24:
+                    case (char)25:
+                    case (char)26:
+                    case (char)27:
+                    case (char)28:
+                    case (char)29:
+                    case (char)30:
+                    case (char)31:
+                        throw new JSONParseException("Unescaped control code",
+                                scanner.parsePosition());
+                    case '\\':
+                        c = scanner.next();
+                        switch (c) {
+                            case 'b':
+                                sb.append('\b');
+                                break;
+                            case 't':
+                                sb.append('\t');
+                                break;
+                            case 'n':
+                                sb.append('\n');
+                                break;
+                            case 'f':
+                                sb.append('\f');
+                                break;
+                            case 'r':
+                                sb.append('\r');
+                                break;
+                            case 'u':
+                                try {
+                                    sb.append((char) Integer.parseInt(next4HexDigits(), 16));
+                                } catch (NumberFormatException e) {
+                                    throw new JSONParseException("Illegal unicode escape", e,
+                                            scanner.parsePosition());
+                                }
+                                break;
+                            case '"':
+                            case '\\':
+                            case '/':
+                                sb.append(c);
+                                break;
+                            default:
+                                throw new JSONParseException("Illegal escape",
+                                        scanner.parsePosition());
+                        }
+                        break;
+                    case '"':
+                        return sb;
+                    default:
+                        sb.append(c);
+                        break;
+                }
+            }
+        } catch (IOException e) {
+            throw new JSONParseException("IOException", e, scanner.parsePosition());
+        }
+        throw new JSONParseException("String value too long", scanner.parsePosition());
+    }
+
+    /**
      * Skip the characters up to the next close quote character.
      * Backslash processing is done. The formal JSON format only allows
      * strings in double quotes.
@@ -511,6 +627,112 @@ public final class JSONLexer {
     }
 
     /**
+     * Parse a number strictly according to the JSON specification.
+     * <p>
+     * Most practical JSON parsers limit the number values to those
+     * expressible by {@code Long} or {@code Double} values.</p>
+     *
+     * @param sb The Appendable to which the parsed character sequence is
+     *           appended
+     * @param mDigits maximum number of mantissa digits to be parsed,
+     *                &lt;= 0 to limit to {@code Integer.MAX_VALUE}
+     * @param eDigits maximum number of exponent digits to be parsed,
+     *                0 for no exponent, or &lt; 0 to limit to
+     *                {@code Integer.MAX_VALUE}
+     * @return {@code true} if the number is a floating point value, otherwise
+     * {@code false} to indicate an integer value
+     */
+    public boolean nextNumber(Appendable sb, int mDigits, int eDigits) throws JSONException {
+        int m = 0, e = 0;
+        boolean dbl = false;
+        char c = scanner.next();
+
+        if(mDigits <= 0) {
+            mDigits = Integer.MAX_VALUE;
+        }
+        if(eDigits < 0) {
+            eDigits = Integer.MAX_VALUE;
+        }
+
+        try {
+            // likely digit
+            if(c == '-') {
+                sb.append(c);
+                c = scanner.next();
+            }
+            if(c == '0') {
+                sb.append(c);
+                m++;
+                c = scanner.next();
+            } else if((c >= '1') && (c <= '9')) {
+                sb.append(c);
+                m++;
+
+                // whole number values
+                c = scanner.next();
+                while((c >= '0') && (c <= '9') && (m <= mDigits)) {
+                    sb.append(c);
+                    m++;
+                    c = scanner.next();
+                }
+            } else {
+                throw new JSONParseException("Expected number", scanner.parsePosition());
+            }
+            if(m > mDigits) {
+                throw new JSONParseException("Number overflow", scanner.parsePosition());
+            }
+
+            if(c == '.') {
+                dbl = true;
+                sb.append(c);
+
+                // decimal place values
+                c = scanner.next();
+                while((c >= '0') && (c <= '9') && (m <= mDigits)) {
+                    sb.append(c);
+                    m++;
+                    c = scanner.next();
+                }
+                if(m > mDigits) {
+                    throw new JSONParseException("Number overflow", scanner.parsePosition());
+                }
+            }
+            if((c == 'e') || (c == 'E')) {
+                dbl = true;
+                sb.append(c);
+
+                // exponent values
+                c = scanner.next();
+                if((c == '+') || (c == '-')) {
+                    sb.append(c);
+                    c = scanner.next();
+                }
+                if((c >= '0') && (c <= '9')) {
+                    sb.append(c);
+                    e++;
+                    c = scanner.next();
+                } else {
+                    throw new JSONParseException("Expected exponent value",
+                            scanner.parsePosition());
+                }
+                while((c >= '0') && (c <= '9') && (e <= eDigits)) {
+                    sb.append(c);
+                    e++;
+                    c = scanner.next();
+                }
+                if(e > eDigits) {
+                    throw new JSONParseException("Number overflow",
+                            scanner.parsePosition());
+                }
+            }
+            scanner.back();
+        } catch (IOException ex) {
+            throw new JSONParseException("IO exception", ex, scanner.parsePosition());
+        }
+        return dbl;
+    }
+
+    /**
      * Skip a number strictly according to the JSON specification.
      */
     public void skipNumber() throws JSONException {
@@ -523,7 +745,6 @@ public final class JSONLexer {
         if(c == '0') {
             c = scanner.next();
         } else if((c >= '1') && (c <= '9')) {
-
             // whole number values
             c = scanner.next();
             while((c >= '0') && (c <= '9')) {
