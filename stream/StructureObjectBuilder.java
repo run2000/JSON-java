@@ -77,8 +77,8 @@ final class StructureObjectBuilder implements StructureBuilder {
     }
 
     /**
-     * Encode a key according to the JSON Pointer algorithm. See RFC 6901
-     * for details.
+     * Encode a key according to the JSON Pointer syntax. See RFC 6901
+     * section 3 for details.
      *
      * @param name the key to be encoded
      * @return the encoded key
