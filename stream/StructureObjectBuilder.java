@@ -71,8 +71,59 @@ final class StructureObjectBuilder implements StructureBuilder {
     public String jsonPointerFragment() {
         String item = null;
         if(key != null) {
-            item = key.replaceAll("~", "~0").replaceAll("/", "~1");
+            item = encodePointer(key);
         }
         return '/' + item;
+    }
+
+    /**
+     * Encode a key according to the JSON Pointer algorithm. See RFC 6901
+     * for details.
+     *
+     * @param name the key to be encoded
+     * @return the encoded key
+     */
+    private static String encodePointer(String name) {
+        final int len = (name == null) ? 0 : name.length();
+        if(len == 0) {
+            return name;
+        }
+
+        StringBuilder builder = null;
+        int prev = 0;
+        int curr;
+
+        for(curr = 0; curr < len; curr++) {
+            char c = name.charAt(curr);
+            switch(c) {
+                case '~':
+                    if(builder == null) {
+                        builder = new StringBuilder(len + 2);
+                    }
+                    if(prev < curr) {
+                        builder.append(name.substring(prev, curr));
+                        builder.append("~0");
+                        prev = curr + 1;
+                    }
+                    break;
+                case '/':
+                    if(builder == null) {
+                        builder = new StringBuilder(len + 2);
+                    }
+                    if(prev < curr) {
+                        builder.append(name.substring(prev, curr));
+                        builder.append("~1");
+                        prev = curr + 1;
+                    }
+                    break;
+            }
+        }
+        if(builder == null) {
+            return name;
+        }
+        if(prev < curr) {
+            builder.append(name.substring(prev));
+        }
+        return builder.toString();
     }
 }
