@@ -182,6 +182,16 @@ public final class TrampolineObjectBuilder {
         return result;
     }
 
+    /**
+     * Iterate over a stack of StructureBuilder objects, starting from an
+     * initial {@code JSONArray} builder. Using this type of iterative approach
+     * instead of recursion is known as trampolining.
+     *
+     * @param reader the stream reader
+     * @param array the array to be populated
+     * @param filter any filter to be applied to the stream
+     * @return the populated JSON array
+     */
     private static JSONArray trampolineArray(JSONStreamReader reader, JSONArray array,
                                              TrampolineFilter filter) {
         ALStack<StructureBuilder> stack = new ALStack<StructureBuilder>();
@@ -195,6 +205,16 @@ public final class TrampolineObjectBuilder {
         return array;
     }
 
+    /**
+     * Iterate over a stack of StructureBuilder objects, starting from an
+     * initial {@code JSONObject} builder. Using this type of iterative approach
+     * instead of recursion is known as trampolining.
+     *
+     * @param reader the stream reader
+     * @param object the object to be populated
+     * @param filter any filter to be applied to the stream
+     * @return the populated JSON object
+     */
     private static JSONObject trampolineObject(JSONStreamReader reader, JSONObject object,
                                                TrampolineFilter filter) {
         ALStack<StructureBuilder> stack = new ALStack<StructureBuilder>();
@@ -414,6 +434,16 @@ public final class TrampolineObjectBuilder {
         return array;
     }
 
+    /**
+     * Given a {@link StructureBuilder} stack as an {@code Iterable},
+     * create a JSON Pointer string. The resulting pointer expression
+     * points to the value as presented to the parser, not necessarily
+     * as filtered by the {@link TrampolineFilter}.
+     *
+     * @param stack a stack of StructureBuilder objects, from which the
+     *              JSON Pointer is created
+     * @return an encoded JSON Pointer
+     */
     public static String toJSONPointer(Iterable<StructureBuilder> stack) {
         if(stack == null) {
             return "";
