@@ -69,7 +69,7 @@ import java.nio.charset.Charset;
  * @author JSON.org
  * @version 2016-06-26
  */
-public final class JSONStreamReader {
+public class JSONStreamReader {
 
     private static final int NONE = 0;
     private static final int INTERNAL = 1;
@@ -220,10 +220,10 @@ public final class JSONStreamReader {
         }
     }
 
-    private final JSONLexer lexer;
-    private final ALStack<Token> objectStack = new ALStack<Token>(); // START_ARRAY, START_OBJECT, or one of the _VALUEs
-    private final BufferedAppendable bufferedAppender;
-    private ParseState state = ParseState.INIT;
+    protected final JSONLexer lexer;
+    protected final ALStack<Token> objectStack = new ALStack<Token>(); // START_ARRAY, START_OBJECT, or one of the _VALUEs
+    protected final BufferedAppendable bufferedAppender;
+    protected ParseState state = ParseState.INIT;
 
     /**
      * Construct a {@code JSONStreamReader} from a {@code Reader}.
@@ -929,7 +929,7 @@ public final class JSONStreamReader {
      *
      * @return the number represented by the token sequence
      */
-    private Number decodeNumber(String val, boolean isDbl) throws JSONException {
+    protected Number decodeNumber(String val, boolean isDbl) throws JSONException {
 
         if (isDbl) {
             try {
@@ -972,7 +972,7 @@ public final class JSONStreamReader {
      *
      * @return the number represented by the token sequence
      */
-    private double decodeDouble(String val, boolean isDbl) throws JSONException {
+    protected double decodeDouble(String val, boolean isDbl) throws JSONException {
 
         try {
             if(isDbl) {
@@ -996,7 +996,7 @@ public final class JSONStreamReader {
      *
      * @return the number represented by the token sequence
      */
-    private int decodeInt(String val, boolean isDbl) throws JSONException {
+    protected int decodeInt(String val, boolean isDbl) throws JSONException {
         try {
             if (!isDbl) {
                 int i = Integer.parseInt(val);
@@ -1014,7 +1014,7 @@ public final class JSONStreamReader {
      *
      * @return the number represented by the token sequence
      */
-    private long decodeLong(String val, boolean isDbl) throws JSONException {
+    protected long decodeLong(String val, boolean isDbl) throws JSONException {
         try {
             if (!isDbl) {
                 long l = Long.parseLong(val);
@@ -1032,7 +1032,7 @@ public final class JSONStreamReader {
      *
      * @return the number represented by the token sequence
      */
-    private BigDecimal decodeBigDecimal(String val) throws JSONException {
+    protected BigDecimal decodeBigDecimal(String val) throws JSONException {
 
         try {
             return new BigDecimal(val);
@@ -1048,7 +1048,7 @@ public final class JSONStreamReader {
      *
      * @return the number represented by the token sequence
      */
-    private BigInteger decodeBigInteger(String val, boolean isDbl) throws JSONException {
+    protected BigInteger decodeBigInteger(String val, boolean isDbl) throws JSONException {
 
         if(!isDbl) {
             try {

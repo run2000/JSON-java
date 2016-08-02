@@ -33,6 +33,7 @@ import org.json.stream.JSONStreamReader.ParseState;
 import java.io.InputStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.util.EmptyStackException;
 
 /**
  * Builds a JSON object model using events supplied from {@link JSONStreamReader}.
@@ -350,15 +351,21 @@ public final class JSONTrampolineBuilder {
      * @return the populated JSON array
      */
     private static JSONArray parseArrayTree(JSONStreamReader reader,
-                                            TrampolineFilter filter) {
+                                            TrampolineFilter filter) throws JSONException {
         JSONArray array = new JSONArray();
         ALStack<StructureBuilder> stack = new ALStack<StructureBuilder>();
         stack.push(new StructureArrayBuilder(array, filter));
         ParseState state;
 
-        while(!stack.isEmpty()) {
-            state = reader.nextState();
-            stack.peek().accept(state, stack, reader);
+        try {
+            while(!stack.isEmpty()) {
+                state = reader.nextState();
+                stack.peek().accept(state, stack, reader);
+            }
+        } catch (RuntimeException e) {
+            throw new JSONParseException(e.getMessage() + ", at "
+                    + JSONPointerUtils.toJSONPointer(stack),
+                    reader.getParsePosition());
         }
         return array;
     }
@@ -373,15 +380,21 @@ public final class JSONTrampolineBuilder {
      * @return the populated JSON object
      */
     private static JSONObject parseObjectTree(JSONStreamReader reader,
-                                              TrampolineFilter filter) {
+                                              TrampolineFilter filter) throws JSONException {
         JSONObject object = new JSONObject();
         ALStack<StructureBuilder> stack = new ALStack<StructureBuilder>();
         stack.push(new StructureObjectBuilder(object, filter));
         ParseState state;
 
-        while(!stack.isEmpty()) {
-            state = reader.nextState();
-            stack.peek().accept(state, stack, reader);
+        try {
+            while(!stack.isEmpty()) {
+                state = reader.nextState();
+                stack.peek().accept(state, stack, reader);
+            }
+        } catch (RuntimeException e) {
+            throw new JSONParseException(e.getMessage() + ", at "
+                    + JSONPointerUtils.toJSONPointer(stack),
+                    reader.getParsePosition());
         }
         return object;
     }
