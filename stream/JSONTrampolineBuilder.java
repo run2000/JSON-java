@@ -42,9 +42,9 @@ import java.nio.charset.Charset;
  * @author JSON.org
  * @version 2016-08-01
  */
-public final class TrampolineObjectBuilder {
+public final class JSONTrampolineBuilder {
 
-    private TrampolineObjectBuilder() {
+    private JSONTrampolineBuilder() {
     }
 
     /**
@@ -154,13 +154,11 @@ public final class TrampolineObjectBuilder {
 
         switch(state) {
             case OBJECT:
-                JSONObject object = new JSONObject();
-                result = trampolineObject(reader, object, filter);
+                result = parseObjectTree(reader, filter);
                 break;
 
             case ARRAY:
-                JSONArray array = new JSONArray();
-                result = trampolineArray(reader, array, filter);
+                result = parseArrayTree(reader, filter);
                 break;
 
             case NULL_VALUE:
@@ -180,52 +178,6 @@ public final class TrampolineObjectBuilder {
         }
 
         return result;
-    }
-
-    /**
-     * Iterate over a stack of StructureBuilder objects, starting from an
-     * initial {@code JSONArray} builder. Using this type of iterative approach
-     * instead of recursion is known as trampolining.
-     *
-     * @param reader the stream reader
-     * @param array the array to be populated
-     * @param filter any filter to be applied to the stream
-     * @return the populated JSON array
-     */
-    private static JSONArray trampolineArray(JSONStreamReader reader, JSONArray array,
-                                             TrampolineFilter filter) {
-        ALStack<StructureBuilder> stack = new ALStack<StructureBuilder>();
-        stack.push(new StructureArrayBuilder(array, filter));
-        ParseState state;
-
-        while(!stack.isEmpty()) {
-            state = reader.nextState();
-            stack.peek().accept(state, stack, reader);
-        }
-        return array;
-    }
-
-    /**
-     * Iterate over a stack of StructureBuilder objects, starting from an
-     * initial {@code JSONObject} builder. Using this type of iterative approach
-     * instead of recursion is known as trampolining.
-     *
-     * @param reader the stream reader
-     * @param object the object to be populated
-     * @param filter any filter to be applied to the stream
-     * @return the populated JSON object
-     */
-    private static JSONObject trampolineObject(JSONStreamReader reader, JSONObject object,
-                                               TrampolineFilter filter) {
-        ALStack<StructureBuilder> stack = new ALStack<StructureBuilder>();
-        stack.push(new StructureObjectBuilder(object, filter));
-        ParseState state;
-
-        while(!stack.isEmpty()) {
-            state = reader.nextState();
-            stack.peek().accept(state, stack, reader);
-        }
-        return object;
     }
 
     /**
@@ -287,13 +239,12 @@ public final class TrampolineObjectBuilder {
                     reader.getParsePosition());
         }
 
-        JSONObject object;
+        JSONObject result;
         state = reader.nextState();
 
         switch(state) {
             case OBJECT:
-                object = new JSONObject();
-                trampolineObject(reader, object, filter);
+                result = parseObjectTree(reader, filter);
                 break;
 
             default:
@@ -306,7 +257,7 @@ public final class TrampolineObjectBuilder {
                     reader.getParsePosition());
         }
 
-        return object;
+        return result;
     }
 
     /**
@@ -368,13 +319,12 @@ public final class TrampolineObjectBuilder {
                     reader.getParsePosition());
         }
 
-        JSONArray array;
+        JSONArray result;
         state = reader.nextState();
 
         switch(state) {
             case ARRAY:
-                array = new JSONArray();
-                trampolineArray(reader, array, filter);
+                result = parseArrayTree(reader, filter);
                 break;
 
             default:
@@ -387,7 +337,53 @@ public final class TrampolineObjectBuilder {
                     reader.getParsePosition());
         }
 
+        return result;
+    }
+
+    /**
+     * Iterate over a stack of StructureBuilder objects, starting from an
+     * initial {@code JSONArray} builder. Using this type of iterative approach
+     * instead of recursion is known as trampolining.
+     *
+     * @param reader the stream reader
+     * @param filter any filter to be applied to the stream
+     * @return the populated JSON array
+     */
+    private static JSONArray parseArrayTree(JSONStreamReader reader,
+                                            TrampolineFilter filter) {
+        JSONArray array = new JSONArray();
+        ALStack<StructureBuilder> stack = new ALStack<StructureBuilder>();
+        stack.push(new StructureArrayBuilder(array, filter));
+        ParseState state;
+
+        while(!stack.isEmpty()) {
+            state = reader.nextState();
+            stack.peek().accept(state, stack, reader);
+        }
         return array;
+    }
+
+    /**
+     * Iterate over a stack of StructureBuilder objects, starting from an
+     * initial {@code JSONObject} builder. Using this type of iterative approach
+     * instead of recursion is known as trampolining.
+     *
+     * @param reader the stream reader
+     * @param filter any filter to be applied to the stream
+     * @return the populated JSON object
+     */
+    private static JSONObject parseObjectTree(JSONStreamReader reader,
+                                              TrampolineFilter filter) {
+        JSONObject object = new JSONObject();
+        ALStack<StructureBuilder> stack = new ALStack<StructureBuilder>();
+        stack.push(new StructureObjectBuilder(object, filter));
+        ParseState state;
+
+        while(!stack.isEmpty()) {
+            state = reader.nextState();
+            stack.peek().accept(state, stack, reader);
+        }
+        return object;
     }
 
     /**
@@ -407,9 +403,7 @@ public final class TrampolineObjectBuilder {
             throw new JSONParseException("Expected OBJECT state",
                     reader.getParsePosition());
         }
-        JSONObject object = new JSONObject();
-        trampolineObject(reader, object, null);
-        return object;
+        return parseObjectTree(reader, null);
     }
 
     /**
@@ -429,29 +423,6 @@ public final class TrampolineObjectBuilder {
             throw new JSONParseException("Expected ARRAY state",
                     reader.getParsePosition());
         }
-        JSONArray array = new JSONArray();
-        trampolineArray(reader, array, null);
-        return array;
-    }
-
-    /**
-     * Given a {@link StructureBuilder} stack as an {@code Iterable},
-     * create a JSON Pointer string. The resulting pointer expression
-     * points to the value as presented to the parser, not necessarily
-     * as filtered by the {@link TrampolineFilter}.
-     *
-     * @param stack a stack of StructureBuilder objects, from which the
-     *              JSON Pointer is created
-     * @return an encoded JSON Pointer
-     */
-    public static String toJSONPointer(Iterable<StructureBuilder> stack) {
-        if(stack == null) {
-            return "";
-        }
-        StringBuilder builder = new StringBuilder();
-        for(StructureBuilder item : stack) {
-            builder.append(item.jsonPointerFragment());
-        }
-        return builder.toString();
+        return parseArrayTree(reader, null);
     }
 }

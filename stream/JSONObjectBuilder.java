@@ -388,7 +388,7 @@ public final class JSONObjectBuilder {
         if((reader.currentState() != ParseState.OBJECT) || (reader.getStackDepth() == 0)) {
             throw new JSONParseException("Expected OBJECT state", reader.getParsePosition());
         }
-        return JSONObjectBuilder.parseObjectTree(reader);
+        return parseObjectTree(reader);
     }
 
     /**
@@ -407,6 +407,6 @@ public final class JSONObjectBuilder {
         if((reader.currentState() != ParseState.ARRAY) || (reader.getStackDepth() == 0)) {
             throw new JSONParseException("Expected ARRAY state", reader.getParsePosition());
         }
-        return JSONObjectBuilder.parseArrayTree(reader);
+        return parseArrayTree(reader);
     }
 }

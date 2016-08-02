@@ -117,7 +117,7 @@ public final class ALStack<E> implements Iterable<E> {
      */
     @Override
     public Iterator<E> iterator() {
-        return new ALIterator<>(elements);
+        return new ALIterator<E>(elements);
     }
 
     /**
