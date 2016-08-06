@@ -100,7 +100,7 @@ public class JSONTokener extends Scanner {
 
     /**
      * Get the next char in the string, skipping whitespace.
-     * @throws JSONException
+     * @throws JSONException Thrown if there is an error reading the source string.
      * @return  A character, or 0 if there are no more characters.
      */
     public char nextClean() throws JSONException {
