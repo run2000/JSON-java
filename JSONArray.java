@@ -80,7 +80,7 @@ import java.util.Map;
  * </ul>
  *
  * @author JSON.org
- * @version 2016-07-28
+ * @version 2016-08-04
  */
 public class JSONArray implements Iterable<Object> {
 
@@ -268,7 +268,7 @@ public class JSONArray implements Iterable<Object> {
 
     /**
     * Get the enum value associated with an index.
-    *
+    * 
     * @param clazz
     *            The type of enum to retrieve.
     * @param index
@@ -612,7 +612,7 @@ public class JSONArray implements Iterable<Object> {
 
     /**
      * Get the enum value associated with a key.
-     *
+     * 
      * @param clazz
      *            The type of enum to retrieve.
      * @param index
@@ -625,7 +625,7 @@ public class JSONArray implements Iterable<Object> {
 
     /**
      * Get the enum value associated with a key.
-     *
+     * 
      * @param clazz
      *            The type of enum to retrieve.
      * @param index
@@ -656,8 +656,8 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-     * Get the optional BigInteger value associated with an index. The
-     * defaultValue is returned if there is no value for the index, or if the
+     * Get the optional BigInteger value associated with an index. The 
+     * defaultValue is returned if there is no value for the index, or if the 
      * value is not a number and cannot be converted to a number.
      *
      * @param index
@@ -679,8 +679,8 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-     * Get the optional BigDecimal value associated with an index. The
-     * defaultValue is returned if there is no value for the index, or if the
+     * Get the optional BigDecimal value associated with an index. The 
+     * defaultValue is returned if there is no value for the index, or if the 
      * value is not a number and cannot be converted to a number.
      *
      * @param index
@@ -1028,9 +1028,9 @@ public class JSONArray implements Iterable<Object> {
         }
         return this;
     }
-
+    
     /**
-     * Creates a JSONPointer using an initialization string and tries to
+     * Creates a JSONPointer using an initialization string and tries to 
      * match it to an item within this JSONArray. For example, given a
      * JSONArray initialized with this document:
      * <pre>
@@ -1038,7 +1038,7 @@ public class JSONArray implements Iterable<Object> {
      *     {"b":"c"}
      * ]
      * </pre>
-     * and this JSONPointer string:
+     * and this JSONPointer string: 
      * <pre>
      * "/0/b"
      * </pre>
@@ -1051,11 +1051,11 @@ public class JSONArray implements Iterable<Object> {
     public Object query(String jsonPointer) {
         return new JSONPointer(jsonPointer).queryFrom(this);
     }
-
+    
     /**
      * Queries and returns a value from this object using {@code jsonPointer}, or
      * returns null if the query fails due to a missing key.
-     *
+     * 
      * @param jsonPointer the string representation of the JSON pointer
      * @return the queried value or {@code null}
      * @throws IllegalArgumentException if {@code jsonPointer} has invalid syntax

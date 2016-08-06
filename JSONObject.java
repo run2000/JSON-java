@@ -97,7 +97,7 @@ import java.util.Set;
  * </ul>
  *
  * @author JSON.org
- * @version 2016-07-28
+ * @version 2016-08-04
  */
 public class JSONObject {
     /**
@@ -485,7 +485,7 @@ public class JSONObject {
 
     /**
     * Get the enum value associated with a key.
-    *
+    * 
     * @param clazz
     *           The type of enum to retrieve.
     * @param key
@@ -540,7 +540,7 @@ public class JSONObject {
      *            A key string.
      * @return The numeric value.
      * @throws JSONException
-     *             if the key is not found or if the value cannot
+     *             if the key is not found or if the value cannot 
      *             be converted to BigInteger.
      */
     public BigInteger getBigInteger(String key) throws JSONException {
@@ -883,7 +883,7 @@ public class JSONObject {
 
     /**
      * Get the enum value associated with a key.
-     *
+     * 
      * @param clazz
      *            The type of enum to retrieve.
      * @param key
@@ -896,7 +896,7 @@ public class JSONObject {
 
     /**
      * Get the enum value associated with a key.
-     *
+     * 
      * @param clazz
      *            The type of enum to retrieve.
      * @param key
@@ -1401,7 +1401,7 @@ public class JSONObject {
     }
 
     /**
-     * Creates a JSONPointer using an intialization string and tries to
+     * Creates a JSONPointer using an intialization string and tries to 
      * match it to an item within this JSONObject. For example, given a
      * JSONObject initialized with this document:
      * <pre>
@@ -1409,24 +1409,24 @@ public class JSONObject {
      *     "a":{"b":"c"}
      * }
      * </pre>
-     * and this JSONPointer string:
+     * and this JSONPointer string: 
      * <pre>
      * "/a/b"
      * </pre>
      * Then this method will return the String "c".
      * A JSONPointerException may be thrown from code called by this method.
-     *
+     *   
      * @param jsonPointer string that can be used to create a JSONPointer
      * @return the item matched by the JSONPointer, otherwise null
      */
     public Object query(String jsonPointer) {
         return new JSONPointer(jsonPointer).queryFrom(this);
     }
-
+    
     /**
      * Queries and returns a value from this object using {@code jsonPointer}, or
      * returns null if the query fails due to a missing key.
-     *
+     * 
      * @param jsonPointer the string representation of the JSON pointer
      * @return the queried value or {@code null}
      * @throws IllegalArgumentException if {@code jsonPointer} has invalid syntax
@@ -1488,6 +1488,7 @@ public class JSONObject {
         String hhhh;
         int i;
         int len = string.length();
+        int prev = 0;
 
         w.append('"');
         for (i = 0; i < len; i += 1) {
@@ -1496,41 +1497,73 @@ public class JSONObject {
             switch (c) {
             case '\\':
             case '"':
+                if(prev < i) {
+                    w.append(string, prev, i);
+                }
                 w.append('\\');
-                w.append(c);
+                prev = i;
                 break;
             case '/':
                 if (b == '<') {
+                    if(prev < i) {
+                        w.append(string, prev, i);
+                    }
                     w.append('\\');
+                    prev = i;
                 }
-                w.append(c);
                 break;
             case '\b':
+                if(prev < i) {
+                    w.append(string, prev, i);
+                }
                 w.append("\\b");
+                prev = i + 1;
                 break;
             case '\t':
+                if(prev < i) {
+                    w.append(string, prev, i);
+                }
                 w.append("\\t");
+                prev = i + 1;
                 break;
             case '\n':
+                if(prev < i) {
+                    w.append(string, prev, i);
+                }
                 w.append("\\n");
+                prev = i + 1;
                 break;
             case '\f':
+                if(prev < i) {
+                    w.append(string, prev, i);
+                }
                 w.append("\\f");
+                prev = i + 1;
                 break;
             case '\r':
+                if(prev < i) {
+                    w.append(string, prev, i);
+                }
                 w.append("\\r");
+                prev = i + 1;
                 break;
             default:
                 if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
                         || (c >= '\u2000' && c < '\u2100')) {
-                    w.append("\\u");
+                    if(prev < i) {
+                        w.append(string, prev, i);
+                    }
                     hhhh = Integer.toHexString(c);
-                    w.append("0000", 0, 4 - hhhh.length());
+                    w.append("\\u0000", 0, 6 - hhhh.length());
                     w.append(hhhh);
-                } else {
-                    w.append(c);
+                    prev = i + 1;
                 }
             }
+        }
+        if(prev == 0) {
+            w.append(string);
+        } else if(prev < len) {
+            w.append(string, prev, len);
         }
         w.append('"');
         return w;
