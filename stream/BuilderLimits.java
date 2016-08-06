@@ -149,10 +149,24 @@ public class BuilderLimits implements Cloneable {
         return nestingDepth;
     }
 
+    /**
+     * Soft filtering for any object, array, or value that passes the other
+     * limits provided. If the filter rejects the value, it will be skipped
+     * and parsing continues.
+     *
+     * @return the filter for accepting or rejecting values
+     */
     public LimitFilter getFilter() {
         return filter;
     }
 
+    /**
+     * Soft filtering for any object, array, or value that passes the other
+     * limits provided. If the filter rejects the value, it will be skipped
+     * and parsing continues.
+     *
+     * @param filter the filter for creating objects, arrays, or values
+     */
     public void setFilter(LimitFilter filter) {
         this.filter = filter;
     }
@@ -182,9 +196,6 @@ public class BuilderLimits implements Cloneable {
         }
     }
 
-
-
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -196,6 +207,9 @@ public class BuilderLimits implements Cloneable {
 
         BuilderLimits that = (BuilderLimits) o;
 
+        if((filter == null) ? (that.filter != null) : !filter.equals(that.filter)) {
+            return false;
+        }
         if (keyLength != that.keyLength) {
             return false;
         }
@@ -217,7 +231,8 @@ public class BuilderLimits implements Cloneable {
 
     @Override
     public int hashCode() {
-        int result = keyLength;
+        int result = (filter == null) ? 0 : filter.hashCode();
+        result = 31 * result + keyLength;
         result = 31 * result + (int) (stringLength ^ (stringLength >>> 32));
         result = 31 * result + mantissaDigits;
         result = 31 * result + exponentDigits;
@@ -229,7 +244,8 @@ public class BuilderLimits implements Cloneable {
     @Override
     public String toString() {
         return "BuilderLimits { " +
-                "key length = " + keyLength +
+                "filter = " + filter +
+                ", key length = " + keyLength +
                 ", string length = " + stringLength +
                 ", mantissa digits = " + mantissaDigits +
                 ", exponent digits = " + exponentDigits +
