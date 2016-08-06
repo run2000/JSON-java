@@ -37,11 +37,11 @@ import org.json.JSONParseException;
  */
 final class StructureLimitObjectBuilder implements StructureBuilder {
     private final JSONObject object;
-    private final LimitParameters params;
+    private final BuilderLimits params;
     private String key = null;
     private int index;
 
-    public StructureLimitObjectBuilder(JSONObject object, LimitParameters params) {
+    public StructureLimitObjectBuilder(JSONObject object, BuilderLimits params) {
         this.object = object;
         this.params = params;
         this.index = -1;

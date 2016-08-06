@@ -44,6 +44,8 @@ import java.nio.charset.Charset;
  */
 public final class JSONLimitTrampolineBuilder {
 
+    private static final BuilderLimits DEFAULT_PARAMS = new BuilderLimits();
+
     private JSONLimitTrampolineBuilder() {
     }
 
@@ -59,12 +61,17 @@ public final class JSONLimitTrampolineBuilder {
      * </ul>
      *
      * @param reader     A reader.
+     * @param params the limits imposed on the builder
      * @return a JSON value of the type defined above
      */
-    public static Object buildJSONValue(Reader reader, LimitParameters params) throws JSONException {
+    public static Object buildJSONValue(Reader reader, BuilderLimits params) throws JSONException {
         return buildJSONValue(new JSONLimitStreamReader(reader), params);
     }
 
+    public static Object buildJSONValue(Reader reader) throws JSONException {
+        return buildJSONValue(new JSONLimitStreamReader(reader), DEFAULT_PARAMS);
+    }
+    
     /**
      * Build a JSON value from a {@code InputStream} and supplied
      * {@code Charset}. The value may be one of:
@@ -80,11 +87,17 @@ public final class JSONLimitTrampolineBuilder {
      * @param inputStream   the input stream containing the JSON data
      * @param charset       the character set with which to interpret the
      *                      input stream
+     * @param params the limits imposed on the builder
      * @return a JSON value of the type defined above
      */
-    public static Object buildJSONValue(InputStream inputStream, Charset charset, LimitParameters params)
+    public static Object buildJSONValue(InputStream inputStream, Charset charset, BuilderLimits params)
             throws JSONException {
         return buildJSONValue(new JSONLimitStreamReader(inputStream, charset), params);
+    }
+
+    public static Object buildJSONValue(InputStream inputStream, Charset charset)
+            throws JSONException {
+        return buildJSONValue(new JSONLimitStreamReader(inputStream, charset), DEFAULT_PARAMS);
     }
 
     /**
@@ -99,10 +112,15 @@ public final class JSONLimitTrampolineBuilder {
      * </ul>
      *
      * @param s     A source string.
+     * @param params the limits imposed on the builder
      * @return a JSON value of the type defined above
      */
-    public static Object buildJSONValue(String s, LimitParameters params) throws JSONException {
+    public static Object buildJSONValue(String s, BuilderLimits params) throws JSONException {
         return buildJSONValue(new JSONLimitStreamReader(s), params);
+    }
+
+    public static Object buildJSONValue(String s) throws JSONException {
+        return buildJSONValue(new JSONLimitStreamReader(s), DEFAULT_PARAMS);
     }
 
     /**
@@ -121,16 +139,30 @@ public final class JSONLimitTrampolineBuilder {
      * @param reader    A source stream.
      * @return a JSON value of the type defined above
      */
-    public static Object buildJSONValue(JSONLimitStreamReader reader, LimitParameters params) throws JSONException {
+    public static Object buildJSONValue(JSONLimitStreamReader reader) throws JSONException {
+        return buildJSONValue(reader, DEFAULT_PARAMS);
+    }    
+    
+    /**
+     * Build a JSON value from a {@code JSONStreamReader}. The value may be one
+     * of:
+     * <ul>
+     *     <li>{@code JSONObject.NULL}</li>
+     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     *     <li>A {@code String}</li>
+     *     <li>A {@code JSONObject}</li>
+     *     <li>A {@code JSONArray}</li>
+     * </ul>
+     * <p>The reader must be at the beginning of the document.</p>
+     *
+     * @param reader    A source stream.
+     * @param params the limits imposed on the builder
+     * @return a JSON value of the type defined above
+     */
+    public static Object buildJSONValue(JSONLimitStreamReader reader, BuilderLimits params) throws JSONException {
 
-        if(params != null) {
-            reader.setKeyLength(params.getKeyLength());
-            reader.setStringLength(params.getStringLength());
-            reader.setMantissaDigits(params.getMantissaDigits());
-            reader.setExponentDigits(params.getExponentDigits());
-        } else {
-            params = new LimitParameters();
-        }
+        reader.withLimits(params);
 
         ParseState state = reader.nextState();
 
@@ -174,10 +206,11 @@ public final class JSONLimitTrampolineBuilder {
      * Build a JSONObject from a {@code Reader}.
      *
      * @param reader     A reader.
+     * @param params the limits imposed on the builder
      * @return a JSONObject value
      */
-    public static JSONObject buildJSONObject(Reader reader, LimitParameters params) throws JSONException {
-        return buildJSONObject(new JSONStreamReader(reader), params);
+    public static JSONObject buildJSONObject(Reader reader, BuilderLimits params) throws JSONException {
+        return buildJSONObject(new JSONLimitStreamReader(reader), params);
     }
 
     /**
@@ -187,21 +220,23 @@ public final class JSONLimitTrampolineBuilder {
      * @param inputStream   the input stream containing the JSON data
      * @param charset       the character set with which to interpret the
      *                      input stream
+     * @param params the limits imposed on the builder
      * @return a JSONObject value
      */
-    public static JSONObject buildJSONObject(InputStream inputStream, Charset charset, LimitParameters params)
+    public static JSONObject buildJSONObject(InputStream inputStream, Charset charset, BuilderLimits params)
             throws JSONException {
-        return buildJSONObject(new JSONStreamReader(inputStream, charset), params);
+        return buildJSONObject(new JSONLimitStreamReader(inputStream, charset), params);
     }
 
     /**
      * Build a JSONObject from a {@code String}.
      *
      * @param s     A source string.
+     * @param params the limits imposed on the builder
      * @return a JSONObject value
      */
-    public static JSONObject buildJSONObject(String s, LimitParameters params) throws JSONException {
-        return buildJSONObject(new JSONStreamReader(s), params);
+    public static JSONObject buildJSONObject(String s, BuilderLimits params) throws JSONException {
+        return buildJSONObject(new JSONLimitStreamReader(s), params);
     }
 
     /**
@@ -209,9 +244,11 @@ public final class JSONLimitTrampolineBuilder {
      * at the beginning of the document.
      *
      * @param reader    A source stream.
+     * @param params the limits imposed on the builder
      * @return a JSONObject value
      */
-    public static JSONObject buildJSONObject(JSONStreamReader reader, LimitParameters params) throws JSONException {
+    public static JSONObject buildJSONObject(JSONLimitStreamReader reader, BuilderLimits params) throws JSONException {
+        reader.withLimits(params);
         ParseState state = reader.nextState();
 
         if(state != ParseState.DOCUMENT) {
@@ -244,10 +281,11 @@ public final class JSONLimitTrampolineBuilder {
      * Build a JSONArray from a {@code Reader}.
      *
      * @param reader     A reader.
+     * @param params the limits imposed on the builder
      * @return a JSONArray value
      */
-    public static JSONArray buildJSONArray(Reader reader, LimitParameters params) throws JSONException {
-        return buildJSONArray(new JSONStreamReader(reader), params);
+    public static JSONArray buildJSONArray(Reader reader, BuilderLimits params) throws JSONException {
+        return buildJSONArray(new JSONLimitStreamReader(reader), params);
     }
 
     /**
@@ -257,20 +295,22 @@ public final class JSONLimitTrampolineBuilder {
      * @param inputStream   the input stream containing the JSON data
      * @param charset       the character set with which to interpret the
      *                      input stream
+     * @param params the limits imposed on the builder
      * @return a JSONArray value
      */
-    public static JSONArray buildJSONArray(InputStream inputStream, Charset charset, LimitParameters params) throws JSONException {
-        return buildJSONArray(new JSONStreamReader(inputStream, charset), params);
+    public static JSONArray buildJSONArray(InputStream inputStream, Charset charset, BuilderLimits params) throws JSONException {
+        return buildJSONArray(new JSONLimitStreamReader(inputStream, charset), params);
     }
 
     /**
      * Build a JSONArray from a {@code String}.
      *
      * @param s     A source string.
+     * @param params the limits imposed on the builder
      * @return a JSONArray value
      */
-    public static JSONArray buildJSONArray(String s, LimitParameters params) throws JSONException {
-        return buildJSONArray(new JSONStreamReader(s), params);
+    public static JSONArray buildJSONArray(String s, BuilderLimits params) throws JSONException {
+        return buildJSONArray(new JSONLimitStreamReader(s), params);
     }
 
     /**
@@ -278,9 +318,11 @@ public final class JSONLimitTrampolineBuilder {
      * at the beginning of the document.
      *
      * @param reader    A source stream.
+     * @param params the limits imposed on the builder
      * @return a JSONArray value
      */
-    public static JSONArray buildJSONArray(JSONStreamReader reader, LimitParameters params) throws JSONException {
+    public static JSONArray buildJSONArray(JSONLimitStreamReader reader, BuilderLimits params) throws JSONException {
+        reader.withLimits(params);
         ParseState state = reader.nextState();
 
         if(state != ParseState.DOCUMENT) {
@@ -315,9 +357,10 @@ public final class JSONLimitTrampolineBuilder {
      * instead of recursion is known as trampolining.
      *
      * @param reader the stream reader
+     * @param params the limits imposed on the builder
      * @return the populated JSON array
      */
-    private static JSONArray parseArrayTree(JSONStreamReader reader, LimitParameters params) throws JSONException {
+    private static JSONArray parseArrayTree(JSONLimitStreamReader reader, BuilderLimits params) throws JSONException {
         JSONArray array = new JSONArray();
         ALStack<StructureBuilder> stack = new ALStack<StructureBuilder>();
         stack.push(new StructureLimitArrayBuilder(array, params));
@@ -342,9 +385,10 @@ public final class JSONLimitTrampolineBuilder {
      * instead of recursion is known as trampolining.
      *
      * @param reader the stream reader
+     * @param params the limits imposed on the builder
      * @return the populated JSON object
      */
-    private static JSONObject parseObjectTree(JSONStreamReader reader, LimitParameters params) throws JSONException {
+    private static JSONObject parseObjectTree(JSONLimitStreamReader reader, BuilderLimits params) throws JSONException {
         JSONObject object = new JSONObject();
         ALStack<StructureBuilder> stack = new ALStack<StructureBuilder>();
         stack.push(new StructureLimitObjectBuilder(object, params));

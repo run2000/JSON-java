@@ -25,19 +25,42 @@ SOFTWARE.
 */
 
 /**
+ * Builder limits, based on similar limits used in some XML parsers.
+ *
  * @author JSON.org
  * @version 2016-08-02
  */
-public class LimitParameters {
+public class BuilderLimits implements Cloneable {
 
     private int keyLength = Integer.MAX_VALUE;
-    private long stringLength = Long.MAX_VALUE;
+    private int stringLength = Integer.MAX_VALUE;
     private int mantissaDigits = Short.MAX_VALUE;
     private int exponentDigits = Byte.MAX_VALUE;
     private int contentNodes = Integer.MAX_VALUE;
     private int nestingDepth = Integer.MAX_VALUE;
 
-    public LimitParameters() {
+    // Secure defaults. Cloned for mutability reasons.
+    private static final BuilderLimits SECURE_DEFAULTS =
+            makeSecureDefaults();
+
+    private static BuilderLimits makeSecureDefaults() {
+        BuilderLimits params = new BuilderLimits();
+
+        params.setKeyLength(1024);
+        params.setStringLength(Integer.MAX_VALUE);
+        params.setMantissaDigits(19);// Long.MAX_VALUE length
+        params.setExponentDigits(3); // Double.MAX_VALUE exponent (ieee 754)
+        params.setContentNodes(10000);
+        params.setNestingDepth(256);
+
+        return params;
+    }
+
+    /**
+     * Create a new BuilderLimits class with large, but bounded, limits
+     * on object building.
+     */
+    public BuilderLimits() {
     }
 
     /**
@@ -50,8 +73,8 @@ public class LimitParameters {
     /**
      * The maximum length of any string value.
      */
-    public void setStringLength(long stringLength) {
-        this.stringLength = (stringLength <= 0) ? Long.MAX_VALUE : stringLength;
+    public void setStringLength(int stringLength) {
+        this.stringLength = (stringLength <= 0) ? Integer.MAX_VALUE : stringLength;
     }
 
     /**
@@ -92,7 +115,7 @@ public class LimitParameters {
     /**
      * The maximum length of any string value.
      */
-    public long getStringLength() {
+    public int getStringLength() {
         return stringLength;
     }
 
@@ -124,16 +147,81 @@ public class LimitParameters {
         return nestingDepth;
     }
 
-    public static LimitParameters secureDefaults() {
-        LimitParameters params = new LimitParameters();
+    /**
+     * Return a BuilderLimits object that contains some limits for
+     * secure processing. These can be customised as needed.
+     *
+     * @return a BuilderLimits object with secure processing limits
+     */
+    public static BuilderLimits secureDefaults() {
+        return SECURE_DEFAULTS.clone();
+    }
 
-        params.setKeyLength(1024);
-        params.setStringLength(Integer.MAX_VALUE);
-        params.setMantissaDigits(17);
-        params.setExponentDigits(3);
-        params.setContentNodes(10000);
-        params.setNestingDepth(200);
+    /**
+     * Clone this BuilderLimits object for customisation, or to avoid
+     * mutation from outside code.
+     *
+     * @return a clone of this BuilderLimits object
+     */
+    @Override
+    protected BuilderLimits clone() {
+        try {
+            return (BuilderLimits) super.clone();
+        } catch(CloneNotSupportedException e) {
+            throw new Error("Clone not cloneable!");
+        }
+    }
 
-        return params;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        BuilderLimits that = (BuilderLimits) o;
+
+        if (keyLength != that.keyLength) {
+            return false;
+        }
+        if (stringLength != that.stringLength) {
+            return false;
+        }
+        if (mantissaDigits != that.mantissaDigits) {
+            return false;
+        }
+        if (exponentDigits != that.exponentDigits) {
+            return false;
+        }
+        if (contentNodes != that.contentNodes) {
+            return false;
+        }
+        return nestingDepth == that.nestingDepth;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = keyLength;
+        result = 31 * result + (int) (stringLength ^ (stringLength >>> 32));
+        result = 31 * result + mantissaDigits;
+        result = 31 * result + exponentDigits;
+        result = 31 * result + contentNodes;
+        result = 31 * result + nestingDepth;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "BuilderLimits { " +
+                "key length = " + keyLength +
+                ", string length = " + stringLength +
+                ", mantissa digits = " + mantissaDigits +
+                ", exponent digits = " + exponentDigits +
+                ", content nodes = " + contentNodes +
+                ", nesting depth = " + nestingDepth +
+                " }";
     }
 }

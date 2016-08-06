@@ -38,10 +38,10 @@ import org.json.stream.JSONStreamReader.ParseState;
  */
 final class StructureLimitArrayBuilder implements StructureBuilder {
     private final JSONArray array;
-    private final LimitParameters params;
+    private final BuilderLimits params;
     private int index;
 
-    public StructureLimitArrayBuilder(JSONArray array, LimitParameters params) {
+    public StructureLimitArrayBuilder(JSONArray array, BuilderLimits params) {
         this.array = array;
         this.params = params;
         this.index = -1;

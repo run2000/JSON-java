@@ -73,7 +73,7 @@ import java.nio.charset.Charset;
 public final class JSONLimitStreamReader extends JSONStreamReader {
 
     private int keyLength = Integer.MAX_VALUE;
-    private long stringLength = Long.MAX_VALUE;
+    private int stringLength = Integer.MAX_VALUE;
     private int mantissaDigits = Short.MAX_VALUE;
     private int exponentDigits = Byte.MAX_VALUE;
 
@@ -108,6 +108,21 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
+     * Set keyLength, stringLength, mantissaDigits, and exponentDigits
+     * using values from the supplied {@link BuilderLimits} object.
+     *
+     * @param limits the limits to be set
+     * @return this object
+     */
+    public JSONLimitStreamReader withLimits(BuilderLimits limits) {
+        this.keyLength = limits.getKeyLength();
+        this.stringLength = limits.getStringLength();
+        this.mantissaDigits = limits.getMantissaDigits();
+        this.exponentDigits = limits.getExponentDigits();
+        return this;
+    }
+
+    /**
      * The maximum length of any key.
      */
     public void setKeyLength(int keyLength) {
@@ -117,8 +132,8 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     /**
      * The maximum length of any string value.
      */
-    public void setStringLength(long stringLength) {
-        this.stringLength = (stringLength <= 0) ? Long.MAX_VALUE : stringLength;
+    public void setStringLength(int stringLength) {
+        this.stringLength = (stringLength <= 0) ? Integer.MAX_VALUE : stringLength;
     }
 
     /**
