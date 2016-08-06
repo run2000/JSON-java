@@ -42,11 +42,11 @@ import java.nio.charset.Charset;
  * @author JSON.org
  * @version 2016-08-01
  */
-public final class JSONLimitTrampolineBuilder {
+public final class JSONLimitBuilder {
 
     private static final BuilderLimits DEFAULT_PARAMS = new BuilderLimits();
 
-    private JSONLimitTrampolineBuilder() {
+    private JSONLimitBuilder() {
     }
 
     /**
@@ -68,6 +68,20 @@ public final class JSONLimitTrampolineBuilder {
         return buildJSONValue(new JSONLimitStreamReader(reader), params);
     }
 
+    /**
+     * Build a JSON value from a {@code Reader}. The value may be one of:
+     * <ul>
+     *     <li>{@code JSONObject.NULL}</li>
+     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     *     <li>A {@code String}</li>
+     *     <li>A {@code JSONObject}</li>
+     *     <li>A {@code JSONArray}</li>
+     * </ul>
+     *
+     * @param reader     A reader.
+     * @return a JSON value of the type defined above
+     */
     public static Object buildJSONValue(Reader reader) throws JSONException {
         return buildJSONValue(new JSONLimitStreamReader(reader), DEFAULT_PARAMS);
     }
@@ -95,6 +109,23 @@ public final class JSONLimitTrampolineBuilder {
         return buildJSONValue(new JSONLimitStreamReader(inputStream, charset), params);
     }
 
+    /**
+     * Build a JSON value from a {@code InputStream} and supplied
+     * {@code Charset}. The value may be one of:
+     * <ul>
+     *     <li>{@code JSONObject.NULL}</li>
+     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     *     <li>A {@code String}</li>
+     *     <li>A {@code JSONObject}</li>
+     *     <li>A {@code JSONArray}</li>
+     * </ul>
+     *
+     * @param inputStream   the input stream containing the JSON data
+     * @param charset       the character set with which to interpret the
+     *                      input stream
+     * @return a JSON value of the type defined above
+     */
     public static Object buildJSONValue(InputStream inputStream, Charset charset)
             throws JSONException {
         return buildJSONValue(new JSONLimitStreamReader(inputStream, charset), DEFAULT_PARAMS);
@@ -119,6 +150,20 @@ public final class JSONLimitTrampolineBuilder {
         return buildJSONValue(new JSONLimitStreamReader(s), params);
     }
 
+    /**
+     * Build a JSON value from a {@code String}. The value may be one of:
+     * <ul>
+     *     <li>{@code JSONObject.NULL}</li>
+     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     *     <li>A {@code String}</li>
+     *     <li>A {@code JSONObject}</li>
+     *     <li>A {@code JSONArray}</li>
+     * </ul>
+     *
+     * @param s     A source string.
+     * @return a JSON value of the type defined above
+     */
     public static Object buildJSONValue(String s) throws JSONException {
         return buildJSONValue(new JSONLimitStreamReader(s), DEFAULT_PARAMS);
     }
@@ -161,9 +206,7 @@ public final class JSONLimitTrampolineBuilder {
      * @return a JSON value of the type defined above
      */
     public static Object buildJSONValue(JSONLimitStreamReader reader, BuilderLimits params) throws JSONException {
-
         reader.withLimits(params);
-
         ParseState state = reader.nextState();
 
         if(state != ParseState.DOCUMENT) {
