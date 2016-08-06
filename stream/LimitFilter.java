@@ -26,6 +26,7 @@ SOFTWARE.
 
 import org.json.stream.JSONStreamReader.ParseState;
 import org.json.util.JSONPointerUtils;
+import org.json.util.SizedIterable;
 
 /**
  * Filtering for structures during a parse. Provided by the {@link BuilderLimits}
@@ -46,7 +47,7 @@ public interface LimitFilter {
      * @return {@code true} to allow the value to be created, otherwise
      * {@code false} to skip the value
      */
-    boolean acceptIndex(int index, ParseState state, Iterable<StructureBuilder> stack);
+    boolean acceptIndex(int index, ParseState state, SizedIterable<StructureBuilder> stack);
 
     /**
      * Determine whether to accept or reject a value within an object.
@@ -58,6 +59,6 @@ public interface LimitFilter {
      * @return {@code true} to allow the value to be created, otherwise
      * {@code false} to skip the value
      */
-    boolean acceptField(String fieldName, ParseState state, Iterable<StructureBuilder> stack);
+    boolean acceptField(String fieldName, ParseState state, SizedIterable<StructureBuilder> stack);
 
 }

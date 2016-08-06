@@ -35,7 +35,7 @@ import java.util.Iterator;
  * @author JSON.org
  * @version 2016-6-30
  */
-public final class ALStack<E> implements Iterable<E> {
+public final class ALStack<E> implements SizedIterable<E> {
     private final ArrayList<E> elements;
 
     /**
@@ -97,6 +97,7 @@ public final class ALStack<E> implements Iterable<E> {
      *
      * @return {@code true} if the stack is empty, otherwise {@code false}
      */
+    @Override
     public boolean isEmpty() {
         return elements.isEmpty();
     }
@@ -106,6 +107,7 @@ public final class ALStack<E> implements Iterable<E> {
      *
      * @return the number of elements on the stack
      */
+    @Override
     public int size() {
         return elements.size();
     }
