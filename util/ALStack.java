@@ -46,6 +46,16 @@ public final class ALStack<E> implements Iterable<E> {
     }
 
     /**
+     * Create a new stack object with a given initial size.
+     *
+     * @param initSize the initial size of the stack
+     */
+    public ALStack(int initSize) {
+        elements = new ArrayList<E>(initSize);
+    }
+
+    /**
+    /**
      * Push an element onto the stack.
      *
      * @param elem the element to be pushed

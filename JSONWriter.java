@@ -1,6 +1,10 @@
 package org.json;
 
+import org.json.util.ALStack;
+
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /*
 Copyright (c) 2006 JSON.org
@@ -49,14 +53,14 @@ SOFTWARE.
  * <p>
  * The first method called must be <code>array</code> or <code>object</code>.
  * There are no methods for adding commas or colons. JSONWriter adds them for
- * you. Objects and arrays can be nested up to 200 levels deep.
+ * you. Objects and arrays can be nested arbitrarily deep.
  * <p>
  * This can sometimes be easier than using a JSONObject to build a string.
  * @author JSON.org
  * @version 2016-08-04
  */
 public class JSONWriter {
-    private static final int maxdepth = 200;
+    private static final int initdepth = 16;
 
     /**
      * The comma flag determines if a comma should be output before the next
@@ -77,12 +81,7 @@ public class JSONWriter {
     /**
      * The object/array stack.
      */
-    private final JSONObject stack[];
-
-    /**
-     * The stack top index. A value of 0 indicates that the stack is empty.
-     */
-    private int top;
+    private final ALStack<Set<String>> stack;
 
     /**
      * The writer that will receive the output.
@@ -95,8 +94,7 @@ public class JSONWriter {
     public JSONWriter(Appendable w) {
         this.comma = false;
         this.mode = 'i';
-        this.stack = new JSONObject[maxdepth];
-        this.top = 0;
+        this.stack = new ALStack<Set<String>>(initdepth);
         this.writer = w;
     }
 
@@ -233,7 +231,10 @@ public class JSONWriter {
         }
         if (this.mode == 'k') {
             try {
-                this.stack[this.top - 1].putOnce(string, Boolean.TRUE);
+                if(!this.stack.peek().add(string)) {
+                    throw new JSONException("Duplicate key \"" + string + "\"");
+                }
+                //this.stack[this.top - 1].putOnce(string, Boolean.TRUE);
                 if (this.comma) {
                     this.writer.append(',');
                 }
@@ -265,7 +266,7 @@ public class JSONWriter {
         }
         if (this.mode == 'o' || this.mode == 'a') {
             this.append("{");
-            this.push(new JSONObject());
+            this.push(new HashSet<String>());
             this.comma = false;
             return this;
         }
@@ -280,33 +281,28 @@ public class JSONWriter {
      * @throws JSONException If nesting is wrong.
      */
     private void pop(char c) throws JSONException {
-        if (this.top <= 0) {
+        if (this.stack.isEmpty()) {
             throw new JSONException("Nesting error.");
         }
-        char m = this.stack[this.top - 1] == null ? 'a' : 'k';
+        char m = this.stack.pop() == null ? 'a' : 'k';
         if (m != c) {
             throw new JSONException("Nesting error.");
         }
-        this.top -= 1;
-        this.mode = this.top == 0
+        this.mode = this.stack.isEmpty()
             ? 'd'
-            : this.stack[this.top - 1] == null
+            : this.stack.peek() == null
             ? 'a'
             : 'k';
     }
 
     /**
      * Push an array or object scope.
-     * @param jo The scope to open.
+     * @param set The scope to open.
      * @throws JSONException If nesting is too deep.
      */
-    private void push(JSONObject jo) throws JSONException {
-        if (this.top >= maxdepth) {
-            throw new JSONException("Nesting too deep.");
-        }
-        this.stack[this.top] = jo;
-        this.mode = jo == null ? 'a' : 'k';
-        this.top += 1;
+    private void push(Set<String> set) throws JSONException {
+        this.stack.push(set);
+        this.mode = set == null ? 'a' : 'k';
     }
 
 
