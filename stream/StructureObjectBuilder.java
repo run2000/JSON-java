@@ -28,6 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONParseException;
+import org.json.stream.JSONStreamReader.ParseState;
 
 /**
  * Build values onto a given JSONObject.
@@ -51,12 +52,14 @@ final class StructureObjectBuilder implements StructureBuilder {
     }
 
     @Override
-    public void accept(JSONStreamReader.ParseState state, ALStack<StructureBuilder> stack, JSONStreamReader reader) throws JSONException {
+    public void accept(ParseState state, ALStack<StructureBuilder> stack, JSONStreamReader reader) throws JSONException {
+
+        if(state == ParseState.KEY) {
+            key = reader.nextKey();
+            state = reader.nextState();
+        }
 
         switch(state) {
-            case KEY:
-                key = reader.nextKey();
-                break;
             case NULL_VALUE:
             case BOOLEAN_VALUE:
             case NUMBER_VALUE:
