@@ -39,6 +39,8 @@ public class BuilderLimits implements Cloneable {
     private int contentNodes = Integer.MAX_VALUE;
     private int nestingDepth = Integer.MAX_VALUE;
 
+    public LimitFilter filter;
+
     // Secure defaults. Cloned for mutability reasons.
     private static final BuilderLimits SECURE_DEFAULTS =
             makeSecureDefaults();
@@ -147,6 +149,14 @@ public class BuilderLimits implements Cloneable {
         return nestingDepth;
     }
 
+    public LimitFilter getFilter() {
+        return filter;
+    }
+
+    public void setFilter(LimitFilter filter) {
+        this.filter = filter;
+    }
+
     /**
      * Return a BuilderLimits object that contains some limits for
      * secure processing. These can be customised as needed.
@@ -171,6 +181,9 @@ public class BuilderLimits implements Cloneable {
             throw new Error("Clone not cloneable!");
         }
     }
+
+
+
 
     @Override
     public boolean equals(Object o) {

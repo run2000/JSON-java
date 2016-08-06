@@ -50,6 +50,7 @@ final class StructureLimitArrayBuilder implements StructureBuilder {
 
     @Override
     public void accept(ParseState state, ALStack<StructureBuilder> stack, JSONStreamReader reader) throws JSONException {
+        final LimitFilter filter = params.getFilter();
 
         switch(state) {
             case NULL_VALUE:
@@ -59,7 +60,7 @@ final class StructureLimitArrayBuilder implements StructureBuilder {
                 ++index;
                 if (index >= params.getContentNodes()) {
                     throw new JSONParseException("Too many content nodes", reader.getParsePosition());
-                } else {
+                } else if (filter == null || filter.acceptIndex(index, state, stack.size(), stack)) {
                     Object value = reader.nextValue();
                     array.put(value);
                 }
@@ -70,10 +71,12 @@ final class StructureLimitArrayBuilder implements StructureBuilder {
                     throw new JSONParseException("Too many content nodes", reader.getParsePosition());
                 } else if (stack.size() >= params.getNestingDepth()) {
                     throw new JSONParseException("Object nesting too deep", reader.getParsePosition());
-                } else {
+                } else if (filter == null || filter.acceptIndex(index, state, stack.size(), stack)) {
                     JSONArray newArray = new JSONArray();
                     array.put(newArray);
                     stack.push(new StructureLimitArrayBuilder(newArray, params));
+                } else {
+                    reader.skipToEndStructure();
                 }
                 break;
             case OBJECT:
@@ -82,10 +85,12 @@ final class StructureLimitArrayBuilder implements StructureBuilder {
                     throw new JSONParseException("Too many content nodes", reader.getParsePosition());
                 } else if (stack.size() >= params.getNestingDepth()) {
                     throw new JSONParseException("Object nesting too deep", reader.getParsePosition());
-                } else {
+                } else if (filter == null || filter.acceptIndex(index, state, stack.size(), stack)) {
                     JSONObject newObject = new JSONObject();
                     array.put(newObject);
                     stack.push(new StructureLimitObjectBuilder(newObject, params));
+                } else {
+                    reader.skipToEndStructure();
                 }
                 break;
             case END_ARRAY:

@@ -54,15 +54,15 @@ public final class JSONLimitBuilder {
     /**
      * Build a JSON value from a {@code Reader}. The value may be one of:
      * <ul>
-     *     <li>{@code JSONObject.NULL}</li>
-     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
-     *     <li>A {@code String}</li>
-     *     <li>A {@code JSONObject}</li>
-     *     <li>A {@code JSONArray}</li>
+     * <li>{@code JSONObject.NULL}</li>
+     * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code String}</li>
+     * <li>A {@code JSONObject}</li>
+     * <li>A {@code JSONArray}</li>
      * </ul>
      *
-     * @param reader     A reader.
+     * @param reader A reader.
      * @param params the limits imposed on the builder
      * @return a JSON value of the type defined above
      */
@@ -73,37 +73,37 @@ public final class JSONLimitBuilder {
     /**
      * Build a JSON value from a {@code Reader}. The value may be one of:
      * <ul>
-     *     <li>{@code JSONObject.NULL}</li>
-     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
-     *     <li>A {@code String}</li>
-     *     <li>A {@code JSONObject}</li>
-     *     <li>A {@code JSONArray}</li>
+     * <li>{@code JSONObject.NULL}</li>
+     * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code String}</li>
+     * <li>A {@code JSONObject}</li>
+     * <li>A {@code JSONArray}</li>
      * </ul>
      *
-     * @param reader     A reader.
+     * @param reader A reader.
      * @return a JSON value of the type defined above
      */
     public static Object buildJSONValue(Reader reader) throws JSONException {
         return buildJSONValue(new JSONLimitStreamReader(reader), DEFAULT_PARAMS);
     }
-    
+
     /**
      * Build a JSON value from a {@code InputStream} and supplied
      * {@code Charset}. The value may be one of:
      * <ul>
-     *     <li>{@code JSONObject.NULL}</li>
-     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
-     *     <li>A {@code String}</li>
-     *     <li>A {@code JSONObject}</li>
-     *     <li>A {@code JSONArray}</li>
+     * <li>{@code JSONObject.NULL}</li>
+     * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code String}</li>
+     * <li>A {@code JSONObject}</li>
+     * <li>A {@code JSONArray}</li>
      * </ul>
      *
-     * @param inputStream   the input stream containing the JSON data
-     * @param charset       the character set with which to interpret the
-     *                      input stream
-     * @param params the limits imposed on the builder
+     * @param inputStream the input stream containing the JSON data
+     * @param charset     the character set with which to interpret the
+     *                    input stream
+     * @param params      the limits imposed on the builder
      * @return a JSON value of the type defined above
      */
     public static Object buildJSONValue(InputStream inputStream, Charset charset, BuilderLimits params)
@@ -115,17 +115,17 @@ public final class JSONLimitBuilder {
      * Build a JSON value from a {@code InputStream} and supplied
      * {@code Charset}. The value may be one of:
      * <ul>
-     *     <li>{@code JSONObject.NULL}</li>
-     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
-     *     <li>A {@code String}</li>
-     *     <li>A {@code JSONObject}</li>
-     *     <li>A {@code JSONArray}</li>
+     * <li>{@code JSONObject.NULL}</li>
+     * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code String}</li>
+     * <li>A {@code JSONObject}</li>
+     * <li>A {@code JSONArray}</li>
      * </ul>
      *
-     * @param inputStream   the input stream containing the JSON data
-     * @param charset       the character set with which to interpret the
-     *                      input stream
+     * @param inputStream the input stream containing the JSON data
+     * @param charset     the character set with which to interpret the
+     *                    input stream
      * @return a JSON value of the type defined above
      */
     public static Object buildJSONValue(InputStream inputStream, Charset charset)
@@ -136,15 +136,15 @@ public final class JSONLimitBuilder {
     /**
      * Build a JSON value from a {@code String}. The value may be one of:
      * <ul>
-     *     <li>{@code JSONObject.NULL}</li>
-     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
-     *     <li>A {@code String}</li>
-     *     <li>A {@code JSONObject}</li>
-     *     <li>A {@code JSONArray}</li>
+     * <li>{@code JSONObject.NULL}</li>
+     * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code String}</li>
+     * <li>A {@code JSONObject}</li>
+     * <li>A {@code JSONArray}</li>
      * </ul>
      *
-     * @param s     A source string.
+     * @param s      A source string.
      * @param params the limits imposed on the builder
      * @return a JSON value of the type defined above
      */
@@ -155,15 +155,15 @@ public final class JSONLimitBuilder {
     /**
      * Build a JSON value from a {@code String}. The value may be one of:
      * <ul>
-     *     <li>{@code JSONObject.NULL}</li>
-     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
-     *     <li>A {@code String}</li>
-     *     <li>A {@code JSONObject}</li>
-     *     <li>A {@code JSONArray}</li>
+     * <li>{@code JSONObject.NULL}</li>
+     * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code String}</li>
+     * <li>A {@code JSONObject}</li>
+     * <li>A {@code JSONArray}</li>
      * </ul>
      *
-     * @param s     A source string.
+     * @param s A source string.
      * @return a JSON value of the type defined above
      */
     public static Object buildJSONValue(String s) throws JSONException {
@@ -174,36 +174,36 @@ public final class JSONLimitBuilder {
      * Build a JSON value from a {@code JSONStreamReader}. The value may be one
      * of:
      * <ul>
-     *     <li>{@code JSONObject.NULL}</li>
-     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
-     *     <li>A {@code String}</li>
-     *     <li>A {@code JSONObject}</li>
-     *     <li>A {@code JSONArray}</li>
+     * <li>{@code JSONObject.NULL}</li>
+     * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code String}</li>
+     * <li>A {@code JSONObject}</li>
+     * <li>A {@code JSONArray}</li>
      * </ul>
      * <p>The reader must be at the beginning of the document.</p>
      *
-     * @param reader    A source stream.
+     * @param reader A source stream.
      * @return a JSON value of the type defined above
      */
     public static Object buildJSONValue(JSONLimitStreamReader reader) throws JSONException {
         return buildJSONValue(reader, DEFAULT_PARAMS);
-    }    
-    
+    }
+
     /**
      * Build a JSON value from a {@code JSONStreamReader}. The value may be one
      * of:
      * <ul>
-     *     <li>{@code JSONObject.NULL}</li>
-     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     *     <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
-     *     <li>A {@code String}</li>
-     *     <li>A {@code JSONObject}</li>
-     *     <li>A {@code JSONArray}</li>
+     * <li>{@code JSONObject.NULL}</li>
+     * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code String}</li>
+     * <li>A {@code JSONObject}</li>
+     * <li>A {@code JSONArray}</li>
      * </ul>
      * <p>The reader must be at the beginning of the document.</p>
      *
-     * @param reader    A source stream.
+     * @param reader A source stream.
      * @param params the limits imposed on the builder
      * @return a JSON value of the type defined above
      */
@@ -211,7 +211,7 @@ public final class JSONLimitBuilder {
         reader.withLimits(params);
         ParseState state = reader.nextState();
 
-        if(state != ParseState.DOCUMENT) {
+        if (state != ParseState.DOCUMENT) {
             throw new JSONParseException("JSON parser should be at the beginning",
                     reader.getParsePosition());
         }
@@ -219,7 +219,7 @@ public final class JSONLimitBuilder {
         state = reader.nextState();
         Object result;
 
-        switch(state) {
+        switch (state) {
             case OBJECT:
                 result = parseObjectTree(reader, params);
                 break;
@@ -239,7 +239,7 @@ public final class JSONLimitBuilder {
                 throw new JSONParseException("Expected value", reader.getParsePosition());
         }
 
-        if(reader.nextState() != ParseState.END_DOCUMENT) {
+        if (reader.nextState() != ParseState.END_DOCUMENT) {
             throw new JSONParseException("JSON parser in an unexpected state",
                     reader.getParsePosition());
         }
@@ -250,7 +250,7 @@ public final class JSONLimitBuilder {
     /**
      * Build a JSONObject from a {@code Reader}.
      *
-     * @param reader     A reader.
+     * @param reader A reader.
      * @param params the limits imposed on the builder
      * @return a JSONObject value
      */
@@ -258,14 +258,18 @@ public final class JSONLimitBuilder {
         return buildJSONObject(new JSONLimitStreamReader(reader), params);
     }
 
+    public static JSONObject buildJSONObject(Reader reader) throws JSONException {
+        return buildJSONObject(new JSONLimitStreamReader(reader), DEFAULT_PARAMS);
+    }
+
     /**
      * Build a JSONObject from a {@code InputStream} and supplied
      * {@code Charset}.
      *
-     * @param inputStream   the input stream containing the JSON data
-     * @param charset       the character set with which to interpret the
-     *                      input stream
-     * @param params the limits imposed on the builder
+     * @param inputStream the input stream containing the JSON data
+     * @param charset     the character set with which to interpret the
+     *                    input stream
+     * @param params      the limits imposed on the builder
      * @return a JSONObject value
      */
     public static JSONObject buildJSONObject(InputStream inputStream, Charset charset, BuilderLimits params)
@@ -273,15 +277,28 @@ public final class JSONLimitBuilder {
         return buildJSONObject(new JSONLimitStreamReader(inputStream, charset), params);
     }
 
+    public static JSONObject buildJSONObject(InputStream inputStream, Charset charset)
+            throws JSONException {
+        return buildJSONObject(new JSONLimitStreamReader(inputStream, charset), DEFAULT_PARAMS);
+    }
+
     /**
      * Build a JSONObject from a {@code String}.
      *
-     * @param s     A source string.
+     * @param s      A source string.
      * @param params the limits imposed on the builder
      * @return a JSONObject value
      */
     public static JSONObject buildJSONObject(String s, BuilderLimits params) throws JSONException {
         return buildJSONObject(new JSONLimitStreamReader(s), params);
+    }
+
+    public static JSONObject buildJSONObject(String s) throws JSONException {
+        return buildJSONObject(new JSONLimitStreamReader(s), DEFAULT_PARAMS);
+    }
+
+    public static JSONObject buildJSONObject(JSONLimitStreamReader reader) throws JSONException {
+        return buildJSONObject(reader, DEFAULT_PARAMS);
     }
 
     /**
@@ -333,6 +350,10 @@ public final class JSONLimitBuilder {
         return buildJSONArray(new JSONLimitStreamReader(reader), params);
     }
 
+    public static JSONArray buildJSONArray(Reader reader) throws JSONException {
+        return buildJSONArray(new JSONLimitStreamReader(reader), DEFAULT_PARAMS);
+    }
+
     /**
      * Build a JSONArray from a {@code InputStream} and supplied
      * {@code Charset}.
@@ -347,6 +368,10 @@ public final class JSONLimitBuilder {
         return buildJSONArray(new JSONLimitStreamReader(inputStream, charset), params);
     }
 
+    public static JSONArray buildJSONArray(InputStream inputStream, Charset charset) throws JSONException {
+        return buildJSONArray(new JSONLimitStreamReader(inputStream, charset), DEFAULT_PARAMS);
+    }
+
     /**
      * Build a JSONArray from a {@code String}.
      *
@@ -356,6 +381,14 @@ public final class JSONLimitBuilder {
      */
     public static JSONArray buildJSONArray(String s, BuilderLimits params) throws JSONException {
         return buildJSONArray(new JSONLimitStreamReader(s), params);
+    }
+
+    public static JSONArray buildJSONArray(String s) throws JSONException {
+        return buildJSONArray(new JSONLimitStreamReader(s), DEFAULT_PARAMS);
+    }
+
+    public static JSONArray buildJSONArray(JSONLimitStreamReader reader) throws JSONException {
+        return buildJSONArray(reader, DEFAULT_PARAMS);
     }
 
     /**

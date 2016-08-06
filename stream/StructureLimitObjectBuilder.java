@@ -51,6 +51,7 @@ final class StructureLimitObjectBuilder implements StructureBuilder {
 
     @Override
     public void accept(ParseState state, ALStack<StructureBuilder> stack, JSONStreamReader reader) throws JSONException {
+        final LimitFilter filter = params.getFilter();
 
         if(state == ParseState.KEY) {
             key = reader.nextKey();
@@ -65,7 +66,7 @@ final class StructureLimitObjectBuilder implements StructureBuilder {
                 ++index;
                 if (index >= params.getContentNodes()) {
                     throw new JSONParseException("Too many content nodes", reader.getParsePosition());
-                } else {
+                } else if((filter == null) || (filter.acceptField(key, state, stack.size(), stack))) {
                     Object value = reader.nextValue();
                     object.putOnce(key, value);
                 }
@@ -76,10 +77,12 @@ final class StructureLimitObjectBuilder implements StructureBuilder {
                     throw new JSONParseException("Too many content nodes", reader.getParsePosition());
                 } else if (stack.size() >= params.getNestingDepth()) {
                     throw new JSONParseException("Object nesting too deep", reader.getParsePosition());
-                } else {
+                } else if((filter == null) || (filter.acceptField(key, state, stack.size(), stack))) {
                     JSONArray newArray = new JSONArray();
                     object.putOnce(key, newArray);
                     stack.push(new StructureLimitArrayBuilder(newArray, params));
+                } else {
+                    reader.skipToEndStructure();
                 }
                 break;
             case OBJECT:
@@ -88,10 +91,12 @@ final class StructureLimitObjectBuilder implements StructureBuilder {
                     throw new JSONParseException("Too many content nodes", reader.getParsePosition());
                 } else if (stack.size() >= params.getNestingDepth()) {
                     throw new JSONParseException("Object nesting too deep", reader.getParsePosition());
-                } else {
+                } else if((filter == null) || (filter.acceptField(key, state, stack.size(), stack))) {
                     JSONObject newObject = new JSONObject();
                     object.putOnce(key, newObject);
                     stack.push(new StructureLimitObjectBuilder(newObject, params));
+                } else {
+                    reader.skipToEndStructure();
                 }
                 break;
             case END_OBJECT:

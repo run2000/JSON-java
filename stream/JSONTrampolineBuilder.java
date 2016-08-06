@@ -143,7 +143,7 @@ public final class JSONTrampolineBuilder {
      * @param reader    A source stream.
      * @return a JSON value of the type defined above
      */
-    public static Object buildJSONValue(JSONStreamReader reader, TrampolineFilter filter) throws JSONException {
+    public static Object buildJSONValue(JSONStreamReader reader, LimitFilter filter) throws JSONException {
         ParseState state = reader.nextState();
 
         if(state != ParseState.DOCUMENT) {
@@ -233,7 +233,7 @@ public final class JSONTrampolineBuilder {
      * @param reader    A source stream.
      * @return a JSONObject value
      */
-    public static JSONObject buildJSONObject(JSONStreamReader reader, TrampolineFilter filter) throws JSONException {
+    public static JSONObject buildJSONObject(JSONStreamReader reader, LimitFilter filter) throws JSONException {
         ParseState state = reader.nextState();
 
         if(state != ParseState.DOCUMENT) {
@@ -313,7 +313,7 @@ public final class JSONTrampolineBuilder {
      * @param reader    A source stream.
      * @return a JSONArray value
      */
-    public static JSONArray buildJSONArray(JSONStreamReader reader, TrampolineFilter filter) throws JSONException {
+    public static JSONArray buildJSONArray(JSONStreamReader reader, LimitFilter filter) throws JSONException {
         ParseState state = reader.nextState();
 
         if(state != ParseState.DOCUMENT) {
@@ -352,7 +352,7 @@ public final class JSONTrampolineBuilder {
      * @return the populated JSON array
      */
     private static JSONArray parseArrayTree(JSONStreamReader reader,
-                                            TrampolineFilter filter) throws JSONException {
+                                            LimitFilter filter) throws JSONException {
         JSONArray array = new JSONArray();
         ALStack<StructureBuilder> stack = new ALStack<StructureBuilder>();
         stack.push(new StructureArrayBuilder(array, filter));
@@ -381,7 +381,7 @@ public final class JSONTrampolineBuilder {
      * @return the populated JSON object
      */
     private static JSONObject parseObjectTree(JSONStreamReader reader,
-                                              TrampolineFilter filter) throws JSONException {
+                                              LimitFilter filter) throws JSONException {
         JSONObject object = new JSONObject();
         ALStack<StructureBuilder> stack = new ALStack<StructureBuilder>();
         stack.push(new StructureObjectBuilder(object, filter));

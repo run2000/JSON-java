@@ -24,14 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import org.json.stream.JSONStreamReader;
-
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.Iterator;
 
 /**
- * A simple unsynchronized stack implementation, used by {@link JSONStreamReader}.
+ * A simple unsynchronized stack implementation, used by {@link org.json.stream.JSONStreamReader}.
  * The stack is backed by an {@code ArrayList}.
  *
  * @author JSON.org

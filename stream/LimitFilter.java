@@ -33,7 +33,7 @@ import org.json.util.JSONPointerUtils;
  * @author JSON.org
  * @version 2016-08-02
  */
-public interface TrampolineFilter {
+public interface LimitFilter {
 
     /**
      * Determine whether to accept or reject a value within an array.

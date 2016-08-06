@@ -39,7 +39,7 @@ import org.json.util.ALStack;
  */
 final class StructureObjectBuilder implements StructureBuilder {
     private final JSONObject object;
-    private final TrampolineFilter filter;
+    private final LimitFilter filter;
     private String key = null;
 
     public StructureObjectBuilder(JSONObject object) {
@@ -47,7 +47,7 @@ final class StructureObjectBuilder implements StructureBuilder {
         this.filter = null;
     }
 
-    public StructureObjectBuilder(JSONObject object, TrampolineFilter filter) {
+    public StructureObjectBuilder(JSONObject object, LimitFilter filter) {
         this.object = object;
         this.filter = filter;
     }

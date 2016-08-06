@@ -27,7 +27,7 @@ SOFTWARE.
 import org.json.stream.StructureBuilder;
 
 /**
- * Utilities for conversion an iterable of {@link StructureBuilder} objects
+ * Utilities for conversion an iterable of {@link org.json.stream.StructureBuilder} objects
  * into a JSON Pointer expression. See RFC 6901 for details of JSON Pointer.
  *
  * @author JSON.org
@@ -81,7 +81,7 @@ public final class JSONPointerUtils {
     }
 
     /**
-     * Given a {@link StructureBuilder} stack as an {@code Iterable},
+     * Given a {@link org.json.stream.StructureBuilder} stack as an {@code Iterable},
      * create a JSON Pointer string.
      *
      * @param stack a stack of StructureBuilder objects, from which the

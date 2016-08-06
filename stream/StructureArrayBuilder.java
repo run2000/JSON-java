@@ -39,7 +39,7 @@ import org.json.util.ALStack;
  */
 final class StructureArrayBuilder implements StructureBuilder {
     private final JSONArray array;
-    private final TrampolineFilter filter;
+    private final LimitFilter filter;
     private int index;
 
     public StructureArrayBuilder(JSONArray array) {
@@ -48,7 +48,7 @@ final class StructureArrayBuilder implements StructureBuilder {
         this.index = -1;
     }
 
-    public StructureArrayBuilder(JSONArray array, TrampolineFilter filter) {
+    public StructureArrayBuilder(JSONArray array, LimitFilter filter) {
         this.array = array;
         this.filter = filter;
         this.index = -1;
