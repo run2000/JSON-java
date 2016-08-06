@@ -26,6 +26,7 @@ SOFTWARE.
 
 import org.json.JSONException;
 import org.json.stream.JSONStreamReader.ParseState;
+import org.json.util.ALStack;
 
 /**
  * Structure builder interface, used by the {@link JSONTrampolineBuilder}
