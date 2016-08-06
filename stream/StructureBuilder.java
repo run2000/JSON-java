@@ -29,7 +29,7 @@ import org.json.stream.JSONStreamReader.ParseState;
 import org.json.util.ALStack;
 
 /**
- * Structure builder interface, used by the {@link JSONTrampolineBuilder}
+ * Structure builder interface, used by the {@link JSONLimitBuilder}
  * class to create arrays and objects without requiring a recursive algorithm.
  *
  * @author JSON.org
