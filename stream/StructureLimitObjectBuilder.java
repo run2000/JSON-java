@@ -66,7 +66,7 @@ final class StructureLimitObjectBuilder implements StructureBuilder {
                 ++index;
                 if (index >= params.getContentNodes()) {
                     throw new JSONParseException("Too many content nodes", reader.getParsePosition());
-                } else if((filter == null) || (filter.acceptField(key, state, stack.size(), stack))) {
+                } else if((filter == null) || (filter.acceptField(key, state, stack))) {
                     Object value = reader.nextValue();
                     object.putOnce(key, value);
                 }
@@ -77,7 +77,7 @@ final class StructureLimitObjectBuilder implements StructureBuilder {
                     throw new JSONParseException("Too many content nodes", reader.getParsePosition());
                 } else if (stack.size() >= params.getNestingDepth()) {
                     throw new JSONParseException("Object nesting too deep", reader.getParsePosition());
-                } else if((filter == null) || (filter.acceptField(key, state, stack.size(), stack))) {
+                } else if((filter == null) || (filter.acceptField(key, state, stack))) {
                     JSONArray newArray = new JSONArray();
                     object.putOnce(key, newArray);
                     stack.push(new StructureLimitArrayBuilder(newArray, params));
@@ -91,7 +91,7 @@ final class StructureLimitObjectBuilder implements StructureBuilder {
                     throw new JSONParseException("Too many content nodes", reader.getParsePosition());
                 } else if (stack.size() >= params.getNestingDepth()) {
                     throw new JSONParseException("Object nesting too deep", reader.getParsePosition());
-                } else if((filter == null) || (filter.acceptField(key, state, stack.size(), stack))) {
+                } else if((filter == null) || (filter.acceptField(key, state, stack))) {
                     JSONObject newObject = new JSONObject();
                     object.putOnce(key, newObject);
                     stack.push(new StructureLimitObjectBuilder(newObject, params));

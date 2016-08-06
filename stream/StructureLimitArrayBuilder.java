@@ -60,7 +60,7 @@ final class StructureLimitArrayBuilder implements StructureBuilder {
                 ++index;
                 if (index >= params.getContentNodes()) {
                     throw new JSONParseException("Too many content nodes", reader.getParsePosition());
-                } else if (filter == null || filter.acceptIndex(index, state, stack.size(), stack)) {
+                } else if (filter == null || filter.acceptIndex(index, state, stack)) {
                     Object value = reader.nextValue();
                     array.put(value);
                 }
@@ -71,7 +71,7 @@ final class StructureLimitArrayBuilder implements StructureBuilder {
                     throw new JSONParseException("Too many content nodes", reader.getParsePosition());
                 } else if (stack.size() >= params.getNestingDepth()) {
                     throw new JSONParseException("Object nesting too deep", reader.getParsePosition());
-                } else if (filter == null || filter.acceptIndex(index, state, stack.size(), stack)) {
+                } else if (filter == null || filter.acceptIndex(index, state, stack)) {
                     JSONArray newArray = new JSONArray();
                     array.put(newArray);
                     stack.push(new StructureLimitArrayBuilder(newArray, params));
@@ -85,7 +85,7 @@ final class StructureLimitArrayBuilder implements StructureBuilder {
                     throw new JSONParseException("Too many content nodes", reader.getParsePosition());
                 } else if (stack.size() >= params.getNestingDepth()) {
                     throw new JSONParseException("Object nesting too deep", reader.getParsePosition());
-                } else if (filter == null || filter.acceptIndex(index, state, stack.size(), stack)) {
+                } else if (filter == null || filter.acceptIndex(index, state, stack)) {
                     JSONObject newObject = new JSONObject();
                     array.put(newObject);
                     stack.push(new StructureLimitObjectBuilder(newObject, params));

@@ -28,7 +28,8 @@ import org.json.stream.JSONStreamReader.ParseState;
 import org.json.util.JSONPointerUtils;
 
 /**
- * Filtering for structures during a parse.
+ * Filtering for structures during a parse. Provided by the {@link BuilderLimits}
+ * class to the {@link StructureBuilder} implementations.
  *
  * @author JSON.org
  * @version 2016-08-02
@@ -40,25 +41,23 @@ public interface LimitFilter {
      *
      * @param index the array index within the current array
      * @param state the type of value that will be built
-     * @param stackDepth the depth of the object or array
      * @param stack can be used to construct a JSON Pointer expression, see
      *              {@link JSONPointerUtils#toJSONPointer(Iterable)}.
      * @return {@code true} to allow the value to be created, otherwise
      * {@code false} to skip the value
      */
-    boolean acceptIndex(int index, ParseState state, int stackDepth, Iterable<StructureBuilder> stack);
+    boolean acceptIndex(int index, ParseState state, Iterable<StructureBuilder> stack);
 
     /**
      * Determine whether to accept or reject a value within an object.
      *
      * @param fieldName the key name within the current object
      * @param state the type of value that will be built
-     * @param stackDepth the depth of the object or array
      * @param stack can be used to construct a JSON Pointer expression, see
      *              {@link JSONPointerUtils#toJSONPointer(Iterable)}.
      * @return {@code true} to allow the value to be created, otherwise
      * {@code false} to skip the value
      */
-    boolean acceptField(String fieldName, ParseState state, int stackDepth, Iterable<StructureBuilder> stack);
+    boolean acceptField(String fieldName, ParseState state, Iterable<StructureBuilder> stack);
 
 }
