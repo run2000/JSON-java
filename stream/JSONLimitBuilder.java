@@ -441,7 +441,7 @@ public final class JSONLimitBuilder {
     private static JSONArray parseArrayTree(JSONLimitStreamReader reader, BuilderLimits params) throws JSONException {
         JSONArray array = new JSONArray();
         ALStack<StructureBuilder> stack = new ALStack<StructureBuilder>();
-        stack.push(new StructureLimitArrayBuilder(array, params));
+        stack.push(new StructureArrayBuilder(array, params));
         ParseState state;
 
         try {
@@ -469,7 +469,7 @@ public final class JSONLimitBuilder {
     private static JSONObject parseObjectTree(JSONLimitStreamReader reader, BuilderLimits params) throws JSONException {
         JSONObject object = new JSONObject();
         ALStack<StructureBuilder> stack = new ALStack<StructureBuilder>();
-        stack.push(new StructureLimitObjectBuilder(object, params));
+        stack.push(new StructureObjectBuilder(object, params));
         ParseState state;
 
         try {

@@ -32,18 +32,19 @@ import org.json.stream.JSONStreamReader.ParseState;
 import org.json.util.ALStack;
 
 /**
- * Build values onto a given JSONArray.
+ * Build values onto a given JSONObject.
  *
  * @author JSON.org
  * @version 2016-08-02
  */
-final class StructureLimitArrayBuilder implements StructureBuilder {
-    private final JSONArray array;
+final class StructureObjectBuilder implements StructureBuilder {
+    private final JSONObject object;
     private final BuilderLimits params;
+    private String key = null;
     private int index;
 
-    public StructureLimitArrayBuilder(JSONArray array, BuilderLimits params) {
-        this.array = array;
+    public StructureObjectBuilder(JSONObject object, BuilderLimits params) {
+        this.object = object;
         this.params = params;
         this.index = -1;
     }
@@ -51,6 +52,11 @@ final class StructureLimitArrayBuilder implements StructureBuilder {
     @Override
     public void accept(ParseState state, ALStack<StructureBuilder> stack, JSONStreamReader reader) throws JSONException {
         final LimitFilter filter = params.getFilter();
+
+        if(state == ParseState.KEY) {
+            key = reader.nextKey();
+            state = reader.nextState();
+        }
 
         switch(state) {
             case NULL_VALUE:
@@ -60,9 +66,9 @@ final class StructureLimitArrayBuilder implements StructureBuilder {
                 ++index;
                 if (index >= params.getContentNodes()) {
                     throw new JSONParseException("Too many content nodes", reader.getParsePosition());
-                } else if (filter == null || filter.acceptIndex(index, state, stack)) {
+                } else if((filter == null) || (filter.acceptField(key, state, stack))) {
                     Object value = reader.nextValue();
-                    array.put(value);
+                    object.putOnce(key, value);
                 }
                 break;
             case ARRAY:
@@ -71,10 +77,10 @@ final class StructureLimitArrayBuilder implements StructureBuilder {
                     throw new JSONParseException("Too many content nodes", reader.getParsePosition());
                 } else if (stack.size() >= params.getNestingDepth()) {
                     throw new JSONParseException("Object nesting too deep", reader.getParsePosition());
-                } else if (filter == null || filter.acceptIndex(index, state, stack)) {
+                } else if((filter == null) || (filter.acceptField(key, state, stack))) {
                     JSONArray newArray = new JSONArray();
-                    array.put(newArray);
-                    stack.push(new StructureLimitArrayBuilder(newArray, params));
+                    object.putOnce(key, newArray);
+                    stack.push(new StructureArrayBuilder(newArray, params));
                 } else {
                     reader.skipToEndStructure();
                 }
@@ -85,15 +91,15 @@ final class StructureLimitArrayBuilder implements StructureBuilder {
                     throw new JSONParseException("Too many content nodes", reader.getParsePosition());
                 } else if (stack.size() >= params.getNestingDepth()) {
                     throw new JSONParseException("Object nesting too deep", reader.getParsePosition());
-                } else if (filter == null || filter.acceptIndex(index, state, stack)) {
+                } else if((filter == null) || (filter.acceptField(key, state, stack))) {
                     JSONObject newObject = new JSONObject();
-                    array.put(newObject);
-                    stack.push(new StructureLimitObjectBuilder(newObject, params));
+                    object.putOnce(key, newObject);
+                    stack.push(new StructureObjectBuilder(newObject, params));
                 } else {
                     reader.skipToEndStructure();
                 }
                 break;
-            case END_ARRAY:
+            case END_OBJECT:
                 stack.pop();
                 break;
             default:
@@ -102,7 +108,7 @@ final class StructureLimitArrayBuilder implements StructureBuilder {
     }
 
     public String getIdentifier() {
-        return String.valueOf(index);
+        return String.valueOf(key);
     }
 
     @Override
