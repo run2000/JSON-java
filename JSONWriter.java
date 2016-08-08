@@ -2,6 +2,7 @@ package org.json;
 
 import org.json.util.ALStack;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -59,7 +60,7 @@ SOFTWARE.
  * @author JSON.org
  * @version 2016-08-04
  */
-public class JSONWriter {
+public class JSONWriter implements Closeable {
     private static final int initdepth = 16;
 
     /**
@@ -348,5 +349,56 @@ public class JSONWriter {
      */
     public JSONWriter value(Object object) throws JSONException {
         return this.appendValue(object);
+    }
+
+    /**
+     * Append a sequence of values into an array.
+     *
+     * @param values The objects to append. They can be null, or a Boolean, Number,
+     *   String, JSONObject, or JSONArray, or an object that implements JSONString.
+     * @return this
+     * @throws JSONException If a value is out of place. For example, a value
+     *  occurs where a key is expected.
+     */
+    public JSONWriter values(Iterable<?> values) throws JSONException {
+        for(Object obj : values) {
+            this.appendValue(obj);
+        }
+        return this;
+    }
+
+    /**
+     * Append a sequence of key-value pairs into an object.
+     *
+     * @param kvPairs The objects to append. The values can be null, or a Boolean,
+     *   Number, String, JSONObject, or JSONArray, or an object that implements
+     *   JSONString.
+     * @return this
+     * @throws JSONException If a value is out of place. For example, a value
+     *  occurs where a key is expected.
+     */
+    public JSONWriter entries(Map<String, ?> kvPairs) throws JSONException {
+        for(Map.Entry<String, ?> entry : kvPairs.entrySet()) {
+            this.key(entry.getKey());
+            this.appendValue(entry);
+        }
+        return this;
+    }
+
+    /**
+     * Asserts the JSON writer is finished, and close any underlying
+     * {@code Closeable} writer.
+     *
+     * @throws IOException the writer cannot be closed
+     */
+    @Override
+    public void close() throws IOException {
+        if(!this.stack.isEmpty()) {
+            throw new IOException("JSON stack is not empty");
+        }
+
+        if(writer instanceof Closeable) {
+            ((Closeable)writer).close();
+        }
     }
 }
