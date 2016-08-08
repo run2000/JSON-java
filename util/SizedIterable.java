@@ -9,8 +9,19 @@ package org.json.util;
  */
 public interface SizedIterable<T> extends Iterable<T> {
 
+    /**
+     * Returns the number of elements in this {@code Iterable}.
+     *
+     * @return the number of element
+     */
     int size();
 
+    /**
+     * Determine whether the {@code Iterable} has any elements.
+     *
+     * @return {@code true} if this collection contains no elements, otherwise
+     * {@code false}
+     */
     boolean isEmpty();
 
 }
