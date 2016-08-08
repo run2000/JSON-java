@@ -188,7 +188,7 @@ public class BuilderLimits implements Cloneable {
      * @return a clone of this BuilderLimits object
      */
     @Override
-    protected BuilderLimits clone() {
+    public BuilderLimits clone() {
         try {
             return (BuilderLimits) super.clone();
         } catch(CloneNotSupportedException e) {
