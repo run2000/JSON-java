@@ -83,14 +83,16 @@ public class BuilderLimits implements Cloneable {
      * The maximum number of mantissa digits in a number.
      */
     public void setMantissaDigits(int mantissaDigits) {
-        this.mantissaDigits = (mantissaDigits <= 0) ? Short.MAX_VALUE : mantissaDigits;
+        this.mantissaDigits = ((mantissaDigits <= 0) || (mantissaDigits > Short.MAX_VALUE))
+                ? Short.MAX_VALUE : mantissaDigits;
     }
 
     /**
      * The maximum number of exponent digits in a number.
      */
     public void setExponentDigits(int exponentDigits) {
-        this.exponentDigits = (exponentDigits < 0) ? Byte.MAX_VALUE : exponentDigits;
+        this.exponentDigits = ((exponentDigits < 0) || (exponentDigits > Byte.MAX_VALUE))
+                ? Byte.MAX_VALUE : exponentDigits;
     }
 
     /**
