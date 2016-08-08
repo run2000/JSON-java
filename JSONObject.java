@@ -1930,13 +1930,13 @@ public class JSONObject {
 
     static void indent(Appendable writer, int indent) throws IOException {
         final int padding = PADDING_SPACES.length();
-        int i = indent;
-        while(i > padding) {
+
+        while(indent > padding) {
             writer.append(PADDING_SPACES);
-            i -= padding;
+            indent -= padding;
         }
-        if(i > 0) {
-            writer.append(PADDING_SPACES, 0, i);
+        if(indent > 0) {
+            writer.append(PADDING_SPACES, 0, indent);
         }
     }
 
