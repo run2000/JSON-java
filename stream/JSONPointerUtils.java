@@ -24,8 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import org.json.stream.StructureBuilder;
-
 /**
  * Utilities for conversion an iterable of {@link org.json.stream.StructureBuilder} objects
  * into a JSON Pointer expression. See RFC 6901 for details of JSON Pointer.
