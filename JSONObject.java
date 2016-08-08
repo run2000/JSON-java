@@ -691,14 +691,7 @@ public class JSONObject {
         if (length == 0) {
             return null;
         }
-        Iterator<String> iterator = jo.keys();
-        String[] names = new String[length];
-        int i = 0;
-        while (iterator.hasNext()) {
-            names[i] = iterator.next();
-            i += 1;
-        }
-        return names;
+        return jo.keySet().toArray(new String[length]);
     }
 
     /**
@@ -833,10 +826,7 @@ public class JSONObject {
      *         is empty.
      */
     public JSONArray names() {
-        JSONArray ja = new JSONArray();
-        for(String key : this.keySet()) {
-            ja.put(key);
-        }
+        JSONArray ja = new JSONArray(this.keySet());
         return ja.length() == 0 ? null : ja;
     }
 
