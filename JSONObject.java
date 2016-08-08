@@ -1925,16 +1925,17 @@ public class JSONObject {
         return writer;
     }
 
-    private static final String SPACES_8 = "        ";
+    private static final String PADDING_SPACES = "                ";
 
     static void indent(Appendable writer, int indent) throws IOException {
+        final int padding = PADDING_SPACES.length();
         int i = indent;
-        while(i > 8) {
-            writer.append(SPACES_8);
-            i -= 8;
+        while(i > padding) {
+            writer.append(PADDING_SPACES);
+            i -= padding;
         }
         if(i > 0) {
-            writer.append(SPACES_8, 0, i);
+            writer.append(PADDING_SPACES, 0, i);
         }
     }
 
