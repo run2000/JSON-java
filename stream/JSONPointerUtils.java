@@ -1,4 +1,4 @@
-package org.json.util;
+package org.json.stream;
 
 /*
 Copyright (c) 2002 JSON.org
