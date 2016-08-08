@@ -1925,7 +1925,8 @@ public class JSONObject {
         return writer;
     }
 
-    private static final String PADDING_SPACES = "                ";
+    // 24 spaces, divides by 1, 2, 3, 4, 6, 8, 12.
+    private static final String PADDING_SPACES = "                        ";
 
     static void indent(Appendable writer, int indent) throws IOException {
         final int padding = PADDING_SPACES.length();
