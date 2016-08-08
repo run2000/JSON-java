@@ -166,7 +166,7 @@ public class JSONWriter {
      */
     public JSONWriter array() throws JSONException {
         if (this.mode == 'i' || this.mode == 'o' || this.mode == 'a') {
-            this.push(null);
+            this.push(false);
             this.append("[");
             this.comma = false;
             return this;
@@ -266,7 +266,7 @@ public class JSONWriter {
         }
         if (this.mode == 'o' || this.mode == 'a') {
             this.append("{");
-            this.push(new HashSet<String>());
+            this.push(true);
             this.comma = false;
             return this;
         }
@@ -296,15 +296,16 @@ public class JSONWriter {
     }
 
     /**
-     * Push an array or object scope.
-     * @param set The scope to open.
+     * Push an object or array scope.
+     *
+     * @param obj {@code true} to indicate an Object, otherwise {@code false}
+     *            to indicate an Array
      * @throws JSONException If nesting is too deep.
      */
-    private void push(Set<String> set) throws JSONException {
-        this.stack.push(set);
-        this.mode = set == null ? 'a' : 'k';
+    private void push(boolean obj) throws JSONException {
+        this.stack.push(obj ? new HashSet<String>() : null);
+        this.mode = obj ? 'k' : 'a';
     }
-
 
     /**
      * Append either the value <code>true</code> or the value
