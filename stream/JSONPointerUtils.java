@@ -73,7 +73,9 @@ public final class JSONPointerUtils {
                     break;
             }
         }
-        if(prev < curr) {
+        if(prev == 0) {
+            builder.append(name);
+        } else if(prev < curr) {
             builder.append(name, prev, curr);
         }
     }
