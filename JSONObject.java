@@ -826,8 +826,8 @@ public class JSONObject {
      *         is empty.
      */
     public JSONArray names() {
-        JSONArray ja = new JSONArray(this.keySet());
-        return ja.length() == 0 ? null : ja;
+        Set<String> keySet = this.keySet();
+        return keySet.size() == 0 ? null : new JSONArray(keySet);
     }
 
     /**
