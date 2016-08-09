@@ -121,6 +121,8 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
 
     /**
      * The maximum length of any key.
+     *
+     * @param keyLength the maximum length of any key
      */
     public void setKeyLength(int keyLength) {
         this.keyLength = (keyLength <= 0) ? Integer.MAX_VALUE : keyLength;
@@ -128,6 +130,8 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
 
     /**
      * The maximum length of any string value.
+     *
+     * @param stringLength the maximum length of any string value
      */
     public void setStringLength(int stringLength) {
         this.stringLength = (stringLength <= 0) ? Integer.MAX_VALUE : stringLength;
@@ -135,13 +139,20 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
 
     /**
      * The maximum number of mantissa digits in a number.
+     *
+     * @param mantissaDigits the maximum number of mantissa digits of any
+     *                       number value
      */
     public void setMantissaDigits(int mantissaDigits) {
         this.mantissaDigits = (mantissaDigits <= 0) ? Short.MAX_VALUE : mantissaDigits;
     }
 
     /**
-     * The maximum number of exponent digits in a number.
+     * The maximum number of exponent digits in a number. May be 0 to indicate
+     * integer-only values.
+     *
+     * @param exponentDigits the maximum number of exponent digits of any
+     *                       number value
      */
     public void setExponentDigits(int exponentDigits) {
         this.exponentDigits = (exponentDigits < 0) ? Byte.MAX_VALUE : exponentDigits;

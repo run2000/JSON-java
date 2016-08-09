@@ -381,6 +381,7 @@ public final class JSONObjectBuilder {
      * will be thrown.
      * </p>
      *
+     * @param reader A source stream reader.
      * @return a JSONObject representing the subtree starting at the current
      * OBJECT state
      */
@@ -400,6 +401,7 @@ public final class JSONObjectBuilder {
      * will be thrown.
      * </p>
      *
+     * @param reader A source stream reader.
      * @return a JSONArray representing the subtree starting at the current
      * ARRAY state
      */

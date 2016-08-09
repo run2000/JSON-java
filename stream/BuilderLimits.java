@@ -67,6 +67,8 @@ public class BuilderLimits implements Cloneable {
 
     /**
      * The maximum length of any key.
+     *
+     * @param keyLength the maximum length of any key
      */
     public void setKeyLength(int keyLength) {
         this.keyLength = (keyLength <= 0) ? Integer.MAX_VALUE : keyLength;
@@ -74,6 +76,8 @@ public class BuilderLimits implements Cloneable {
 
     /**
      * The maximum length of any string value.
+     *
+     * @param stringLength the maximum length of any string value
      */
     public void setStringLength(int stringLength) {
         this.stringLength = (stringLength <= 0) ? Integer.MAX_VALUE : stringLength;
@@ -81,6 +85,9 @@ public class BuilderLimits implements Cloneable {
 
     /**
      * The maximum number of mantissa digits in a number.
+     *
+     * @param mantissaDigits the maximum number of mantissa digits of any
+     *                       number value
      */
     public void setMantissaDigits(int mantissaDigits) {
         this.mantissaDigits = ((mantissaDigits <= 0) || (mantissaDigits > Short.MAX_VALUE))
@@ -89,6 +96,9 @@ public class BuilderLimits implements Cloneable {
 
     /**
      * The maximum number of exponent digits in a number.
+     *
+     * @param exponentDigits the maximum number of exponent digits of any
+     *                       number value
      */
     public void setExponentDigits(int exponentDigits) {
         this.exponentDigits = ((exponentDigits < 0) || (exponentDigits > Byte.MAX_VALUE))
@@ -97,6 +107,9 @@ public class BuilderLimits implements Cloneable {
 
     /**
      * Total number of child nodes per object or array.
+     *
+     * @param contentNodes the total number of values, arrays, and objects for
+     *                     any given container array or object
      */
     public void setContentNodes(int contentNodes) {
         this.contentNodes = (contentNodes <= 0) ? Integer.MAX_VALUE : contentNodes;
@@ -104,6 +117,8 @@ public class BuilderLimits implements Cloneable {
 
     /**
      * Total nesting depth of objects or arrays.
+     *
+     * @param nestingDepth the maximum nesting depth within any array or object
      */
     public void setNestingDepth(int nestingDepth) {
         this.nestingDepth = (nestingDepth <= 0) ? Integer.MAX_VALUE : nestingDepth;
@@ -111,6 +126,8 @@ public class BuilderLimits implements Cloneable {
 
     /**
      * The maximum length of any key.
+     *
+     * @return the maximum length of any key
      */
     public int getKeyLength() {
         return keyLength;
@@ -118,6 +135,8 @@ public class BuilderLimits implements Cloneable {
 
     /**
      * The maximum length of any string value.
+     *
+     * @return the maximum length of any string value
      */
     public int getStringLength() {
         return stringLength;
@@ -125,6 +144,8 @@ public class BuilderLimits implements Cloneable {
 
     /**
      * The maximum number of mantissa digits in a number.
+     *
+     * @return the maximum number of mantissa digits of any number value
      */
     public int getMantissaDigits() {
         return mantissaDigits;
@@ -132,6 +153,8 @@ public class BuilderLimits implements Cloneable {
 
     /**
      * The maximum number of exponent digits in a number.
+     *
+     * @return the maximum number of exponent digits of any number value
      */
     public int getExponentDigits() {
         return exponentDigits;
@@ -139,6 +162,9 @@ public class BuilderLimits implements Cloneable {
 
     /**
      * Total number of child nodes per object or array.
+     *
+     * @return the total number of values, arrays, and objects for any given
+     * container array or object
      */
     public int getContentNodes() {
         return contentNodes;
@@ -146,6 +172,8 @@ public class BuilderLimits implements Cloneable {
 
     /**
      * Total nesting depth of objects or arrays.
+     *
+     * @return the maximum nesting depth within any array or object
      */
     public int getNestingDepth() {
         return nestingDepth;

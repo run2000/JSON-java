@@ -929,6 +929,9 @@ public class JSONStreamReader {
     /**
      * Decode a number strictly according to the JSON specification.
      *
+     * @param val the String value to be decoded as a number
+     * @param isDbl {@code true} to indicate the value is a decimal or
+     *              exponent value, otherwise {@code false}
      * @return the number represented by the token sequence
      */
     protected Number decodeNumber(String val, boolean isDbl) throws JSONException {
@@ -972,6 +975,9 @@ public class JSONStreamReader {
     /**
      * Decode a number as a double strictly according to the JSON specification.
      *
+     * @param val the String value to be decoded as a double
+     * @param isDbl {@code true} to indicate the value is a decimal or
+     *              exponent value, otherwise {@code false}
      * @return the number represented by the token sequence
      */
     protected double decodeDouble(String val, boolean isDbl) throws JSONException {
@@ -996,6 +1002,9 @@ public class JSONStreamReader {
      * Parse a number as an int strictly according to the JSON specification.
      * No coercion of double or long values.
      *
+     * @param val the String value to be decoded as an int
+     * @param isDbl {@code true} to indicate the value is a decimal or
+     *              exponent value, otherwise {@code false}
      * @return the number represented by the token sequence
      */
     protected int decodeInt(String val, boolean isDbl) throws JSONException {
@@ -1014,6 +1023,9 @@ public class JSONStreamReader {
      * Parse a number as a long strictly according to the JSON specification.
      * No coercion of double values.
      *
+     * @param val the String value to be decoded as a long
+     * @param isDbl {@code true} to indicate the value is a decimal or
+     *              exponent value, otherwise {@code false}
      * @return the number represented by the token sequence
      */
     protected long decodeLong(String val, boolean isDbl) throws JSONException {
@@ -1032,6 +1044,7 @@ public class JSONStreamReader {
      * Parse a number as a {@code BigDecimal} strictly according to the JSON
      * specification.
      *
+     * @param val the String value to be decoded as a big decimal value
      * @return the number represented by the token sequence
      */
     protected BigDecimal decodeBigDecimal(String val) throws JSONException {
@@ -1048,6 +1061,9 @@ public class JSONStreamReader {
      * Parse a number as a {@code BigInteger} strictly according to the JSON
      * specification.
      *
+     * @param val the String value to be decoded as a big integer
+     * @param isDbl {@code true} to indicate the value is a decimal or
+     *              exponent value, otherwise {@code false}
      * @return the number represented by the token sequence
      */
     protected BigInteger decodeBigInteger(String val, boolean isDbl) throws JSONException {

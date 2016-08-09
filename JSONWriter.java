@@ -92,6 +92,8 @@ public class JSONWriter implements Closeable {
 
     /**
      * Make a fresh JSONWriter. It can be used to build one JSON text.
+     *
+     * @param w the Writer to which JSON content will be written
      */
     public JSONWriter(Appendable w) {
         this.comma = false;
