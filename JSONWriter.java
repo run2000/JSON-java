@@ -81,14 +81,16 @@ public class JSONWriter implements Closeable {
     protected char mode;
 
     /**
-     * The object/array stack.
+     * The object/array stack, for duplicate key detection.
+     * Arrays are represented as null elements, while objects are
+     * represented as sets of key strings.
      */
     private final ALStack<Set<String>> stack;
 
     /**
      * The writer that will receive the output.
      */
-    protected Appendable writer;
+    protected final Appendable writer;
 
     /**
      * Make a fresh JSONWriter. It can be used to build one JSON text.
@@ -112,22 +114,25 @@ public class JSONWriter implements Closeable {
         if (string == null) {
             throw new JSONException("Null pointer");
         }
-        if (this.mode == 'o' || this.mode == 'a') {
-            try {
-                if (this.comma && this.mode == 'a') {
-                    this.writer.append(',');
-                }
-                this.writer.append(string);
-            } catch (IOException e) {
-                throw new JSONException(e);
+        try {
+            switch (this.mode) {
+                case 'a':
+                    if (this.comma) {
+                        this.writer.append(',');
+                    }
+                    break;
+                case 'o':
+                    this.mode = 'k';
+                    break;
+                default:
+                    throw new JSONException("Value out of sequence.");
             }
-            if (this.mode == 'o') {
-                this.mode = 'k';
-            }
+            this.writer.append(string);
             this.comma = true;
             return this;
+        } catch (IOException e) {
+            throw new JSONException(e);
         }
-        throw new JSONException("Value out of sequence.");
     }
 
     /**
@@ -238,7 +243,6 @@ public class JSONWriter implements Closeable {
                 if(!this.stack.peek().add(string)) {
                     throw new JSONException("Duplicate key \"" + string + "\"");
                 }
-                //this.stack[this.top - 1].putOnce(string, Boolean.TRUE);
                 if (this.comma) {
                     this.writer.append(',');
                 }
@@ -319,7 +323,7 @@ public class JSONWriter implements Closeable {
      * @throws JSONException
      */
     public JSONWriter value(boolean b) throws JSONException {
-        return this.append(b ? "true" : "false");
+        return this.append(Boolean.toString(b));
     }
 
     /**
@@ -371,14 +375,16 @@ public class JSONWriter implements Closeable {
     }
 
     /**
-     * Append a sequence of key-value pairs into an object.
+     * Append a sequence of keys and values in an object.
+     * The key will be associated with the corresponding value. In an
+     * object, every value must be associated with a key.
      *
      * @param kvPairs The objects to append. The values can be null, or a Boolean,
      *   Number, String, JSONObject, or JSONArray, or an object that implements
      *   JSONString.
      * @return this
-     * @throws JSONException If a value is out of place. For example, a value
-     *  occurs where a key is expected.
+     * @throws JSONException If a key or value is out of place. For example, keys
+     *  do not belong in arrays or if the key is null.
      */
     public JSONWriter entries(Map<String, ?> kvPairs) throws JSONException {
         for(Map.Entry<String, ?> entry : kvPairs.entrySet()) {
