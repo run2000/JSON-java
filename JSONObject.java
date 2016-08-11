@@ -1921,7 +1921,7 @@ public class JSONObject {
     static void indent(Appendable writer, int indent) throws IOException {
         final int padding = PADDING_SPACES.length();
 
-        while(indent > padding) {
+        while(indent >= padding) {
             writer.append(PADDING_SPACES);
             indent -= padding;
         }
