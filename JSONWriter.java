@@ -6,6 +6,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.Map;
 import java.util.HashSet;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /*
@@ -386,10 +387,10 @@ public class JSONWriter implements Closeable {
      * @throws JSONException If a key or value is out of place. For example, keys
      *  do not belong in arrays or if the key is null.
      */
-    public JSONWriter entries(Map<String, ?> kvPairs) throws JSONException {
-        for(Map.Entry<String, ?> entry : kvPairs.entrySet()) {
+    public JSONWriter entries(Iterable<Entry<String, ?>> kvPairs) throws JSONException {
+        for(Entry<String, ?> entry : kvPairs) {
             this.key(entry.getKey());
-            this.appendValue(entry);
+            this.appendValue(entry.getValue());
         }
         return this;
     }
