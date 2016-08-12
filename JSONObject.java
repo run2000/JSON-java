@@ -453,11 +453,15 @@ public class JSONObject {
         String string = Double.toString(d);
         if (string.indexOf('.') > 0 && string.indexOf('e') < 0
                 && string.indexOf('E') < 0) {
-            while (string.endsWith("0")) {
-                string = string.substring(0, string.length() - 1);
+            int len = string.length();
+            while ((len > 0) && (string.charAt(len - 1) == '0')) {
+                len--;
             }
-            if (string.endsWith(".")) {
-                string = string.substring(0, string.length() - 1);
+            if ((len > 0) && (string.charAt(len - 1) == '.')) {
+                len--;
+            }
+            if (len < string.length()) {
+                string = string.substring(0, len);
             }
         }
         return string;
@@ -850,15 +854,15 @@ public class JSONObject {
         String string = number.toString();
         if (string.indexOf('.') > 0 && string.indexOf('e') < 0
                 && string.indexOf('E') < 0) {
-            int len = str.length();
-            while ((len > 0) && (str.charAt(len - 1) == '0')) {
+            int len = string.length();
+            while ((len > 0) && (string.charAt(len - 1) == '0')) {
                 len--;
             }
-            if ((len > 0) && (str.charAt(len - 1) == '.')) {
+            if ((len > 0) && (string.charAt(len - 1) == '.')) {
                 len--;
             }
-            if (len < str.length()) {
-                str = str.substring(0, len);
+            if (len < string.length()) {
+                string = string.substring(0, len);
             }
         }
         return string;

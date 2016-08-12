@@ -333,7 +333,7 @@ public class JSONWriter implements Closeable {
      * @throws JSONException If the number is not finite.
      */
     public JSONWriter value(double d) throws JSONException {
-        return this.append(JSONObject.numberToString(Double.valueOf(d)));
+        return this.append(JSONObject.numberToString(d));
     }
 
     /**
