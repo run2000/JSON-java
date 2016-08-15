@@ -451,20 +451,7 @@ public class JSONObject {
 // Shave off trailing zeros and decimal point, if possible.
 
         String string = Double.toString(d);
-        if (string.indexOf('.') > 0 && string.indexOf('e') < 0
-                && string.indexOf('E') < 0) {
-            int len = string.length();
-            while ((len > 0) && (string.charAt(len - 1) == '0')) {
-                len--;
-            }
-            if ((len > 0) && (string.charAt(len - 1) == '.')) {
-                len--;
-            }
-            if (len < string.length()) {
-                string = string.substring(0, len);
-            }
-        }
-        return string;
+        return stripNumberDigits(string);
     }
 
     /**
@@ -852,6 +839,97 @@ public class JSONObject {
 // Shave off trailing zeros and decimal point, if possible.
 
         String string = number.toString();
+        return stripNumberDigits(string);
+    }
+
+    /**
+     * Write the given double to the given Appendable.
+     *
+     * @param writer
+     *            The Appendable to which the double value is written
+     * @param d
+     *            A double
+     * @param <T> subtype of Appendable, returned to the caller
+     * @return the given Appendable
+     * @throws JSONException there was a problem writing the double
+     */
+    public static <T extends Appendable> T writeDouble(T writer, double d) throws JSONException {
+        if (Double.isInfinite(d) || Double.isNaN(d)) {
+            try {
+                writer.append("null");
+                return writer;
+            } catch (IOException e) {
+                throw new JSONException(e);
+            }
+        }
+
+        String string = Double.toString(d);
+        writeNumberDigits(writer, string);
+        return writer;
+    }
+
+    /**
+     * Write the given number to the given Appendable.
+     *
+     * @param writer
+     *            The Appendable to which the number value is written
+     * @param number
+     *            A Number
+     * @param <T> subtype of Appendable, returned to the caller
+     * @return the given Appendable
+     * @throws JSONException there was a problem writing the number
+     */
+    public static <T extends Appendable> T writeNumber(T writer, Number number) throws JSONException {
+        if (number == null) {
+            throw new JSONException("Null pointer");
+        }
+        testValidity(number);
+
+// Shave off trailing zeros and decimal point, if possible.
+
+        String string = number.toString();
+        writeNumberDigits(writer, string);
+        return writer;
+    }
+
+    /**
+     * Write a number value, trimming any trailing zero digits from a real number.
+     * If all zeros appear immediately after a decimal, the decimal is omitted
+     * as well.
+     *
+     * @param writer the Appendable to which the digits will be written
+     * @param string the string of digits
+     */
+    private static void writeNumberDigits(Appendable writer, String string) throws JSONException {
+        try {
+            if (string.indexOf('.') > 0 && string.indexOf('e') < 0
+                    && string.indexOf('E') < 0) {
+                int len = string.length();
+                while ((len > 0) && (string.charAt(len - 1) == '0')) {
+                    len--;
+                }
+                if ((len > 0) && (string.charAt(len - 1) == '.')) {
+                    len--;
+                }
+                if (len < string.length()) {
+                    writer.append(string, 0, len);
+                    return;
+                }
+            }
+            writer.append(string);
+        } catch (IOException e) {
+            throw new JSONException(e);
+        }
+    }
+
+    /**
+     * Trim any trailing zero digits from a real number. If all zeros appear
+     * immediately after a decimal, omit the decimal as well.
+     *
+     * @param string the string of digits
+     * @return the string, with trailing digits stripped if possible
+     */
+    private static String stripNumberDigits(String string) {
         if (string.indexOf('.') > 0 && string.indexOf('e') < 0
                 && string.indexOf('E') < 0) {
             int len = string.length();
@@ -1900,7 +1978,7 @@ public class JSONObject {
         } else if (value.getClass().isArray()) {
             new JSONArray(value).write(writer, indentFactor, indent);
         } else if (value instanceof Number) {
-            writer.append(numberToString((Number) value));
+            writeNumber(writer, (Number) value);
         } else if (value instanceof Boolean) {
             writer.append(value.toString());
         } else if (value instanceof JSONString) {

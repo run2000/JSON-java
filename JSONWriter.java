@@ -4,7 +4,6 @@ import org.json.util.ALStack;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.Map;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -106,15 +105,10 @@ public class JSONWriter implements Closeable {
     }
 
     /**
-     * Append a JSON-encoded value.
-     * @param string A string value.
-     * @return this
-     * @throws JSONException If the value is out of sequence.
+     * Prepare for the next value to be written. Append a comma if required,
+     * assert and advance the mode as needed.
      */
-    private JSONWriter append(String string) throws JSONException {
-        if (string == null) {
-            throw new JSONException("Null pointer");
-        }
+    private void prepValue() throws JSONException {
         try {
             switch (this.mode) {
                 case 'a':
@@ -128,38 +122,7 @@ public class JSONWriter implements Closeable {
                 default:
                     throw new JSONException("Value out of sequence.");
             }
-            this.writer.append(string);
             this.comma = true;
-            return this;
-        } catch (IOException e) {
-            throw new JSONException(e);
-        }
-    }
-
-    /**
-     * Append a value, converting it into a JSON string.
-     *
-     * @param val A value.
-     * @return this
-     * @throws JSONException If the value is out of sequence.
-     */
-    private JSONWriter appendValue(Object val) throws JSONException {
-        try {
-            switch (this.mode) {
-                case 'a':
-                    if (this.comma) {
-                        this.writer.append(',');
-                    }
-                    break;
-                case 'o':
-                    this.mode = 'k';
-                    break;
-                default:
-                    throw new JSONException("Value out of sequence.");
-            }
-            JSONObject.writeValue(this.writer, val);
-            this.comma = true;
-            return this;
         } catch (IOException e) {
             throw new JSONException(e);
         }
@@ -177,7 +140,12 @@ public class JSONWriter implements Closeable {
     public JSONWriter array() throws JSONException {
         if (this.mode == 'i' || this.mode == 'o' || this.mode == 'a') {
             this.push(false);
-            this.append("[");
+            try {
+                this.prepValue();
+                this.writer.append('[');
+            } catch (IOException e) {
+                throw new JSONException(e);
+            }
             this.comma = false;
             return this;
         }
@@ -274,7 +242,12 @@ public class JSONWriter implements Closeable {
             this.mode = 'o';
         }
         if (this.mode == 'o' || this.mode == 'a') {
-            this.append("{");
+            try {
+                this.prepValue();
+                this.writer.append('{');
+            } catch (IOException e) {
+                throw new JSONException(e);
+            }
             this.push(true);
             this.comma = false;
             return this;
@@ -324,7 +297,14 @@ public class JSONWriter implements Closeable {
      * @throws JSONException
      */
     public JSONWriter value(boolean b) throws JSONException {
-        return this.append(Boolean.toString(b));
+        String string = Boolean.toString(b);
+        try {
+            this.prepValue();
+            this.writer.append(string);
+            return this;
+        } catch (IOException e) {
+            throw new JSONException(e);
+        }
     }
 
     /**
@@ -334,7 +314,9 @@ public class JSONWriter implements Closeable {
      * @throws JSONException If the number is not finite.
      */
     public JSONWriter value(double d) throws JSONException {
-        return this.append(JSONObject.numberToString(d));
+        this.prepValue();
+        JSONObject.writeDouble(this.writer, d);
+        return this;
     }
 
     /**
@@ -344,25 +326,34 @@ public class JSONWriter implements Closeable {
      * @throws JSONException
      */
     public JSONWriter value(long l) throws JSONException {
-        return this.append(Long.toString(l));
+        String string = Long.toString(l);
+        try {
+            this.prepValue();
+            this.writer.append(string);
+            return this;
+        } catch (IOException e) {
+            throw new JSONException(e);
+        }
     }
 
 
     /**
      * Append an object value.
-     * @param object The object to append. It can be null, or a Boolean, Number,
+     * @param object The object to appendString. It can be null, or a Boolean, Number,
      *   String, JSONObject, or JSONArray, or an object that implements JSONString.
      * @return this
      * @throws JSONException If the value is out of sequence.
      */
     public JSONWriter value(Object object) throws JSONException {
-        return this.appendValue(object);
+        this.prepValue();
+        JSONObject.writeValue(this.writer, object);
+        return this;
     }
 
     /**
      * Append a sequence of values into an array.
      *
-     * @param values The objects to append. They can be null, or a Boolean, Number,
+     * @param values The objects to appendString. They can be null, or a Boolean, Number,
      *   String, JSONObject, or JSONArray, or an object that implements JSONString.
      * @return this
      * @throws JSONException If a value is out of place. For example, a value
@@ -370,7 +361,8 @@ public class JSONWriter implements Closeable {
      */
     public JSONWriter values(Iterable<?> values) throws JSONException {
         for(Object obj : values) {
-            this.appendValue(obj);
+            this.prepValue();
+            JSONObject.writeValue(this.writer, obj);
         }
         return this;
     }
@@ -380,7 +372,7 @@ public class JSONWriter implements Closeable {
      * The key will be associated with the corresponding value. In an
      * object, every value must be associated with a key.
      *
-     * @param kvPairs The objects to append. The values can be null, or a Boolean,
+     * @param kvPairs The objects to appendString. The values can be null, or a Boolean,
      *   Number, String, JSONObject, or JSONArray, or an object that implements
      *   JSONString.
      * @return this
@@ -390,7 +382,8 @@ public class JSONWriter implements Closeable {
     public JSONWriter entries(Iterable<Entry<String, ?>> kvPairs) throws JSONException {
         for(Entry<String, ?> entry : kvPairs) {
             this.key(entry.getKey());
-            this.appendValue(entry.getValue());
+            this.prepValue();
+            JSONObject.writeValue(this.writer, entry.getValue());
         }
         return this;
     }
