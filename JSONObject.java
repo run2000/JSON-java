@@ -904,15 +904,16 @@ public class JSONObject {
         try {
             if (string.indexOf('.') > 0 && string.indexOf('e') < 0
                     && string.indexOf('E') < 0) {
-                int len = string.length();
-                while ((len > 0) && (string.charAt(len - 1) == '0')) {
-                    len--;
+                final int len = string.length();
+                int last = len;
+                while ((last > 0) && (string.charAt(last - 1) == '0')) {
+                    last--;
                 }
-                if ((len > 0) && (string.charAt(len - 1) == '.')) {
-                    len--;
+                if ((last > 0) && (string.charAt(last - 1) == '.')) {
+                    last--;
                 }
-                if (len < string.length()) {
-                    writer.append(string, 0, len);
+                if (last < len) {
+                    writer.append(string, 0, last);
                     return;
                 }
             }
@@ -932,15 +933,16 @@ public class JSONObject {
     private static String stripNumberDigits(String string) {
         if (string.indexOf('.') > 0 && string.indexOf('e') < 0
                 && string.indexOf('E') < 0) {
-            int len = string.length();
-            while ((len > 0) && (string.charAt(len - 1) == '0')) {
-                len--;
+            final int len = string.length();
+            int last = len;
+            while ((last > 0) && (string.charAt(last - 1) == '0')) {
+                last--;
             }
-            if ((len > 0) && (string.charAt(len - 1) == '.')) {
-                len--;
+            if ((last > 0) && (string.charAt(last - 1) == '.')) {
+                last--;
             }
-            if (len < string.length()) {
-                string = string.substring(0, len);
+            if (last < len) {
+                string = string.substring(0, last);
             }
         }
         return string;
