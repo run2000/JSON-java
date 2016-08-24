@@ -27,6 +27,7 @@ package org.json;
 import org.json.JSONTokener.JSONToken;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -1270,38 +1271,21 @@ public class JSONObject {
     private void populateMap(Object bean) {
         Class<?> klass = bean.getClass();
 
-// If klass is a System class then set includeSuperClass to false.
-
+        // If klass is a System class then set includeSuperClass to false.
         boolean includeSuperClass = klass.getClassLoader() != null;
 
-        Method[] methods = includeSuperClass ? klass.getMethods() : klass
-                .getDeclaredMethods();
+        Method[] methods = includeSuperClass ? klass.getMethods()
+                : klass.getDeclaredMethods();
         for (int i = 0; i < methods.length; i += 1) {
             try {
                 Method method = methods[i];
-                if (Modifier.isPublic(method.getModifiers())) {
+                if (Modifier.isPublic(method.getModifiers()) &&
+                        !Modifier.isStatic(method.getModifiers()) &&
+                        !method.isSynthetic()) {
                     String name = method.getName();
-                    String key = "";
-                    if (name.startsWith("get")) {
-                        if ("getClass".equals(name)
-                                || "getDeclaringClass".equals(name)) {
-                            key = "";
-                        } else {
-                            key = name.substring(3);
-                        }
-                    } else if (name.startsWith("is")) {
-                        key = name.substring(2);
-                    }
-                    if (key.length() > 0
-                            && Character.isUpperCase(key.charAt(0))
-                            && method.getParameterTypes().length == 0) {
-                        if (key.length() == 1) {
-                            key = key.toLowerCase();
-                        } else if (!Character.isUpperCase(key.charAt(1))) {
-                            key = key.substring(0, 1).toLowerCase()
-                                    + key.substring(1);
-                        }
-
+                    String key = keyFromMethodName(name);
+                    if ((key.length() > 0)
+                            && (method.getParameterTypes().length == 0)) {
                         Object result = method.invoke(bean, (Object[]) null);
                         if (result != null) {
                             this.map.put(key, wrap(result));
@@ -1311,6 +1295,34 @@ public class JSONObject {
             } catch (Exception ignore) {
             }
         }
+    }
+
+    private static String keyFromMethodName(String methodName) {
+        String key;
+        if (methodName.startsWith("get")) {
+            if ("getClass".equals(methodName)
+                    || "getDeclaringClass".equals(methodName)) {
+                return "";
+            } else {
+                key = methodName.substring(3);
+            }
+        } else if (methodName.startsWith("is")) {
+            key = methodName.substring(2);
+        } else {
+            return "";
+        }
+
+        if((key.length() > 0) && (Character.isUpperCase(key.charAt(0)))) {
+            if (key.length() == 1) {
+                return key.toLowerCase();
+            } else if (!Character.isUpperCase(key.charAt(1))) {
+                return key.substring(0, 1).toLowerCase() + key.substring(1);
+            } else {
+                return key;
+            }
+        }
+
+        return "";
     }
 
     /**
@@ -1902,12 +1914,8 @@ public class JSONObject {
             }
             if (object instanceof JSONObject || object instanceof JSONArray
                     || NULL.equals(object) || object instanceof JSONString
-                    || object instanceof Byte || object instanceof Character
-                    || object instanceof Short || object instanceof Integer
-                    || object instanceof Long || object instanceof Boolean
-                    || object instanceof Float || object instanceof Double
-                    || object instanceof String || object instanceof BigInteger
-                    || object instanceof BigDecimal) {
+                    || object instanceof Number || object instanceof Character
+                    || object instanceof Boolean || object instanceof String) {
                 return object;
             }
 
@@ -1922,18 +1930,22 @@ public class JSONObject {
                 Map<?, ?> map = (Map<?, ?>) object;
                 return new JSONObject(map);
             }
-            Package objectPackage = object.getClass().getPackage();
-            String objectPackageName = objectPackage != null ? objectPackage
-                    .getName() : "";
-            if (objectPackageName.startsWith("java.")
-                    || objectPackageName.startsWith("javax.")
-                    || object.getClass().getClassLoader() == null) {
-                return object.toString();
+            if (objectIsBean(object)) {
+                return new JSONObject(object);
             }
-            return new JSONObject(object);
+            return object.toString();
         } catch (Exception exception) {
             return null;
         }
+    }
+
+    private static boolean objectIsBean(Object object) {
+        Package objectPackage = object.getClass().getPackage();
+        String objectPackageName = objectPackage != null ? objectPackage
+                .getName() : "";
+        return !objectPackageName.startsWith("java.")
+                && !objectPackageName.startsWith("javax.")
+                && object.getClass().getClassLoader() != null;
     }
 
     /**
@@ -1963,26 +1975,204 @@ public class JSONObject {
         }
     }
 
+    static <T extends Appendable> T writeBean(Object bean, T writer,
+            int indentFactor, int indent) throws JSONException {
+        try {
+            final int newindent = indent + indentFactor;
+            Class<?> klass = bean.getClass();
+
+            // If klass is a System class then set includeSuperClass to false.
+            boolean includeSuperClass = klass.getClassLoader() != null;
+            Method[] methods = includeSuperClass ? klass.getMethods()
+                    : klass.getDeclaredMethods();
+            boolean commanate = false;
+
+            writer.append('{');
+            for (int i = 0; i < methods.length; i += 1) {
+                try {
+                    Method method = methods[i];
+                    if (Modifier.isPublic(method.getModifiers()) &&
+                            !Modifier.isStatic(method.getModifiers()) &&
+                            !method.isSynthetic()) {
+                        String name = method.getName();
+                        String key = keyFromMethodName(name);
+                        if ((key.length() > 0)
+                                && (method.getParameterTypes().length == 0)) {
+                            Object result = method.invoke(bean, (Object[]) null);
+                            if (result != null) {
+                                if (commanate) {
+                                    writer.append(',');
+                                }
+                                if (indentFactor > 0) {
+                                    writer.append('\n');
+                                }
+                                indent(writer, newindent);
+                                quote(String.valueOf(key), writer);
+                                writer.append(':');
+                                if (indentFactor > 0) {
+                                    writer.append(' ');
+                                }
+                                writeValue(writer, result, indentFactor, newindent);
+                                commanate = true;
+                            }
+                        }
+                    }
+                } catch (Exception ignore) {
+                }
+            }
+            if(commanate) {
+                if (indentFactor > 0) {
+                    writer.append('\n');
+                }
+                indent(writer, indent);
+            }
+            writer.append('}');
+            return writer;
+        } catch (IOException exception) {
+            throw new JSONException(exception);
+        } catch (RuntimeException exception) {
+            throw new JSONException(exception);
+        }
+    }
+
+    static <T extends Appendable> T writeMap(Map<?, ?> map, T writer, int indentFactor, int indent)
+            throws JSONException {
+        try {
+            boolean commanate = false;
+            final int length = map.size();
+            Iterator<?> keys = map.keySet().iterator();
+            writer.append('{');
+
+            if (length == 1) {
+                Object key = keys.next();
+                quote(String.valueOf(key), writer);
+                writer.append(':');
+                if (indentFactor > 0) {
+                    writer.append(' ');
+                }
+                writeValue(writer, map.get(key), indentFactor, indent);
+            } else if (length != 0) {
+                final int newindent = indent + indentFactor;
+                while (keys.hasNext()) {
+                    Object key = keys.next();
+                    if (commanate) {
+                        writer.append(',');
+                    }
+                    if (indentFactor > 0) {
+                        writer.append('\n');
+                    }
+                    indent(writer, newindent);
+                    quote(String.valueOf(key), writer);
+                    writer.append(':');
+                    if (indentFactor > 0) {
+                        writer.append(' ');
+                    }
+                    writeValue(writer, map.get(key), indentFactor, newindent);
+                    commanate = true;
+                }
+                if (indentFactor > 0) {
+                    writer.append('\n');
+                }
+                indent(writer, indent);
+            }
+            writer.append('}');
+            return writer;
+        } catch (IOException exception) {
+            throw new JSONException(exception);
+        }
+    }
+
+    private static boolean singleIterableElement(Iterable<?> iterable) {
+        if(iterable instanceof Collection) {
+            return ((Collection)iterable).size() == 1;
+        }
+        Iterator<?> iterator = iterable.iterator();
+        if(!iterator.hasNext()) {
+            return false;
+        }
+        iterator.next();
+        return !iterator.hasNext();
+    }
+
+    static <T extends Appendable> T writeIterable(Iterable<?> collection, T writer,
+            int indentFactor, int indent) throws JSONException {
+        try {
+            boolean singleElement = singleIterableElement(collection);
+            Iterator<?> iterator = collection.iterator();
+            boolean commanate = false;
+            writer.append('[');
+
+            if ((singleElement) && (iterator.hasNext())) {
+                JSONObject.writeValue(writer, iterator.next(),
+                        indentFactor, indent);
+            } else if (iterator.hasNext()) {
+                final int newindent = indent + indentFactor;
+
+                while (iterator.hasNext()) {
+                    if (commanate) {
+                        writer.append(',');
+                    }
+                    if (indentFactor > 0) {
+                        writer.append('\n');
+                    }
+                    JSONObject.indent(writer, newindent);
+                    JSONObject.writeValue(writer, iterator.next(),
+                            indentFactor, newindent);
+                    commanate = true;
+                }
+                if (indentFactor > 0) {
+                    writer.append('\n');
+                }
+                JSONObject.indent(writer, indent);
+            }
+            writer.append(']');
+            return writer;
+        } catch (IOException e) {
+            throw new JSONException(e);
+        }
+    }
+
+    static <T extends Appendable> T writeArray(Object array, T writer, int indentFactor, int indent)
+            throws JSONException {
+        try {
+            final int length = Array.getLength(array);
+            boolean commanate = false;
+            writer.append('[');
+
+            if (length == 1) {
+                JSONObject.writeValue(writer, Array.get(array, 0),
+                        indentFactor, indent);
+            } else if (length != 0) {
+                final int newindent = indent + indentFactor;
+
+                for (int i = 0; i < length; i += 1) {
+                    if (commanate) {
+                        writer.append(',');
+                    }
+                    if (indentFactor > 0) {
+                        writer.append('\n');
+                    }
+                    JSONObject.indent(writer, newindent);
+                    JSONObject.writeValue(writer, Array.get(array, i),
+                            indentFactor, newindent);
+                    commanate = true;
+                }
+                if (indentFactor > 0) {
+                    writer.append('\n');
+                }
+                JSONObject.indent(writer, indent);
+            }
+            writer.append(']');
+            return writer;
+        } catch (IOException e) {
+            throw new JSONException(e);
+        }
+    }
+
     static final <T extends Appendable> T writeValue(T writer, Object value,
             int indentFactor, int indent) throws JSONException, IOException {
         if (value == null || value.equals(null)) {
             writer.append("null");
-        } else if (value instanceof JSONObject) {
-            ((JSONObject) value).write(writer, indentFactor, indent);
-        } else if (value instanceof JSONArray) {
-            ((JSONArray) value).write(writer, indentFactor, indent);
-        } else if (value instanceof Map) {
-            Map<?, ?> map = (Map<?, ?>) value;
-            new JSONObject(map).write(writer, indentFactor, indent);
-        } else if (value instanceof Collection) {
-            Collection<?> coll = (Collection<?>) value;
-            new JSONArray(coll).write(writer, indentFactor, indent);
-        } else if (value.getClass().isArray()) {
-            new JSONArray(value).write(writer, indentFactor, indent);
-        } else if (value instanceof Number) {
-            writeNumber(writer, (Number) value);
-        } else if (value instanceof Boolean) {
-            writer.append(value.toString());
         } else if (value instanceof JSONString) {
             String o;
             try {
@@ -1995,8 +2185,26 @@ public class JSONObject {
             } else {
                 quote(value.toString(), writer);
             }
+        } else if (value instanceof Number) {
+            writeNumber(writer, (Number) value);
+        } else if (value instanceof Boolean) {
+            writer.append(value.toString());
+        } else if (value instanceof JSONObject) {
+            ((JSONObject) value).write(writer, indentFactor, indent);
+        } else if (value instanceof JSONArray) {
+            ((JSONArray) value).write(writer, indentFactor, indent);
+        } else if (value instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) value;
+            writeMap(map, writer, indentFactor, indent);
+        } else if (value instanceof Iterable) {
+            Iterable<?> coll = (Iterable<?>) value;
+            writeIterable(coll, writer, indentFactor, indent);
+        } else if (value.getClass().isArray()) {
+            writeArray(value, writer, indentFactor, indent);
         } else if(value instanceof CharSequence) {
-            quote((CharSequence)value, writer);
+            quote((CharSequence) value, writer);
+        } else if(objectIsBean(value)) {
+            writeBean(value, writer, indentFactor, indent);
         } else {
             quote(value.toString(), writer);
         }

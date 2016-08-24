@@ -162,12 +162,12 @@ public class JSONArray implements Iterable<Object> {
     }
 
     /**
-     * Construct a JSONArray from a Collection.
+     * Construct a JSONArray from an Iterable.
      *
      * @param collection
-     *            A Collection.
+     *            An Iterable.
      */
-    public JSONArray(Collection<?> collection) {
+    public JSONArray(Iterable<?> collection) {
         this.myArrayList = new ArrayList<Object>();
         if (collection != null) {
             for (Object o : collection) {
