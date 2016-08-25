@@ -1281,7 +1281,8 @@ public class JSONObject {
                 Method method = methods[i];
                 if (Modifier.isPublic(method.getModifiers()) &&
                         !Modifier.isStatic(method.getModifiers()) &&
-                        !method.isSynthetic()) {
+                        !method.isSynthetic() &&
+                        (method.getReturnType() != Void.TYPE)) {
                     String name = method.getName();
                     String key = keyFromMethodName(name);
                     if ((key.length() > 0)
@@ -1993,7 +1994,8 @@ public class JSONObject {
                     Method method = methods[i];
                     if (Modifier.isPublic(method.getModifiers()) &&
                             !Modifier.isStatic(method.getModifiers()) &&
-                            !method.isSynthetic()) {
+                            !method.isSynthetic() &&
+                            (method.getReturnType() != Void.TYPE)) {
                         String name = method.getName();
                         String key = keyFromMethodName(name);
                         if ((key.length() > 0)
