@@ -1309,13 +1309,13 @@ public class JSONObject {
                 return null;
             } else {
                 keyLen = methodLen - 3;
-                key = new StringBuilder(keyLen);
-                key.append(methodName, 3, methodLen);
+                key = new StringBuilder(keyLen)
+                        .append(methodName, 3, methodLen);
             }
         } else if ((methodLen > 2) && methodName.startsWith("is")) {
             keyLen = methodLen - 2;
-            key = new StringBuilder(keyLen);
-            key.append(methodName, 2, methodLen);
+            key = new StringBuilder(keyLen)
+                    .append(methodName, 2, methodLen);
         } else {
             return null;
         }
