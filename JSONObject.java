@@ -1285,7 +1285,7 @@ public class JSONObject {
                         (method.getReturnType() != Void.TYPE)) {
                     String name = method.getName();
                     String key = keyFromMethodName(name);
-                    if ((key.length() > 0)
+                    if ((key != null)
                             && (method.getParameterTypes().length == 0)) {
                         Object result = method.invoke(bean, (Object[]) null);
                         if (result != null) {
@@ -1299,31 +1299,35 @@ public class JSONObject {
     }
 
     private static String keyFromMethodName(String methodName) {
-        String key;
-        if (methodName.startsWith("get")) {
-            if ("getClass".equals(methodName)
-                    || "getDeclaringClass".equals(methodName)) {
-                return "";
+        final int methodLen = methodName.length();
+        StringBuilder key;
+        int keyLen;
+
+        if ((methodLen > 3) && (methodName.startsWith("get"))) {
+            if ("getClass".equals(methodName) ||
+                    "getDeclaringClass".equals(methodName)) {
+                return null;
             } else {
-                key = methodName.substring(3);
+                keyLen = methodLen - 3;
+                key = new StringBuilder(keyLen);
+                key.append(methodName, 3, methodLen);
             }
-        } else if (methodName.startsWith("is")) {
-            key = methodName.substring(2);
+        } else if ((methodLen > 2) && methodName.startsWith("is")) {
+            keyLen = methodLen - 2;
+            key = new StringBuilder(keyLen);
+            key.append(methodName, 2, methodLen);
         } else {
-            return "";
+            return null;
         }
 
-        if((key.length() > 0) && (Character.isUpperCase(key.charAt(0)))) {
-            if (key.length() == 1) {
-                return key.toLowerCase();
-            } else if (!Character.isUpperCase(key.charAt(1))) {
-                return key.substring(0, 1).toLowerCase() + key.substring(1);
-            } else {
-                return key;
+        // At this point, key is defined, and length > 0
+        if(Character.isUpperCase(key.charAt(0))) {
+            if ((keyLen == 1) || (!Character.isUpperCase(key.charAt(1)))) {
+                key.setCharAt(0, Character.toLowerCase(key.charAt(0)));
             }
+            return key.toString();
         }
-
-        return "";
+        return null;
     }
 
     /**
@@ -1998,7 +2002,7 @@ public class JSONObject {
                             (method.getReturnType() != Void.TYPE)) {
                         String name = method.getName();
                         String key = keyFromMethodName(name);
-                        if ((key.length() > 0)
+                        if ((key != null)
                                 && (method.getParameterTypes().length == 0)) {
                             Object result = method.invoke(bean, (Object[]) null);
                             if (result != null) {
