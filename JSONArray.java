@@ -1152,7 +1152,7 @@ public class JSONArray implements Iterable<Object> {
     @Override
     public String toString() {
         try {
-            return this.toString(0);
+            return JSONWriter.writeJSONArray(this, new StringBuilder(), 0, 0).toString();
         } catch (Exception e) {
             return null;
         }

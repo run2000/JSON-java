@@ -1662,7 +1662,7 @@ public class JSONObject {
     @Override
     public String toString() {
         try {
-            return this.toString(0);
+            return JSONWriter.writeJSONObject(this, new StringBuilder(), 0, 0).toString();
         } catch (Exception e) {
             return null;
         }
