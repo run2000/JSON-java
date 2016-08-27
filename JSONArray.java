@@ -26,7 +26,6 @@ package org.json;
 
 import org.json.JSONTokener.JSONToken;
 
-import java.io.IOException;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -461,7 +460,7 @@ public class JSONArray implements Iterable<Object> {
             if (i > 0) {
                 sb.append(separator);
             }
-            JSONObject.writeValue(sb, this.myArrayList.get(i));
+            JSONWriter.writeValue(sb, this.myArrayList.get(i));
         }
         return sb.toString();
     }
@@ -1172,7 +1171,7 @@ public class JSONArray implements Iterable<Object> {
      * @throws JSONException
      */
     public String toString(int indentFactor) throws JSONException {
-        return this.write(new StringBuilder(), indentFactor, 0).toString();
+        return JSONWriter.writeJSONArray(this, new StringBuilder(), indentFactor, 0).toString();
     }
 
     /**
@@ -1189,7 +1188,7 @@ public class JSONArray implements Iterable<Object> {
      * @throws JSONException
      */
     public <T extends Appendable> T write(T writer) throws JSONException {
-        return this.write(writer, 0, 0);
+        return JSONWriter.writeJSONArray(this, writer, 0, 0);
     }
 
     /**
@@ -1211,39 +1210,7 @@ public class JSONArray implements Iterable<Object> {
      */
     public <T extends Appendable> T write(T writer, int indentFactor, int indent)
             throws JSONException {
-        try {
-            boolean commanate = false;
-            int length = this.length();
-            writer.append('[');
-
-            if (length == 1) {
-                JSONObject.writeValue(writer, this.myArrayList.get(0),
-                        indentFactor, indent);
-            } else if (length != 0) {
-                final int newindent = indent + indentFactor;
-
-                for (int i = 0; i < length; i += 1) {
-                    if (commanate) {
-                        writer.append(',');
-                    }
-                    if (indentFactor > 0) {
-                        writer.append('\n');
-                    }
-                    JSONObject.indent(writer, newindent);
-                    JSONObject.writeValue(writer, this.myArrayList.get(i),
-                            indentFactor, newindent);
-                    commanate = true;
-                }
-                if (indentFactor > 0) {
-                    writer.append('\n');
-                }
-                JSONObject.indent(writer, indent);
-            }
-            writer.append(']');
-            return writer;
-        } catch (IOException e) {
-            throw new JSONException(e);
-        }
+        return JSONWriter.writeJSONArray(this, writer, indentFactor, indent);
     }
 
     /**

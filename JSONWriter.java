@@ -4,7 +4,13 @@ import org.json.util.ALStack;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -215,7 +221,7 @@ public class JSONWriter implements Closeable {
                 if (this.comma) {
                     this.writer.append(',');
                 }
-                JSONObject.quote(string, this.writer);
+                quote(string, this.writer);
                 this.writer.append(':');
                 this.comma = false;
                 this.mode = 'o';
@@ -315,7 +321,7 @@ public class JSONWriter implements Closeable {
      */
     public JSONWriter value(double d) throws JSONException {
         this.prepValue();
-        JSONObject.writeDouble(this.writer, d);
+        writeDouble(this.writer, d);
         return this;
     }
 
@@ -346,7 +352,7 @@ public class JSONWriter implements Closeable {
      */
     public JSONWriter value(Object object) throws JSONException {
         this.prepValue();
-        JSONObject.writeValue(this.writer, object);
+        writeValue(this.writer, object);
         return this;
     }
 
@@ -362,7 +368,7 @@ public class JSONWriter implements Closeable {
     public JSONWriter values(Iterable<?> values) throws JSONException {
         for(Object obj : values) {
             this.prepValue();
-            JSONObject.writeValue(this.writer, obj);
+            writeValue(this.writer, obj);
         }
         return this;
     }
@@ -383,7 +389,7 @@ public class JSONWriter implements Closeable {
         for(Entry<String, ?> entry : kvPairs) {
             this.key(entry.getKey());
             this.prepValue();
-            JSONObject.writeValue(this.writer, entry.getValue());
+            writeValue(this.writer, entry.getValue());
         }
         return this;
     }
@@ -402,6 +408,578 @@ public class JSONWriter implements Closeable {
 
         if(writer instanceof Closeable) {
             ((Closeable)writer).close();
+        }
+    }
+
+    // -- static writer methods
+
+    // 24 spaces, divides by 1, 2, 3, 4, 6, 8, 12.
+    private static final String PADDING_SPACES = "                        ";
+
+    static void indent(Appendable writer, int indent) throws IOException {
+        final int padding = PADDING_SPACES.length();
+
+        while(indent >= padding) {
+            writer.append(PADDING_SPACES);
+            indent -= padding;
+        }
+        if(indent > 0) {
+            writer.append(PADDING_SPACES, 0, indent);
+        }
+    }
+
+    static <T extends Appendable> T writeValue(T writer, Object value)
+            throws JSONException {
+        try {
+            return writeValue(writer, value, 0 ,0);
+        } catch (IOException e) {
+            throw new JSONException(e);
+        }
+    }
+
+    static <T extends Appendable> T writeValue(T writer, Object value,
+            int indentFactor, int indent) throws JSONException, IOException {
+        if (value == null || value.equals(null)) {
+            writer.append("null");
+        } else if (value instanceof JSONString) {
+            String o;
+            try {
+                o = ((JSONString) value).toJSONString();
+            } catch (Exception e) {
+                throw new JSONException(e);
+            }
+            if (o != null) {
+                writer.append(o);
+            } else {
+                quote(value.toString(), writer);
+            }
+        } else if (value instanceof Number) {
+            writeNumber(writer, (Number) value);
+        } else if (value instanceof Boolean) {
+            writer.append(value.toString());
+        } else if (value instanceof JSONObject) {
+            writeJSONObject((JSONObject)value, writer, indentFactor, indent);
+        } else if (value instanceof JSONArray) {
+            writeJSONArray((JSONArray) value, writer, indentFactor, indent);
+        } else if (value instanceof Map) {
+            Map<?, ?> map = (Map<?, ?>) value;
+            writeMap(map, writer, indentFactor, indent);
+        } else if (value instanceof Iterable) {
+            Iterable<?> coll = (Iterable<?>) value;
+            writeIterable(coll, writer, indentFactor, indent);
+        } else if (value.getClass().isArray()) {
+            writeArray(value, writer, indentFactor, indent);
+        } else if(value instanceof CharSequence) {
+            quote((CharSequence) value, writer);
+        } else if (value instanceof Enum<?>) {
+            quote(((Enum<?>)value).name(), writer);
+        } else if(JSONObject.objectIsBean(value)) {
+            writeBean(value, writer, indentFactor, indent);
+        } else {
+            quote(value.toString(), writer);
+        }
+        return writer;
+    }
+
+    /**
+     * Produce a string in double quotes with backslash sequences in all the
+     * right places. A backslash will be inserted within &lt;/, producing &lt;\/,
+     * allowing JSON text to be delivered in HTML. In JSON text, a string cannot
+     * contain a control character or an unescaped quote or backslash.
+     *
+     * @param string
+     *            A character sequence to be quoted
+     * @param w
+     *            the Appendable to which the quoted character sequence will be
+     *            written
+     * @param <T>
+     *            A subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
+     * @return A String correctly formatted for insertion in a JSON text.
+     * @throws IOException there was a problem writing to the Appendable
+     */
+    static <T extends Appendable> T quote(CharSequence string, T w) throws IOException {
+        if (string == null || string.length() == 0) {
+            w.append("\"\"");
+            return w;
+        }
+
+        char b;
+        char c = 0;
+        String hhhh;
+        int i;
+        int len = string.length();
+        int prev = 0;
+
+        w.append('"');
+        for (i = 0; i < len; i += 1) {
+            b = c;
+            c = string.charAt(i);
+            switch (c) {
+                case '\\':
+                case '"':
+                    if(prev < i) {
+                        w.append(string, prev, i);
+                    }
+                    w.append('\\');
+                    prev = i;
+                    break;
+                case '/':
+                    if (b == '<') {
+                        if(prev < i) {
+                            w.append(string, prev, i);
+                        }
+                        w.append('\\');
+                        prev = i;
+                    }
+                    break;
+                case '\b':
+                    if(prev < i) {
+                        w.append(string, prev, i);
+                    }
+                    w.append("\\b");
+                    prev = i + 1;
+                    break;
+                case '\t':
+                    if(prev < i) {
+                        w.append(string, prev, i);
+                    }
+                    w.append("\\t");
+                    prev = i + 1;
+                    break;
+                case '\n':
+                    if(prev < i) {
+                        w.append(string, prev, i);
+                    }
+                    w.append("\\n");
+                    prev = i + 1;
+                    break;
+                case '\f':
+                    if(prev < i) {
+                        w.append(string, prev, i);
+                    }
+                    w.append("\\f");
+                    prev = i + 1;
+                    break;
+                case '\r':
+                    if(prev < i) {
+                        w.append(string, prev, i);
+                    }
+                    w.append("\\r");
+                    prev = i + 1;
+                    break;
+                default:
+                    if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
+                            || (c >= '\u2000' && c < '\u2100')) {
+                        if(prev < i) {
+                            w.append(string, prev, i);
+                        }
+                        hhhh = Integer.toHexString(c);
+                        w.append("\\u0000", 0, 6 - hhhh.length());
+                        w.append(hhhh);
+                        prev = i + 1;
+                    }
+            }
+        }
+        if(prev == 0) {
+            w.append(string);
+        } else if(prev < len) {
+            w.append(string, prev, len);
+        }
+        w.append('"');
+        return w;
+    }
+
+    static <T extends Appendable> T writeBean(Object bean, T writer,
+            int indentFactor, int indent) throws JSONException {
+        try {
+            final int newindent = indent + indentFactor;
+            Class<?> klass = bean.getClass();
+
+            // If klass is a System class then set includeSuperClass to false.
+            boolean includeSuperClass = klass.getClassLoader() != null;
+            Method[] methods = includeSuperClass ? klass.getMethods()
+                    : klass.getDeclaredMethods();
+            boolean commanate = false;
+
+            writer.append('{');
+            for (int i = 0; i < methods.length; i += 1) {
+                try {
+                    Method method = methods[i];
+                    if (Modifier.isPublic(method.getModifiers()) &&
+                            !Modifier.isStatic(method.getModifiers()) &&
+                            !method.isSynthetic() &&
+                            (method.getReturnType() != Void.TYPE)) {
+                        String name = method.getName();
+                        String key = JSONObject.keyFromMethodName(name);
+                        if ((key != null)
+                                && (method.getParameterTypes().length == 0)) {
+                            Object result = method.invoke(bean, (Object[]) null);
+                            if (result != null) {
+                                if (commanate) {
+                                    writer.append(',');
+                                }
+                                if (indentFactor > 0) {
+                                    writer.append('\n');
+                                }
+                                indent(writer, newindent);
+                                quote(String.valueOf(key), writer);
+                                writer.append(':');
+                                if (indentFactor > 0) {
+                                    writer.append(' ');
+                                }
+                                writeValue(writer, result, indentFactor, newindent);
+                                commanate = true;
+                            }
+                        }
+                    }
+                } catch (Exception ignore) {
+                }
+            }
+            if(commanate) {
+                if (indentFactor > 0) {
+                    writer.append('\n');
+                }
+                indent(writer, indent);
+            }
+            writer.append('}');
+            return writer;
+        } catch (IOException exception) {
+            throw new JSONException(exception);
+        } catch (RuntimeException exception) {
+            throw new JSONException(exception);
+        }
+    }
+
+    static <T extends Appendable> T writeMap(Map<?, ?> map, T writer,
+            int indentFactor, int indent) throws JSONException {
+        try {
+            boolean commanate = false;
+            final int length = map.size();
+            Iterator<?> keys = map.keySet().iterator();
+            writer.append('{');
+
+            if (length == 1) {
+                Object key = keys.next();
+                quote(String.valueOf(key), writer);
+                writer.append(':');
+                if (indentFactor > 0) {
+                    writer.append(' ');
+                }
+                writeValue(writer, map.get(key), indentFactor, indent);
+            } else if (length != 0) {
+                final int newindent = indent + indentFactor;
+                while (keys.hasNext()) {
+                    Object key = keys.next();
+                    if (commanate) {
+                        writer.append(',');
+                    }
+                    if (indentFactor > 0) {
+                        writer.append('\n');
+                    }
+                    indent(writer, newindent);
+                    quote(String.valueOf(key), writer);
+                    writer.append(':');
+                    if (indentFactor > 0) {
+                        writer.append(' ');
+                    }
+                    writeValue(writer, map.get(key), indentFactor, newindent);
+                    commanate = true;
+                }
+                if (indentFactor > 0) {
+                    writer.append('\n');
+                }
+                indent(writer, indent);
+            }
+            writer.append('}');
+            return writer;
+        } catch (IOException exception) {
+            throw new JSONException(exception);
+        }
+    }
+
+    private static boolean singleIterableElement(Iterable<?> iterable) {
+        if(iterable instanceof Collection) {
+            return ((Collection)iterable).size() == 1;
+        }
+        Iterator<?> iterator = iterable.iterator();
+        if(!iterator.hasNext()) {
+            return false;
+        }
+        iterator.next();
+        return !iterator.hasNext();
+    }
+
+    static <T extends Appendable> T writeIterable(Iterable<?> collection, T writer,
+            int indentFactor, int indent) throws JSONException {
+        try {
+            boolean singleElement = singleIterableElement(collection);
+            Iterator<?> iterator = collection.iterator();
+            boolean commanate = false;
+            writer.append('[');
+
+            if ((singleElement) && (iterator.hasNext())) {
+                writeValue(writer, iterator.next(),
+                        indentFactor, indent);
+            } else if (iterator.hasNext()) {
+                final int newindent = indent + indentFactor;
+
+                while (iterator.hasNext()) {
+                    if (commanate) {
+                        writer.append(',');
+                    }
+                    if (indentFactor > 0) {
+                        writer.append('\n');
+                    }
+                    indent(writer, newindent);
+                    writeValue(writer, iterator.next(),
+                            indentFactor, newindent);
+                    commanate = true;
+                }
+                if (indentFactor > 0) {
+                    writer.append('\n');
+                }
+                indent(writer, indent);
+            }
+            writer.append(']');
+            return writer;
+        } catch (IOException e) {
+            throw new JSONException(e);
+        }
+    }
+
+    static <T extends Appendable> T writeArray(Object array, T writer,
+            int indentFactor, int indent) throws JSONException {
+        try {
+            final int length = Array.getLength(array);
+            boolean commanate = false;
+            writer.append('[');
+
+            if (length == 1) {
+                writeValue(writer, Array.get(array, 0),
+                        indentFactor, indent);
+            } else if (length != 0) {
+                final int newindent = indent + indentFactor;
+
+                for (int i = 0; i < length; i += 1) {
+                    if (commanate) {
+                        writer.append(',');
+                    }
+                    if (indentFactor > 0) {
+                        writer.append('\n');
+                    }
+                    indent(writer, newindent);
+                    writeValue(writer, Array.get(array, i),
+                            indentFactor, newindent);
+                    commanate = true;
+                }
+                if (indentFactor > 0) {
+                    writer.append('\n');
+                }
+                indent(writer, indent);
+            }
+            writer.append(']');
+            return writer;
+        } catch (IOException e) {
+            throw new JSONException(e);
+        }
+    }
+
+    /**
+     * Write the contents of the JSONObject as JSON text to a writer. For
+     * compactness, no whitespace is added.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @param writer
+     *            Writes the serialized JSON
+     * @param indentFactor
+     *            The number of spaces to add to each level of indentation.
+     * @param indent
+     *            The indention of the top level.
+     * @param <T>
+     *            A subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
+     * @return The writer.
+     * @throws JSONException
+     */
+    static <T extends Appendable> T writeJSONObject(JSONObject object, T writer, int indentFactor, int indent)
+            throws JSONException {
+        try {
+            boolean commanate = false;
+            final int length = object.length();
+            Iterator<String> keys = object.keys();
+            writer.append('{');
+
+            if (length == 1) {
+                String key = keys.next();
+                quote(key, writer);
+                writer.append(':');
+                if (indentFactor > 0) {
+                    writer.append(' ');
+                }
+                writeValue(writer, object.opt(key), indentFactor, indent);
+            } else if (length != 0) {
+                final int newindent = indent + indentFactor;
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    if (commanate) {
+                        writer.append(',');
+                    }
+                    if (indentFactor > 0) {
+                        writer.append('\n');
+                    }
+                    indent(writer, newindent);
+                    quote(key, writer);
+                    writer.append(':');
+                    if (indentFactor > 0) {
+                        writer.append(' ');
+                    }
+                    writeValue(writer, object.opt(key), indentFactor, newindent);
+                    commanate = true;
+                }
+                if (indentFactor > 0) {
+                    writer.append('\n');
+                }
+                indent(writer, indent);
+            }
+            writer.append('}');
+            return writer;
+        } catch (IOException exception) {
+            throw new JSONException(exception);
+        }
+    }
+
+    /**
+     * Write the contents of the JSONArray as JSON text to a writer. For
+     * compactness, no whitespace is added.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @param writer
+     *            Writes the serialized JSON
+     * @param indentFactor
+     *            The number of spaces to add to each level of indentation.
+     * @param indent
+     *            The indention of the top level.
+     * @param <T> a subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
+     * @return The writer.
+     * @throws JSONException
+     */
+    static <T extends Appendable> T writeJSONArray(JSONArray array, T writer, int indentFactor, int indent)
+            throws JSONException {
+        try {
+            boolean commanate = false;
+            int length = array.length();
+            writer.append('[');
+
+            if (length == 1) {
+                writeValue(writer, array.get(0), indentFactor, indent);
+            } else if (length != 0) {
+                final int newindent = indent + indentFactor;
+
+                for (int i = 0; i < length; i += 1) {
+                    if (commanate) {
+                        writer.append(',');
+                    }
+                    if (indentFactor > 0) {
+                        writer.append('\n');
+                    }
+                    indent(writer, newindent);
+                    writeValue(writer, array.get(i), indentFactor, newindent);
+                    commanate = true;
+                }
+                if (indentFactor > 0) {
+                    writer.append('\n');
+                }
+                indent(writer, indent);
+            }
+            writer.append(']');
+            return writer;
+        } catch (IOException e) {
+            throw new JSONException(e);
+        }
+    }
+
+    /**
+     * Write the given double to the given Appendable.
+     *
+     * @param writer
+     *            The Appendable to which the double value is written
+     * @param d
+     *            A double
+     * @param <T> subtype of Appendable, returned to the caller
+     * @return the given Appendable
+     * @throws JSONException there was a problem writing the double
+     */
+    static <T extends Appendable> T writeDouble(T writer, double d) throws JSONException {
+        if (Double.isInfinite(d) || Double.isNaN(d)) {
+            try {
+                writer.append("null");
+                return writer;
+            } catch (IOException e) {
+                throw new JSONException(e);
+            }
+        }
+
+        // Shave off trailing zeros and decimal point, if possible.
+        String string = Double.toString(d);
+        writeNumberDigits(writer, string);
+        return writer;
+    }
+
+    /**
+     * Write the given number to the given Appendable.
+     *
+     * @param writer
+     *            The Appendable to which the number value is written
+     * @param number
+     *            A Number
+     * @param <T> subtype of Appendable, returned to the caller
+     * @return the given Appendable
+     * @throws JSONException there was a problem writing the number
+     */
+    static <T extends Appendable> T writeNumber(T writer, Number number) throws JSONException {
+        if (number == null) {
+            throw new JSONException("Null pointer");
+        }
+        JSONObject.testValidity(number);
+
+        // Shave off trailing zeros and decimal point, if possible.
+        String string = number.toString();
+        writeNumberDigits(writer, string);
+        return writer;
+    }
+
+    /**
+     * Write a number value, trimming any trailing zero digits from a real number.
+     * If all zeros appear immediately after a decimal, the decimal is omitted
+     * as well.
+     *
+     * @param writer the Appendable to which the digits will be written
+     * @param string the string of digits
+     */
+    private static void writeNumberDigits(Appendable writer, String string) throws JSONException {
+        try {
+            if (string.indexOf('.') > 0 && string.indexOf('e') < 0
+                    && string.indexOf('E') < 0) {
+                final int len = string.length();
+                int last = len;
+                while ((last > 0) && (string.charAt(last - 1) == '0')) {
+                    last--;
+                }
+                if ((last > 0) && (string.charAt(last - 1) == '.')) {
+                    last--;
+                }
+                if (last < len) {
+                    writer.append(string, 0, last);
+                    return;
+                }
+            }
+            writer.append(string);
+        } catch (IOException e) {
+            throw new JSONException(e);
         }
     }
 }
