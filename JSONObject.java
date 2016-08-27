@@ -2209,6 +2209,8 @@ public class JSONObject {
             writeArray(value, writer, indentFactor, indent);
         } else if(value instanceof CharSequence) {
             quote((CharSequence) value, writer);
+        } else if (value instanceof Enum<?>) {
+            quote(((Enum<?>)value).name(), writer);
         } else if(objectIsBean(value)) {
             writeBean(value, writer, indentFactor, indent);
         } else {
