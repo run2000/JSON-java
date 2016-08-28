@@ -1713,7 +1713,7 @@ public class JSONObject {
     public static String valueToString(Object value) throws JSONException {
         String result;
 
-        if(value instanceof JSONString) {
+        if((value instanceof JSONString) && !(value instanceof JSONAppendable)) {
             try {
                 result = ((JSONString)value).toJSONString();
             } catch (Exception e) {
@@ -1749,6 +1749,7 @@ public class JSONObject {
             }
             if (object instanceof JSONObject || object instanceof JSONArray
                     || NULL.equals(object) || object instanceof JSONString
+                    || object instanceof JSONAppendable
                     || object instanceof Number || object instanceof Character
                     || object instanceof Boolean || object instanceof String) {
                 return object;

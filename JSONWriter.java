@@ -441,6 +441,14 @@ public class JSONWriter implements Closeable {
             int indentFactor, int indent) throws JSONException, IOException {
         if (value == null || value.equals(null)) {
             writer.append("null");
+        } else if (value instanceof JSONAppendable) {
+            try {
+                ((JSONAppendable)value).appendJSON(writer);
+            } catch(IOException e) {
+                throw new JSONException(e);
+            } catch(RuntimeException e) {
+                throw new JSONException(e);
+            }
         } else if (value instanceof JSONString) {
             String o;
             try {

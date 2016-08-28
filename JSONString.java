@@ -34,6 +34,9 @@ SOFTWARE.
  * <p>
  * If <code>toJSONString()</code> returns <code>null</code>, the class's
  * <code>toString()</code> value will be quoted and used.</p>
+ * <p>
+ * If a large value needs to be written, consider implementing
+ * {@link JSONAppendable} instead.</p>
  * 
  * @author json.org
  * @version 2016-07-28
