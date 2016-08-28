@@ -24,9 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-import java.io.Closeable;
-import java.io.Flushable;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.CharBuffer;
 
 /**
@@ -47,7 +46,7 @@ import java.nio.CharBuffer;
  * @author run2000
  * @version 2016-7-8
  */
-public final class BufferedAppendable implements Appendable, Flushable, Closeable {
+public final class BufferedAppendable extends Writer {
     /** The default buffer size of 1024 characters, if none is specified. */
     public static final int DEFAULT_BUFFER_SIZE = 1024;
     private static final String NULL_SEQ = "null";
@@ -140,7 +139,7 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
      *              subsequence
      * @return this BufferedAppendable
      * @throws IOException there was a problem appending to the underlying
-     *                     appendable
+     *                     {@code Appendable}
      */
     @Override
     public BufferedAppendable append(CharSequence csq, int start, int end) throws IOException {
@@ -177,7 +176,7 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
      * @param c The character to append
      * @return this BufferedAppendable
      * @throws IOException there was a problem appending to the underlying
-     *                     appendable
+     *                     {@code Appendable}
      */
     @Override
     public BufferedAppendable append(char c) throws IOException {
@@ -223,11 +222,107 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
         }
     }
 
+    // -- Fulfill the Writer contract in terms of Appendable, above --
+
+    /**
+     * Writes a single character.  The character to be written is contained in
+     * the 16 low-order bits of the given integer value; the 16 high-order bits
+     * are ignored.
+     *
+     * @param  c int specifying a character to be written
+     * @throws  IOException If an I/O error occurs
+     */
+    @Override
+    public void write(int c) throws IOException {
+        // inline for single char append
+        if (appendable == null) {
+            throw new IOException("Buffered appendable is not open");
+        }
+        if (buffer.remaining() < 1) {
+            flushBuffer();
+        }
+        buffer.append((char)c);
+    }
+
+    /**
+     * Writes an array of characters.
+     *
+     * @param  cbuf Array of characters to be written
+     *
+     * @throws  IOException If an I/O error occurs
+     * @throws  NullPointerException cbuf is {@code null}
+     */
+    @Override
+    public void write(char[] cbuf) throws IOException {
+        if(cbuf.length > 0) {
+            append(CharBuffer.wrap(cbuf));
+        }
+    }
+
+    /**
+     * Writes a portion of an array of characters.
+     *
+     * @param  cbuf Array of characters
+     * @param  off Offset from which to start writing characters
+     * @param  len Number of characters to write
+     * @throws  IOException If an I/O error occurs
+     * @throws  NullPointerException cbuf is {@code null}
+     * @throws  IndexOutOfBoundsException off or len are out of bounds
+     */
+    @Override
+    public void write(char[] cbuf, int off, int len) throws IOException {
+        if ((off < 0) || (off > cbuf.length) || (len < 0) ||
+                ((off + len) > cbuf.length) || ((off + len) < 0)) {
+            throw new IndexOutOfBoundsException();
+        } else if (len == 0) {
+            return;
+        }
+        append(CharBuffer.wrap(cbuf, off, len));
+    }
+
+    /**
+     * Writes a string.
+     *
+     * @param  str String to be written
+     * @throws  IOException If an I/O error occurs
+     * @throws  NullPointerException str is {@code null}
+     */
+    @Override
+    public void write(String str) throws IOException {
+        if(str.length() > 0) {
+            append(str);
+        }
+    }
+
+    /**
+     * Writes a portion of a string.
+     *
+     * @param  str A String
+     * @param  off Offset from which to start writing characters
+     * @param  len Number of characters to write
+     * @throws  IndexOutOfBoundsException
+     *          If {@code off} is negative, or {@code len} is negative,
+     *          or {@code off+len} is negative or greater than the length
+     *          of the given string
+     * @throws  IOException If an I/O error occurs
+     * @throws  NullPointerException str is {@code null}
+     */
+    @Override
+    public void write(String str, int off, int len) throws IOException {
+        if ((off < 0) || (off > str.length()) || (len < 0) ||
+                ((off + len) > str.length()) || ((off + len) < 0)) {
+            throw new IndexOutOfBoundsException();
+        } else if (len == 0) {
+            return;
+        }
+        append(str, off, off + len);
+    }
+
     /**
      * Flush the buffer of this {@code BufferedAppendable}.
      *
      * @throws IOException there was a problem appending to the underlying
-     *                     appendable
+     *                     {@code Appendable}
      */
     @Override
     public void flush() throws IOException {
@@ -238,7 +333,7 @@ public final class BufferedAppendable implements Appendable, Flushable, Closeabl
      * Flush and close the buffer of this {@code BufferedAppendable}.
      *
      * @throws IOException there was a problem appending to the underlying
-     *                     appendable
+     *                     {@code Appendable}
      */
     @Override
     public void close() throws IOException {
