@@ -55,5 +55,5 @@ public interface JSONString {
      * @return A strictly syntactically correct JSON text, or <code>null</code>
      * to indicate the <code>toString</code> value should be used instead
      */
-    public String toJSONString();
+    String toJSONString();
 }
