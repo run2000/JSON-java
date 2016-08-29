@@ -444,6 +444,9 @@ public class JSONWriter implements Closeable {
         } else if (value instanceof JSONAppendable) {
             try {
                 ((JSONAppendable)value).appendJSON(writer);
+            } catch(JSONException e) {
+                // Propagate directly, because JSONException is a RuntimeException
+                throw e;
             } catch(IOException e) {
                 throw new JSONException(e);
             } catch(RuntimeException e) {
@@ -453,6 +456,9 @@ public class JSONWriter implements Closeable {
             String o;
             try {
                 o = ((JSONString) value).toJSONString();
+            } catch(JSONException e) {
+                // Propagate directly, because JSONException is a RuntimeException
+                throw e;
             } catch (Exception e) {
                 throw new JSONException(e);
             }
