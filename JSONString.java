@@ -40,6 +40,7 @@ SOFTWARE.
  * 
  * @author json.org
  * @version 2016-07-28
+ * @see JSONAppendable
  */
 public interface JSONString {
     /**

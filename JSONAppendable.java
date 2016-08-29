@@ -44,6 +44,7 @@ import java.io.IOException;
  * </p>
  * @author JSON.org
  * @version 2016-08-28
+ * @see JSONString
  */
 public interface JSONAppendable {
 
