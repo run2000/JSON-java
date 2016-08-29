@@ -1466,7 +1466,7 @@ public class JSONObject {
     public static String quote(CharSequence string) {
         StringBuilder sb = new StringBuilder();
         try {
-            return JSONWriter.quote(string, sb).toString();
+            return JSONWriter.writeString(string, sb).toString();
         } catch (IOException ignored) {
             // will never happen - we are writing to a string builder
             return "";
@@ -1491,7 +1491,7 @@ public class JSONObject {
      * @throws IOException there was a problem writing to the Appendable
      */
     public static <T extends Appendable> T quote(CharSequence string, T w) throws IOException {
-        return JSONWriter.quote(string, w);
+        return JSONWriter.writeString(string, w);
     }
 
     /**
@@ -1725,7 +1725,7 @@ public class JSONObject {
                 return result;
             }
         } else {
-            result = JSONWriter.writeValue(new StringBuilder(), value).toString();
+            result = JSONWriter.writeValue(value, new StringBuilder()).toString();
         }
         return result;
     }

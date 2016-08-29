@@ -460,7 +460,7 @@ public class JSONArray implements Iterable<Object> {
             if (i > 0) {
                 sb.append(separator);
             }
-            JSONWriter.writeValue(sb, this.myArrayList.get(i));
+            JSONWriter.writeValue(this.myArrayList.get(i), sb);
         }
         return sb.toString();
     }

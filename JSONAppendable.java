@@ -54,7 +54,7 @@ public interface JSONAppendable {
      * value {@code null}.
      * <p>
      * If a runtime exception is thrown, this will be caught and propagated
-     * as a <code>JSONException</code>.</p>
+     * as a {@code JSONException}.</p>
      *
      * @param appender an {@code Appendable} to which a strictly syntactically
      * correct JSON value must be written

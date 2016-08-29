@@ -132,7 +132,7 @@ public class JSONStrictTokener extends JSONTokener {
      * @return the Token type representing the next token type
      */
     @Override
-    public JSONToken nextTokenType() throws JSONException {
+    public JSONTokener.JSONToken nextTokenType() throws JSONException {
         char c = nextClean();
 
         switch(c) {

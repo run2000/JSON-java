@@ -257,6 +257,12 @@ public final class JSONLimitBuilder {
         return buildJSONObject(new JSONLimitStreamReader(reader), params);
     }
 
+    /**
+     * Build a JSONObject from a {@code Reader}.
+     *
+     * @param reader A reader.
+     * @return a JSONObject value
+     */
     public static JSONObject buildJSONObject(Reader reader) throws JSONException {
         return buildJSONObject(new JSONLimitStreamReader(reader), DEFAULT_PARAMS);
     }
@@ -276,6 +282,15 @@ public final class JSONLimitBuilder {
         return buildJSONObject(new JSONLimitStreamReader(inputStream, charset), params);
     }
 
+    /**
+     * Build a JSONObject from a {@code InputStream} and supplied
+     * {@code Charset}.
+     *
+     * @param inputStream the input stream containing the JSON data
+     * @param charset     the character set with which to interpret the
+     *                    input stream
+     * @return a JSONObject value
+     */
     public static JSONObject buildJSONObject(InputStream inputStream, Charset charset)
             throws JSONException {
         return buildJSONObject(new JSONLimitStreamReader(inputStream, charset), DEFAULT_PARAMS);
@@ -292,10 +307,22 @@ public final class JSONLimitBuilder {
         return buildJSONObject(new JSONLimitStreamReader(s), params);
     }
 
+    /**
+     * Build a JSONObject from a {@code String}.
+     *
+     * @param s      A source string.
+     * @return a JSONObject value
+     */
     public static JSONObject buildJSONObject(String s) throws JSONException {
         return buildJSONObject(new JSONLimitStreamReader(s), DEFAULT_PARAMS);
     }
 
+    /**
+     * Build a JSONObject from a {@code JSONLimitStreamReader}.
+     *
+     * @param reader A source stream.
+     * @return a JSONObject value
+     */
     public static JSONObject buildJSONObject(JSONLimitStreamReader reader) throws JSONException {
         return buildJSONObject(reader, DEFAULT_PARAMS);
     }
@@ -349,6 +376,12 @@ public final class JSONLimitBuilder {
         return buildJSONArray(new JSONLimitStreamReader(reader), params);
     }
 
+    /**
+     * Build a JSONArray from a {@code Reader}.
+     *
+     * @param reader     A reader.
+     * @return a JSONArray value
+     */
     public static JSONArray buildJSONArray(Reader reader) throws JSONException {
         return buildJSONArray(new JSONLimitStreamReader(reader), DEFAULT_PARAMS);
     }
@@ -367,6 +400,15 @@ public final class JSONLimitBuilder {
         return buildJSONArray(new JSONLimitStreamReader(inputStream, charset), params);
     }
 
+    /**
+     * Build a JSONArray from a {@code InputStream} and supplied
+     * {@code Charset}.
+     *
+     * @param inputStream   the input stream containing the JSON data
+     * @param charset       the character set with which to interpret the
+     *                      input stream
+     * @return a JSONArray value
+     */
     public static JSONArray buildJSONArray(InputStream inputStream, Charset charset) throws JSONException {
         return buildJSONArray(new JSONLimitStreamReader(inputStream, charset), DEFAULT_PARAMS);
     }
@@ -382,10 +424,22 @@ public final class JSONLimitBuilder {
         return buildJSONArray(new JSONLimitStreamReader(s), params);
     }
 
+    /**
+     * Build a JSONArray from a {@code String}.
+     *
+     * @param s     A source string.
+     * @return a JSONArray value
+     */
     public static JSONArray buildJSONArray(String s) throws JSONException {
         return buildJSONArray(new JSONLimitStreamReader(s), DEFAULT_PARAMS);
     }
 
+    /**
+     * Build a JSONArray from a {@code JSONLimitStreamReader}.
+     *
+     * @param reader A source reader.
+     * @return a JSONArray value
+     */
     public static JSONArray buildJSONArray(JSONLimitStreamReader reader) throws JSONException {
         return buildJSONArray(reader, DEFAULT_PARAMS);
     }

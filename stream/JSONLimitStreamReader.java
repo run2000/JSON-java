@@ -159,7 +159,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#KEY}, return the text of the
+     * If the ParseState was {@link JSONStreamReader.ParseState#KEY}, return the text of the
      * key name.
      * <p>
      * This method advances the parser onto the next state.</p>
@@ -184,10 +184,11 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#NULL_VALUE},
-     * {@link ParseState#BOOLEAN_VALUE}, {@link ParseState#NUMBER_VALUE}, or
-     * {@link ParseState#STRING_VALUE}, return the value as an {@code Object}.
-     * The values that can be returned here are:
+     * If the ParseState was {@link JSONStreamReader.ParseState#NULL_VALUE},
+     * {@link JSONStreamReader.ParseState#BOOLEAN_VALUE},
+     * {@link JSONStreamReader.ParseState#NUMBER_VALUE}, or
+     * {@link JSONStreamReader.ParseState#STRING_VALUE}, return the value as
+     * an {@code Object}. The values that can be returned here are:
      * <ul>
      *     <li>{@code JSONObject.NULL}</li>
      *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
@@ -232,7 +233,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#STRING_VALUE},
+     * If the ParseState was {@link JSONStreamReader.ParseState#STRING_VALUE},
      * return the value as a {@code String}.
      * <p>
      * This method advances the parser onto the next state.</p>
@@ -255,7 +256,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * If the ParseState was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
      * return the value as a {@code Number}.
      * <p>
      * The number type returned is one of:</p>
@@ -289,7 +290,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * If the ParseState was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
      * append the number sequence to the given {@code Appendable}.
      * <p>
      * This method is suitable for cases where the caller wishes to perform
@@ -319,7 +320,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * If the ParseState was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
      * return the value as a {@code BigDecimal}.
      * <p>
      * This method advances the parser onto the next state.</p>
@@ -344,7 +345,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * If the ParseState was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
      * return the value as a {@code BigInteger}.
      * <p>
      * If the JSON value is not parseable as a big integer, as defined by the
@@ -372,7 +373,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * If the ParseState was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
      * return the value as a double.
      * <p>
      * This method advances the parser onto the next state.</p>
@@ -397,7 +398,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * If the ParseState was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
      * return the value as an int.
      * <p>
      * If the JSON value is not parseable as an int, as defined by the JSON
@@ -425,7 +426,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * If the ParseState was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
      * return the value as a long.
      * <p>
      * If the JSON value is not parseable as a long, as defined by the JSON
