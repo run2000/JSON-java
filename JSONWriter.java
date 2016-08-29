@@ -221,8 +221,7 @@ public class JSONWriter implements Closeable {
                 if (this.comma) {
                     this.writer.append(',');
                 }
-                writeString(string, this.writer);
-                this.writer.append(':');
+                writeString(string, this.writer).append(':');
                 this.comma = false;
                 this.mode = 'o';
                 return this;
@@ -529,8 +528,7 @@ public class JSONWriter implements Closeable {
                                     writer.append('\n');
                                 }
                                 indent(newindent, writer);
-                                writeString(String.valueOf(key), writer);
-                                writer.append(':');
+                                writeString(String.valueOf(key), writer).append(':');
                                 if (indentFactor > 0) {
                                     writer.append(' ');
                                 }
@@ -567,8 +565,7 @@ public class JSONWriter implements Closeable {
 
             if (length == 1) {
                 Object key = keys.next();
-                writeString(String.valueOf(key), writer);
-                writer.append(':');
+                writeString(String.valueOf(key), writer).append(':');
                 if (indentFactor > 0) {
                     writer.append(' ');
                 }
@@ -584,8 +581,7 @@ public class JSONWriter implements Closeable {
                         writer.append('\n');
                     }
                     indent(newindent, writer);
-                    writeString(String.valueOf(key), writer);
-                    writer.append(':');
+                    writeString(String.valueOf(key), writer).append(':');
                     if (indentFactor > 0) {
                         writer.append(' ');
                     }
@@ -719,8 +715,7 @@ public class JSONWriter implements Closeable {
 
             if (length == 1) {
                 String key = keys.next();
-                writeString(key, writer);
-                writer.append(':');
+                writeString(key, writer).append(':');
                 if (indentFactor > 0) {
                     writer.append(' ');
                 }
@@ -736,8 +731,7 @@ public class JSONWriter implements Closeable {
                         writer.append('\n');
                     }
                     indent(newindent, writer);
-                    writeString(key, writer);
-                    writer.append(':');
+                    writeString(key, writer).append(':');
                     if (indentFactor > 0) {
                         writer.append(' ');
                     }
