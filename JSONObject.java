@@ -1749,7 +1749,7 @@ public class JSONObject {
             }
             if (object instanceof JSONObject || object instanceof JSONArray
                     || NULL.equals(object) || object instanceof JSONString
-                    || object instanceof JSONAppendable
+                    || object instanceof JSONAppendable || obj instanceof Enum
                     || object instanceof Number || object instanceof Character
                     || object instanceof Boolean || object instanceof String) {
                 return object;
