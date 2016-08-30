@@ -430,69 +430,75 @@ public class JSONWriter implements Closeable {
 
     static <T extends Appendable> T writeValue(Object value, T writer)
             throws JSONException {
-        try {
-            return writeValue(value, writer, 0 ,0);
-        } catch (IOException e) {
-            throw new JSONException(e);
-        }
+        return writeValue(value, writer, 0 ,0);
     }
 
     static <T extends Appendable> T writeValue(Object value, T writer,
-            int indentFactor, int indent) throws JSONException, IOException {
+            int indentFactor, int indent) throws JSONException {
         if (value == null || value.equals(null)) {
-            writer.append("null");
+            writeNull(writer);
         } else if (value instanceof JSONAppendable) {
-            try {
-                ((JSONAppendable)value).appendJSON(writer);
-            } catch(JSONException e) {
-                // Propagate directly, because JSONException is a RuntimeException
-                throw e;
-            } catch(IOException e) {
-                throw new JSONException(e);
-            } catch(RuntimeException e) {
-                throw new JSONException(e);
-            }
+            writeJSONAppendable((JSONAppendable) value, writer);
         } else if (value instanceof JSONString) {
-            String o;
-            try {
-                o = ((JSONString) value).toJSONString();
-            } catch(JSONException e) {
-                // Propagate directly, because JSONException is a RuntimeException
-                throw e;
-            } catch (Exception e) {
-                throw new JSONException(e);
-            }
-            if (o != null) {
-                writer.append(o);
-            } else {
-                writeString(value.toString(), writer);
-            }
-        } else if (value instanceof Number) {
-            writeNumber((Number) value, writer);
-        } else if (value instanceof Boolean) {
-            writer.append(value.toString());
+            writeJSONString((JSONString) value, writer);
         } else if (value instanceof JSONObject) {
             writeJSONObject((JSONObject) value, writer, indentFactor, indent);
         } else if (value instanceof JSONArray) {
             writeJSONArray((JSONArray) value, writer, indentFactor, indent);
-        } else if (value instanceof Map) {
-            Map<?, ?> map = (Map<?, ?>) value;
-            writeMap(map, writer, indentFactor, indent);
-        } else if (value instanceof Iterable) {
-            Iterable<?> coll = (Iterable<?>) value;
-            writeIterable(coll, writer, indentFactor, indent);
-        } else if (value.getClass().isArray()) {
-            writeArray(value, writer, indentFactor, indent);
+        } else if (value instanceof Number) {
+            writeNumber((Number) value, writer);
+        } else if (value instanceof Boolean) {
+            writeBoolean((Boolean) value, writer);
         } else if(value instanceof CharSequence) {
             writeString((CharSequence) value, writer);
+        } else if (value instanceof Map) {
+            writeMap((Map<?, ?>) value, writer, indentFactor, indent);
+        } else if (value instanceof Iterable) {
+            writeIterable((Iterable<?>) value, writer, indentFactor, indent);
+        } else if (value.getClass().isArray()) {
+            writeArray(value, writer, indentFactor, indent);
         } else if (value instanceof Enum<?>) {
-            writeString(((Enum<?>)value).name(), writer);
+            writeString(((Enum<?>) value).name(), writer);
         } else if(JSONObject.objectIsBean(value)) {
             writeBean(value, writer, indentFactor, indent);
         } else {
             writeString(value.toString(), writer);
         }
         return writer;
+    }
+
+    static <T extends Appendable> void writeJSONAppendable(JSONAppendable value,
+            T writer) throws JSONException {
+        try {
+            value.appendJSON(writer);
+        } catch(JSONException e) {
+            // Propagate directly, because JSONException is a RuntimeException
+            throw e;
+        } catch(IOException e) {
+            throw new JSONException(e);
+        } catch(RuntimeException e) {
+            throw new JSONException(e);
+        }
+    }
+
+    static <T extends Appendable> T writeJSONString(JSONString value, T writer)
+            throws JSONException {
+        try {
+            String o = value.toJSONString();
+            if (o != null) {
+                writer.append(o);
+            } else {
+                writeString(value.toString(), writer);
+            }
+            return writer;
+        } catch(JSONException e) {
+            // Propagate directly, because JSONException is a RuntimeException
+            throw e;
+        } catch (IOException e) {
+            throw new JSONException(e);
+        } catch (RuntimeException e) {
+            throw new JSONException(e);
+        }
     }
 
     static <T extends Appendable> T writeBean(Object bean, T writer,
@@ -817,98 +823,103 @@ public class JSONWriter implements Closeable {
      *            A subtype of {@code Appendable}, returned to the caller
      *            for chaining purposes
      * @return A String correctly formatted for insertion in a JSON text.
-     * @throws IOException there was a problem writing to the Appendable
+     * @throws JSONException there was a problem writing to the Appendable
      */
-    static <T extends Appendable> T writeString(CharSequence string, T w) throws IOException {
-        if (string == null || string.length() == 0) {
-            w.append("\"\"");
-            return w;
-        }
+    static <T extends Appendable> T writeString(CharSequence string, T w)
+            throws JSONException {
+        try {
+            if (string == null || string.length() == 0) {
+                w.append("\"\"");
+                return w;
+            }
 
-        char b;
-        char c = 0;
-        String hhhh;
-        int i;
-        int len = string.length();
-        int prev = 0;
+            char b;
+            char c = 0;
+            String hhhh;
+            int i;
+            int len = string.length();
+            int prev = 0;
 
-        w.append('"');
-        for (i = 0; i < len; i += 1) {
-            b = c;
-            c = string.charAt(i);
-            switch (c) {
-                case '\\':
-                case '"':
-                    if(prev < i) {
-                        w.append(string, prev, i);
-                    }
-                    w.append('\\');
-                    prev = i;
-                    break;
-                case '/':
-                    if (b == '<') {
+            w.append('"');
+            for (i = 0; i < len; i += 1) {
+                b = c;
+                c = string.charAt(i);
+                switch (c) {
+                    case '\\':
+                    case '"':
                         if(prev < i) {
                             w.append(string, prev, i);
                         }
                         w.append('\\');
                         prev = i;
-                    }
-                    break;
-                case '\b':
-                    if(prev < i) {
-                        w.append(string, prev, i);
-                    }
-                    w.append("\\b");
-                    prev = i + 1;
-                    break;
-                case '\t':
-                    if(prev < i) {
-                        w.append(string, prev, i);
-                    }
-                    w.append("\\t");
-                    prev = i + 1;
-                    break;
-                case '\n':
-                    if(prev < i) {
-                        w.append(string, prev, i);
-                    }
-                    w.append("\\n");
-                    prev = i + 1;
-                    break;
-                case '\f':
-                    if(prev < i) {
-                        w.append(string, prev, i);
-                    }
-                    w.append("\\f");
-                    prev = i + 1;
-                    break;
-                case '\r':
-                    if(prev < i) {
-                        w.append(string, prev, i);
-                    }
-                    w.append("\\r");
-                    prev = i + 1;
-                    break;
-                default:
-                    if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
-                            || (c >= '\u2000' && c < '\u2100')) {
+                        break;
+                    case '/':
+                        if (b == '<') {
+                            if(prev < i) {
+                                w.append(string, prev, i);
+                            }
+                            w.append('\\');
+                            prev = i;
+                        }
+                        break;
+                    case '\b':
                         if(prev < i) {
                             w.append(string, prev, i);
                         }
-                        hhhh = Integer.toHexString(c);
-                        w.append("\\u0000", 0, 6 - hhhh.length());
-                        w.append(hhhh);
+                        w.append("\\b");
                         prev = i + 1;
-                    }
+                        break;
+                    case '\t':
+                        if(prev < i) {
+                            w.append(string, prev, i);
+                        }
+                        w.append("\\t");
+                        prev = i + 1;
+                        break;
+                    case '\n':
+                        if(prev < i) {
+                            w.append(string, prev, i);
+                        }
+                        w.append("\\n");
+                        prev = i + 1;
+                        break;
+                    case '\f':
+                        if(prev < i) {
+                            w.append(string, prev, i);
+                        }
+                        w.append("\\f");
+                        prev = i + 1;
+                        break;
+                    case '\r':
+                        if(prev < i) {
+                            w.append(string, prev, i);
+                        }
+                        w.append("\\r");
+                        prev = i + 1;
+                        break;
+                    default:
+                        if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
+                                || (c >= '\u2000' && c < '\u2100')) {
+                            if(prev < i) {
+                                w.append(string, prev, i);
+                            }
+                            hhhh = Integer.toHexString(c);
+                            w.append("\\u0000", 0, 6 - hhhh.length());
+                            w.append(hhhh);
+                            prev = i + 1;
+                        }
+                }
             }
+            if(prev == 0) {
+                w.append(string);
+            } else if(prev < len) {
+                w.append(string, prev, len);
+            }
+            w.append('"');
+            return w;
+        } catch (IOException e) {
+            throw new JSONException(e);
         }
-        if(prev == 0) {
-            w.append(string);
-        } else if(prev < len) {
-            w.append(string, prev, len);
-        }
-        w.append('"');
-        return w;
     }
 
     /**
@@ -922,14 +933,10 @@ public class JSONWriter implements Closeable {
      * @return the given Appendable
      * @throws JSONException there was a problem writing the double
      */
-    static <T extends Appendable> T writeDouble(double d, T writer) throws JSONException {
+    static <T extends Appendable> T writeDouble(double d, T writer)
+            throws JSONException {
         if (Double.isInfinite(d) || Double.isNaN(d)) {
-            try {
-                writer.append("null");
-                return writer;
-            } catch (IOException e) {
-                throw new JSONException(e);
-            }
+            return writeNull(writer);
         }
 
         // Shave off trailing zeros and decimal point, if possible.
@@ -948,7 +955,8 @@ public class JSONWriter implements Closeable {
      * @return the given Appendable
      * @throws JSONException there was a problem writing the number
      */
-    static <T extends Appendable> T writeNumber(Number number, T writer) throws JSONException {
+    static <T extends Appendable> T writeNumber(Number number, T writer)
+            throws JSONException {
         if (number == null) {
             throw new JSONException("Null pointer");
         }
@@ -967,8 +975,8 @@ public class JSONWriter implements Closeable {
      * @param string the string of digits
      * @param writer the Appendable to which the digits will be written
      */
-    private static <T extends Appendable> T writeNumberDigits(String string, T writer)
-            throws JSONException {
+    private static <T extends Appendable> T writeNumberDigits(String string,
+            T writer) throws JSONException {
         try {
             if (string.indexOf('.') > 0 && string.indexOf('e') < 0
                     && string.indexOf('E') < 0) {
@@ -986,6 +994,25 @@ public class JSONWriter implements Closeable {
                 }
             }
             writer.append(string);
+            return writer;
+        } catch (IOException e) {
+            throw new JSONException(e);
+        }
+    }
+
+    static <T extends Appendable> T writeBoolean(Boolean value, T writer)
+            throws JSONException {
+        try {
+            writer.append(value.toString());
+            return writer;
+        } catch (IOException e) {
+            throw new JSONException(e);
+        }
+    }
+
+    static <T extends Appendable> T writeNull(T writer) throws JSONException {
+        try {
+            writer.append("null");
             return writer;
         } catch (IOException e) {
             throw new JSONException(e);

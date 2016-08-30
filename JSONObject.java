@@ -26,7 +26,6 @@ package org.json;
 
 import org.json.JSONTokener.JSONToken;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -1465,12 +1464,7 @@ public class JSONObject {
      */
     public static String quote(CharSequence string) {
         StringBuilder sb = new StringBuilder();
-        try {
-            return JSONWriter.writeString(string, sb).toString();
-        } catch (IOException ignored) {
-            // will never happen - we are writing to a string builder
-            return "";
-        }
+        return JSONWriter.writeString(string, sb).toString();
     }
 
     /**
@@ -1488,9 +1482,9 @@ public class JSONObject {
      *            A subtype of {@code Appendable}, returned to the caller
      *            for chaining purposes
      * @return A String correctly formatted for insertion in a JSON text.
-     * @throws IOException there was a problem writing to the Appendable
+     * @throws JSONException there was a problem writing to the Appendable
      */
-    public static <T extends Appendable> T quote(CharSequence string, T w) throws IOException {
+    public static <T extends Appendable> T quote(CharSequence string, T w) throws JSONException {
         return JSONWriter.writeString(string, w);
     }
 
@@ -1755,16 +1749,14 @@ public class JSONObject {
                 return object;
             }
 
+            if (object instanceof Map) {
+                return new JSONObject((Map<?, ?>) object);
+            }
             if (object instanceof Collection) {
-                Collection<?> coll = (Collection<?>) object;
-                return new JSONArray(coll);
+                return new JSONArray((Collection<?>) object);
             }
             if (object.getClass().isArray()) {
                 return new JSONArray(object);
-            }
-            if (object instanceof Map) {
-                Map<?, ?> map = (Map<?, ?>) object;
-                return new JSONObject(map);
             }
             if (objectIsBean(object)) {
                 return new JSONObject(object);
