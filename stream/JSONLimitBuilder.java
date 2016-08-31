@@ -537,4 +537,48 @@ public final class JSONLimitBuilder {
         }
         return object;
     }
+
+    /**
+     * If the given JSONLimitStreamReader's ParseState was {@link ParseState#OBJECT},
+     * return the entire subtree as a JSONObject value. This method advances the
+     * parser onto the {@link ParseState#END_OBJECT} state.
+     * <p>
+     * If the JSON stream is not parseable as an object, a JSONException
+     * will be thrown.
+     * </p>
+     *
+     * @param reader A source stream reader.
+     * @param limits the limits imposed on the builder
+     * @return a JSONObject representing the subtree starting at the current
+     * OBJECT state
+     */
+    public static JSONObject buildObjectSubTree(JSONLimitStreamReader reader,
+            BuilderLimits limits) throws JSONException {
+        if((reader.currentState() != ParseState.OBJECT) || (reader.getStackDepth() == 0)) {
+            throw new JSONParseException("Expected OBJECT state", reader.getParsePosition());
+        }
+        return parseObjectTree(reader, limits);
+    }
+
+    /**
+     * If the given JSONLimitStreamReader's ParseState was {@link ParseState#ARRAY},
+     * return the entire subtree as a JSONArray value. This method advances the
+     * parser onto the {@link ParseState#END_ARRAY} state.
+     * <p>
+     * If the JSON stream is not parseable as an array, a JSONException
+     * will be thrown.
+     * </p>
+     *
+     * @param reader A source stream reader.
+     * @param limits the limits imposed on the builder
+     * @return a JSONArray representing the subtree starting at the current
+     * ARRAY state
+     */
+    public static JSONArray buildArraySubTree(JSONLimitStreamReader reader,
+            BuilderLimits limits) throws JSONException {
+        if((reader.currentState() != ParseState.ARRAY) || (reader.getStackDepth() == 0)) {
+            throw new JSONParseException("Expected ARRAY state", reader.getParsePosition());
+        }
+        return parseArrayTree(reader, limits);
+    }
 }
