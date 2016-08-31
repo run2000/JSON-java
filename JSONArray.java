@@ -885,6 +885,7 @@ public class JSONArray implements Iterable<Object> {
      * @return this.
      */
     public JSONArray put(Object value) {
+        JSONObject.testValidity(value);
         this.myArrayList.add(value);
         return this;
     }
