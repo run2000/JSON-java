@@ -938,7 +938,9 @@ public class JSONArray implements Iterable<Object> {
      *             If the index is negative or if the value is not finite.
      */
     public JSONArray put(int index, double value) throws JSONException {
-        this.put(index, new Double(value));
+        Double d = Double.valueOf(value);
+        JSONObject.testValidity(d);
+        this.put(index, d);
         return this;
     }
 
@@ -956,7 +958,7 @@ public class JSONArray implements Iterable<Object> {
      *             If the index is negative.
      */
     public JSONArray put(int index, int value) throws JSONException {
-        this.put(index, new Integer(value));
+        this.put(index, Integer.valueOf(value));
         return this;
     }
 
@@ -974,7 +976,7 @@ public class JSONArray implements Iterable<Object> {
      *             If the index is negative.
      */
     public JSONArray put(int index, long value) throws JSONException {
-        this.put(index, new Long(value));
+        this.put(index, Long.valueOf(value));
         return this;
     }
 
