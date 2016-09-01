@@ -415,6 +415,19 @@ public class JSONWriter implements Closeable {
     // 24 spaces, divides by 1, 2, 3, 4, 6, 8, 12.
     private static final String PADDING_SPACES = "                        ";
 
+    /**
+     * Indent by the given number of spaces.
+     *
+     * @param indent
+     *            the number of character to indent.
+     * @param writer
+     *            the writer.
+     * @param <T>
+     *            A subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
+     * @return The writer.
+     * @throws IOException there was a problem writing the indentation
+     */
     static <T extends Appendable> T indent(int indent, T writer) throws IOException {
         final int padding = PADDING_SPACES.length();
 
@@ -428,49 +441,110 @@ public class JSONWriter implements Closeable {
         return writer;
     }
 
+    /**
+     * Write the contents of the Object as JSON text to a writer. For
+     * compactness, no whitespace is added.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @param value
+     *            The value to be written
+     * @param writer
+     *            Writes the serialized JSON
+     * @param <T>
+     *            A subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
+     * @return The writer.
+     * @throws JSONException there was a problem writing the Object
+     */
     static <T extends Appendable> T writeValue(Object value, T writer)
             throws JSONException {
         return writeValue(value, writer, 0 ,0);
     }
 
+    /**
+     * Write the contents of the Object as JSON text to a writer.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @param value
+     *            The value to be written
+     * @param writer
+     *            Writes the serialized JSON
+     * @param indentFactor
+     *            The number of spaces to add to each level of indentation.
+     * @param indent
+     *            The indention of the top level.
+     * @param <T>
+     *            A subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
+     * @return The writer.
+     * @throws JSONException there was a problem writing the Object
+     */
     static <T extends Appendable> T writeValue(Object value, T writer,
             int indentFactor, int indent) throws JSONException {
-        if (value == null || value.equals(null)) {
-            writeNull(writer);
-        } else if (value instanceof JSONAppendable) {
-            writeJSONAppendable((JSONAppendable) value, writer);
-        } else if (value instanceof JSONString) {
-            writeJSONString((JSONString) value, writer);
-        } else if (value instanceof JSONObject) {
-            writeJSONObject((JSONObject) value, writer, indentFactor, indent);
-        } else if (value instanceof JSONArray) {
-            writeJSONArray((JSONArray) value, writer, indentFactor, indent);
-        } else if (value instanceof Number) {
-            writeNumber((Number) value, writer);
-        } else if (value instanceof Boolean) {
-            writeBoolean((Boolean) value, writer);
-        } else if(value instanceof CharSequence) {
-            writeString((CharSequence) value, writer);
-        } else if (value instanceof Map) {
-            writeMap((Map<?, ?>) value, writer, indentFactor, indent);
-        } else if (value instanceof Iterable) {
-            writeIterable((Iterable<?>) value, writer, indentFactor, indent);
-        } else if (value.getClass().isArray()) {
-            writeArray(value, writer, indentFactor, indent);
-        } else if (value instanceof Enum<?>) {
-            writeString(((Enum<?>) value).name(), writer);
-        } else if(JSONObject.objectIsBean(value)) {
-            writeBean(value, writer, indentFactor, indent);
-        } else {
-            writeString(value.toString(), writer);
+
+        if ((value == null) || JSONObject.NULL.equals(value)) {
+            return writeNull(writer);
         }
-        return writer;
+        if (value instanceof JSONAppendable) {
+            return writeJSONAppendable((JSONAppendable) value, writer);
+        }
+        if (value instanceof JSONString) {
+            return writeJSONString((JSONString) value, writer);
+        }
+        if (value instanceof JSONObject) {
+            return writeJSONObject((JSONObject) value, writer, indentFactor, indent);
+        }
+        if (value instanceof JSONArray) {
+            return writeJSONArray((JSONArray) value, writer, indentFactor, indent);
+        }
+        if (value instanceof Number) {
+            return writeNumber((Number) value, writer);
+        }
+        if (value instanceof Boolean) {
+            return writeBoolean((Boolean) value, writer);
+        }
+        if (value instanceof CharSequence) {
+            return writeString((CharSequence) value, writer);
+        }
+        if (value instanceof Map) {
+            return writeMap((Map<?, ?>) value, writer, indentFactor, indent);
+        }
+        if (value instanceof Iterable) {
+            return writeIterable((Iterable<?>) value, writer, indentFactor, indent);
+        }
+        if (value.getClass().isArray()) {
+            return writeArray(value, writer, indentFactor, indent);
+        }
+        if (value instanceof Enum<?>) {
+            return writeEnum((Enum<?>) value, writer);
+        }
+        if (JSONObject.objectIsBean(value)) {
+            return writeBean(value, writer, indentFactor, indent);
+        }
+        return writeString(value.toString(), writer);
     }
 
-    static <T extends Appendable> void writeJSONAppendable(JSONAppendable value,
+    /**
+     * Write the JSONAppendable as a JSON value to a writer.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @param value
+     *            The JSONString to be written
+     * @param writer
+     *            Writes the serialized JSON
+     * @param <T> a subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
+     * @return The writer.
+     * @throws JSONException there was a problem writing the JSONAppendable
+     */
+    static <T extends Appendable> T writeJSONAppendable(JSONAppendable value,
             T writer) throws JSONException {
         try {
             value.appendJSON(writer);
+            return writer;
         } catch(JSONException e) {
             // Propagate directly, because JSONException is a RuntimeException
             throw e;
@@ -481,6 +555,20 @@ public class JSONWriter implements Closeable {
         }
     }
 
+    /**
+     * Write the contents of the JSONString as a JSON value to a writer.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @param value
+     *            The JSONString to be written
+     * @param writer
+     *            Writes the serialized JSON
+     * @param <T> a subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
+     * @return The writer.
+     * @throws JSONException there was a problem writing the JSONString
+     */
     static <T extends Appendable> T writeJSONString(JSONString value, T writer)
             throws JSONException {
         try {
@@ -501,6 +589,25 @@ public class JSONWriter implements Closeable {
         }
     }
 
+    /**
+     * Write the contents of the JavaBean as JSON object to a writer.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @param bean
+     *            The bean to be written
+     * @param writer
+     *            Writes the serialized JSON
+     * @param indentFactor
+     *            The number of spaces to add to each level of indentation.
+     * @param indent
+     *            The indention of the top level.
+     * @param <T>
+     *            A subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
+     * @return The writer.
+     * @throws JSONException there was a problem writing the bean
+     */
     static <T extends Appendable> T writeBean(Object bean, T writer,
             int indentFactor, int indent) throws JSONException {
         try {
@@ -561,6 +668,25 @@ public class JSONWriter implements Closeable {
         }
     }
 
+    /**
+     * Write the contents of the Map as JSON object to a writer.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @param map
+     *            The Map to be written
+     * @param writer
+     *            Writes the serialized JSON
+     * @param indentFactor
+     *            The number of spaces to add to each level of indentation.
+     * @param indent
+     *            The indention of the top level.
+     * @param <T>
+     *            A subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
+     * @return The writer.
+     * @throws JSONException there was a problem writing the Map
+     */
     static <T extends Appendable> T writeMap(Map<?, ?> map, T writer,
             int indentFactor, int indent) throws JSONException {
         try {
@@ -606,6 +732,16 @@ public class JSONWriter implements Closeable {
         }
     }
 
+    /**
+     * Determine whether this Iterable has exactly one element. If the
+     * Iterable is a Collection, just check the {@code size()} method.
+     * Otherwise, start iterating until we determine whether there is
+     * more than one element.
+     *
+     * @param iterable the Iterable
+     * @return {@code true} if there is exactly one element, otherwise
+     * {@code false}
+     */
     private static boolean singleIterableElement(Iterable<?> iterable) {
         if(iterable instanceof Collection) {
             return ((Collection)iterable).size() == 1;
@@ -618,6 +754,24 @@ public class JSONWriter implements Closeable {
         return !iterator.hasNext();
     }
 
+    /**
+     * Write the contents of the Iterable as JSON array to a writer.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @param collection
+     *            The Iterable to be written
+     * @param writer
+     *            Writes the serialized JSON
+     * @param indentFactor
+     *            The number of spaces to add to each level of indentation.
+     * @param indent
+     *            The indention of the top level.
+     * @param <T> a subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
+     * @return The writer.
+     * @throws JSONException there was a problem writing the Iterable
+     */
     static <T extends Appendable> T writeIterable(Iterable<?> collection, T writer,
             int indentFactor, int indent) throws JSONException {
         try {
@@ -656,6 +810,24 @@ public class JSONWriter implements Closeable {
         }
     }
 
+    /**
+     * Write the contents of the array as JSON array to a writer.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @param array
+     *            The array to be written
+     * @param writer
+     *            Writes the serialized JSON
+     * @param indentFactor
+     *            The number of spaces to add to each level of indentation.
+     * @param indent
+     *            The indention of the top level.
+     * @param <T> a subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
+     * @return The writer.
+     * @throws JSONException there was a problem writing the array
+     */
     static <T extends Appendable> T writeArray(Object array, T writer,
             int indentFactor, int indent) throws JSONException {
         try {
@@ -694,11 +866,28 @@ public class JSONWriter implements Closeable {
     }
 
     /**
-     * Write the contents of the JSONObject as JSON text to a writer. For
-     * compactness, no whitespace is added.
+     * Write the given Enum to the given Appendable as a String.
+     *
+     * @param <T> subtype of Appendable, returned to the caller
+     * @param value
+     *            An Enum
+     * @param writer
+     *            The Appendable to which the Enum value is written
+     * @return the given Appendable
+     * @throws JSONException there was a problem writing the Enum
+     */
+    static <T extends Appendable> T writeEnum(Enum<?> value, T writer)
+            throws JSONException {
+        return writeString(value.name(), writer);
+    }
+
+    /**
+     * Write the contents of the JSONObject as JSON object to a writer.
      * <p>
      * Warning: This method assumes that the data structure is acyclical.
      *
+     * @param object
+     *            The JSONObject to be written
      * @param writer
      *            Writes the serialized JSON
      * @param indentFactor
@@ -709,7 +898,7 @@ public class JSONWriter implements Closeable {
      *            A subtype of {@code Appendable}, returned to the caller
      *            for chaining purposes
      * @return The writer.
-     * @throws JSONException
+     * @throws JSONException there was a problem writing the JSONObject
      */
     static <T extends Appendable> T writeJSONObject(JSONObject object, T writer,
             int indentFactor, int indent) throws JSONException {
@@ -757,11 +946,12 @@ public class JSONWriter implements Closeable {
     }
 
     /**
-     * Write the contents of the JSONArray as JSON text to a writer. For
-     * compactness, no whitespace is added.
+     * Write the contents of the JSONArray as JSON array to a writer.
      * <p>
      * Warning: This method assumes that the data structure is acyclical.
      *
+     * @param array
+     *            The JSONArray to be written
      * @param writer
      *            Writes the serialized JSON
      * @param indentFactor
@@ -771,7 +961,7 @@ public class JSONWriter implements Closeable {
      * @param <T> a subtype of {@code Appendable}, returned to the caller
      *            for chaining purposes
      * @return The writer.
-     * @throws JSONException
+     * @throws JSONException there was a problem writing the JSONArray
      */
     static <T extends Appendable> T writeJSONArray(JSONArray array, T writer,
             int indentFactor, int indent) throws JSONException {
@@ -974,6 +1164,7 @@ public class JSONWriter implements Closeable {
      *
      * @param string the string of digits
      * @param writer the Appendable to which the digits will be written
+     * @throws JSONException there was a problem writing to the Appendable
      */
     private static <T extends Appendable> T writeNumberDigits(String string,
             T writer) throws JSONException {
@@ -1000,6 +1191,17 @@ public class JSONWriter implements Closeable {
         }
     }
 
+    /**
+     * Write the given Boolean to the given Appendable.
+     *
+     * @param <T> subtype of Appendable, returned to the caller
+     * @param value
+     *            A Boolean
+     * @param writer
+     *            The Appendable to which the boolean value is written
+     * @return the given Appendable
+     * @throws JSONException there was a problem writing the boolean
+     */
     static <T extends Appendable> T writeBoolean(Boolean value, T writer)
             throws JSONException {
         try {
@@ -1010,6 +1212,15 @@ public class JSONWriter implements Closeable {
         }
     }
 
+    /**
+     * Write the value Null to the given Appendable.
+     *
+     * @param <T> subtype of Appendable, returned to the caller
+     * @param writer
+     *            The Appendable to which the null value is written
+     * @return the given Appendable
+     * @throws JSONException there was a problem writing null
+     */
     static <T extends Appendable> T writeNull(T writer) throws JSONException {
         try {
             writer.append("null");
