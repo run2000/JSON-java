@@ -1147,9 +1147,6 @@ public class JSONWriter implements Closeable {
      */
     static <T extends Appendable> T writeNumber(Number number, T writer)
             throws JSONException {
-        if (number == null) {
-            throw new JSONException("Null pointer");
-        }
         if (number instanceof Double) {
             if (((Double) number).isInfinite() || ((Double) number).isNaN()) {
                 return writeNull(writer);
