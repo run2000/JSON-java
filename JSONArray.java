@@ -832,7 +832,6 @@ public class JSONArray implements Iterable<Object> {
      */
     public JSONArray put(double value) throws JSONException {
         Double d = Double.valueOf(value);
-        JSONObject.testValidity(d);
         this.put(d);
         return this;
     }
@@ -939,7 +938,6 @@ public class JSONArray implements Iterable<Object> {
      */
     public JSONArray put(int index, double value) throws JSONException {
         Double d = Double.valueOf(value);
-        JSONObject.testValidity(d);
         this.put(index, d);
         return this;
     }

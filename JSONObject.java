@@ -1307,7 +1307,6 @@ public class JSONObject {
      */
     public JSONObject put(String key, double value) throws JSONException {
         Double d = Double.valueOf(value);
-        JSONObject.testValidity(d);
         this.put(key, d);
         return this;
     }
@@ -1757,6 +1756,15 @@ public class JSONObject {
         try {
             if (object == null) {
                 return NULL;
+            }
+            if(object instanceof Double) {
+                if(((Double)object).isInfinite() || ((Double)object).isNaN()) {
+                    return NULL;
+                }
+            } else if(object instanceof Float) {
+                if (((Float)object).isInfinite() || ((Float)object).isNaN()) {
+                    return NULL;
+                }
             }
             if (object instanceof JSONObject || object instanceof JSONArray
                     || NULL.equals(object) || object instanceof JSONString

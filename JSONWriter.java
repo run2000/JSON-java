@@ -1150,7 +1150,15 @@ public class JSONWriter implements Closeable {
         if (number == null) {
             throw new JSONException("Null pointer");
         }
-        JSONObject.testValidity(number);
+        if (number instanceof Double) {
+            if (((Double) number).isInfinite() || ((Double) number).isNaN()) {
+                return writeNull(writer);
+            }
+        } else if (number instanceof Float) {
+            if (((Float) number).isInfinite() || ((Float) number).isNaN()) {
+                return writeNull(writer);
+            }
+        }
 
         // Shave off trailing zeros and decimal point, if possible.
         String string = number.toString();
