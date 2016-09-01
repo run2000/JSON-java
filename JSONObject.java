@@ -31,7 +31,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1185,6 +1184,13 @@ public class JSONObject {
         return NULL.equals(object) ? defaultValue : object.toString();
     }
 
+    /**
+     * Populate this JSONObject map with values from JavaBean getter methods.
+     * Static methods, synthetic methods, and non-public methods are excluded.
+     * Values in turn are wrapped.
+     *
+     * @param bean the bean with which to populate the JSONObject
+     */
     private void populateMap(Object bean) {
         Class<?> klass = bean.getClass();
 
@@ -1215,6 +1221,15 @@ public class JSONObject {
         }
     }
 
+    /**
+     * Produce a JSON key from a given method name. The method should
+     * correspond to a JavaBean getter. The superclass methods
+     * {@code getClass()} and {@code getDeclaringClass()} are excluded.
+     *
+     * @param methodName the method from which a JSON key should be generated
+     * @return a JSON key corresponding to a getter method, or {@code null}
+     * if the method name is not a valid JavaBean getter method
+     */
     static String keyFromMethodName(String methodName) {
         final int methodLen = methodName.length();
         StringBuilder key;
@@ -1265,16 +1280,16 @@ public class JSONObject {
 
     /**
      * Put a key/value pair in the JSONObject, where the value will be a
-     * JSONArray which is produced from a Collection.
+     * JSONArray which is produced from an Iterable.
      *
      * @param key
      *            A key string.
      * @param value
-     *            A Collection value.
+     *            An Iterable value.
      * @return this.
      * @throws JSONException
      */
-    public JSONObject put(String key, Collection<?> value) throws JSONException {
+    public JSONObject put(String key, Iterable<?> value) throws JSONException {
         this.put(key, new JSONArray(value));
         return this;
     }
@@ -1754,8 +1769,8 @@ public class JSONObject {
             if (object instanceof Map) {
                 return new JSONObject((Map<?, ?>) object);
             }
-            if (object instanceof Collection) {
-                return new JSONArray((Collection<?>) object);
+            if (object instanceof Iterable) {
+                return new JSONArray((Iterable<?>) object);
             }
             if (object.getClass().isArray()) {
                 return new JSONArray(object);
@@ -1769,6 +1784,14 @@ public class JSONObject {
         }
     }
 
+    /**
+     * Determine whether this is a JavaBean for the purposes of writing
+     * or populating a JSON object.
+     *
+     * @param object the object to be tested
+     * @return {@code true} if this object can be written as a JSON Object
+     * using JavaBean getter methods, otherwise {@code false}
+     */
     static boolean objectIsBean(Object object) {
         Package objectPackage = object.getClass().getPackage();
         String objectPackageName = objectPackage != null ? objectPackage

@@ -30,7 +30,6 @@ import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -811,13 +810,13 @@ public class JSONArray implements Iterable<Object> {
 
     /**
      * Put a value in the JSONArray, where the value will be a JSONArray which
-     * is produced from a Collection.
+     * is produced from an Iterable.
      *
      * @param value
-     *            A Collection value.
+     *            An Iterable value.
      * @return this.
      */
-    public JSONArray put(Collection<?> value) {
+    public JSONArray put(Iterable<?> value) {
         this.put(new JSONArray(value));
         return this;
     }
@@ -910,17 +909,17 @@ public class JSONArray implements Iterable<Object> {
 
     /**
      * Put a value in the JSONArray, where the value will be a JSONArray which
-     * is produced from a Collection.
+     * is produced from a Iterable.
      *
      * @param index
      *            The subscript.
      * @param value
-     *            A Collection value.
+     *            An Iterable value.
      * @return this.
      * @throws JSONException
      *             If the index is negative or if the value is not finite.
      */
-    public JSONArray put(int index, Collection<?> value) throws JSONException {
+    public JSONArray put(int index, Iterable<?> value) throws JSONException {
         this.put(index, new JSONArray(value));
         return this;
     }
