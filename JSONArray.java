@@ -817,7 +817,7 @@ public class JSONArray implements Iterable<Object> {
      * @return this.
      */
     public JSONArray put(Iterable<?> value) {
-        this.put(new JSONArray(value));
+        this.put((Object) new JSONArray(value));
         return this;
     }
 
@@ -919,7 +919,7 @@ public class JSONArray implements Iterable<Object> {
      *             If the index is negative or if the value is not finite.
      */
     public JSONArray put(int index, Iterable<?> value) throws JSONException {
-        this.put(index, new JSONArray(value));
+        this.put(index, (Object) new JSONArray(value));
         return this;
     }
 

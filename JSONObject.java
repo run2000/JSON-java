@@ -1290,7 +1290,7 @@ public class JSONObject {
      * @throws JSONException
      */
     public JSONObject put(String key, Iterable<?> value) throws JSONException {
-        this.put(key, new JSONArray(value));
+        this.put(key, (Object) new JSONArray(value));
         return this;
     }
 
