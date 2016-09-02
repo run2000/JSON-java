@@ -41,6 +41,14 @@ public class ParsePosition implements Serializable {
     private final long line;
     private final char lastCharacter;
 
+    /**
+     * Create a new ParsePosition with the given location information.
+     *
+     * @param position the absolute position
+     * @param column the column position
+     * @param line the line position
+     * @param lastCharacter the most recent character
+     */
     public ParsePosition(long position, long column, long line, char lastCharacter) {
         this.position = position;
         this.column = column;
