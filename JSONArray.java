@@ -30,6 +30,7 @@ import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -810,14 +811,14 @@ public class JSONArray implements Iterable<Object> {
 
     /**
      * Put a value in the JSONArray, where the value will be a JSONArray which
-     * is produced from an Iterable.
+     * is produced from a Collection.
      *
      * @param value
-     *            An Iterable value.
+     *            A Collection value.
      * @return this.
      */
-    public JSONArray put(Iterable<?> value) {
-        this.put((Object) new JSONArray(value));
+    public JSONArray put(Collection<?> value) {
+        this.put(new JSONArray(value));
         return this;
     }
 
@@ -831,8 +832,7 @@ public class JSONArray implements Iterable<Object> {
      * @return this.
      */
     public JSONArray put(double value) throws JSONException {
-        Double d = Double.valueOf(value);
-        this.put(d);
+        this.put(Double.valueOf(value));
         return this;
     }
 
@@ -908,18 +908,18 @@ public class JSONArray implements Iterable<Object> {
 
     /**
      * Put a value in the JSONArray, where the value will be a JSONArray which
-     * is produced from a Iterable.
+     * is produced from a Collection.
      *
      * @param index
      *            The subscript.
      * @param value
-     *            An Iterable value.
+     *            A Collection value.
      * @return this.
      * @throws JSONException
      *             If the index is negative or if the value is not finite.
      */
-    public JSONArray put(int index, Iterable<?> value) throws JSONException {
-        this.put(index, (Object) new JSONArray(value));
+    public JSONArray put(int index, Collection<?> value) throws JSONException {
+        this.put(index, new JSONArray(value));
         return this;
     }
 
@@ -937,8 +937,7 @@ public class JSONArray implements Iterable<Object> {
      *             If the index is negative or if the value is not finite.
      */
     public JSONArray put(int index, double value) throws JSONException {
-        Double d = Double.valueOf(value);
-        this.put(index, d);
+        this.put(index, Double.valueOf(value));
         return this;
     }
 

@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1280,17 +1281,17 @@ public class JSONObject {
 
     /**
      * Put a key/value pair in the JSONObject, where the value will be a
-     * JSONArray which is produced from an Iterable.
+     * JSONArray which is produced from a Collection.
      *
      * @param key
      *            A key string.
      * @param value
-     *            An Iterable value.
+     *            A Collection value.
      * @return this.
      * @throws JSONException
      */
-    public JSONObject put(String key, Iterable<?> value) throws JSONException {
-        this.put(key, (Object) new JSONArray(value));
+    public JSONObject put(String key, Collection<?> value) throws JSONException {
+        this.put(key, new JSONArray(value));
         return this;
     }
 
@@ -1306,8 +1307,7 @@ public class JSONObject {
      *             If the key is null or if the number is invalid.
      */
     public JSONObject put(String key, double value) throws JSONException {
-        Double d = Double.valueOf(value);
-        this.put(key, d);
+        this.put(key, Double.valueOf(value));
         return this;
     }
 
