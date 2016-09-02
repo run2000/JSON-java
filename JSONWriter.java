@@ -295,6 +295,17 @@ public class JSONWriter implements Closeable {
     }
 
     /**
+     * Append a <code>null</code> value.
+     * @return this
+     * @throws JSONException there was a problem writing the null value
+     */
+    public JSONWriter nullValue() throws JSONException {
+        this.prepValue();
+        writeNull(this.writer);
+        return this;
+    }
+
+    /**
      * Append either the value <code>true</code> or the value
      * <code>false</code>.
      * @param b A boolean.
@@ -459,7 +470,7 @@ public class JSONWriter implements Closeable {
      */
     static <T extends Appendable> T writeValue(Object value, T writer)
             throws JSONException {
-        return writeValue(value, writer, 0 ,0);
+        return writeValue(value, writer, 0, 0);
     }
 
     /**
