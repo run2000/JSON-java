@@ -317,7 +317,7 @@ public class XML {
      * name/value pairs and arrays of values. JSON does not does not like to
      * distinguish between elements and attributes. Sequences of similar
      * elements are represented as JSONArrays. Content text may be placed in a
-     * "content" member. Comments, prologs, DTDs, and <code>&lt;[ [ ]]&gt;</code>
+     * "content" member. Comments, prologs, DTDs, and {@code <[ [ ]]>}
      * are ignored.
      *
      * @param string
@@ -338,7 +338,7 @@ public class XML {
      * name/value pairs and arrays of values. JSON does not does not like to
      * distinguish between elements and attributes. Sequences of similar
      * elements are represented as JSONArrays. Content text may be placed in a
-     * "content" member. Comments, prologs, DTDs, and <code>&lt;[ [ ]]></code>
+     * "content" member. Comments, prologs, DTDs, and {@code <[ [ ]]>}
      * are ignored.
      * 
      * All values are converted as strings, for 1, 01, 29.0 will not be coerced to

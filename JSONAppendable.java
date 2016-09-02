@@ -32,7 +32,7 @@ import java.io.IOException;
  * {@code JSONObject.toString()}, {@code JSONArray.toString()},
  * and {@code JSONWriter.value(Object)}. The
  * {@code appendJSON()} method will be used instead of the default behavior
- * of using the Object's <code>toString()</code> method and quoting the result.
+ * of using the Object's {@code toString()} method and quoting the result.
  * <p>
  * The classes {@link JSONWriter} and {@link org.json.util.BufferedAppendable}
  * may be used to help generate a valid JSON value.
