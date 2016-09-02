@@ -178,6 +178,7 @@ public class JSONArray implements Iterable<Object> {
     /**
      * Construct a JSONArray from an array
      *
+     * @param array an array of any types
      * @throws JSONException
      *             If not an array.
      */
@@ -1167,7 +1168,7 @@ public class JSONArray implements Iterable<Object> {
      *         object, beginning with <code>[</code>&nbsp;<small>(left
      *         bracket)</small> and ending with <code>]</code>
      *         &nbsp;<small>(right bracket)</small>.
-     * @throws JSONException
+     * @throws JSONException there was a problem creating the String value
      */
     public String toString(int indentFactor) throws JSONException {
         return JSONWriter.writeJSONArray(this, new StringBuilder(), indentFactor, 0).toString();
@@ -1184,7 +1185,7 @@ public class JSONArray implements Iterable<Object> {
      * @param <T> a subtype of {@code Appendable}, returned to the caller
      *            for chaining purposes
      * @return The writer.
-     * @throws JSONException
+     * @throws JSONException there was a problem appending the JSON value
      */
     public <T extends Appendable> T write(T writer) throws JSONException {
         return JSONWriter.writeJSONArray(this, writer, 0, 0);
@@ -1205,7 +1206,7 @@ public class JSONArray implements Iterable<Object> {
      * @param <T> a subtype of {@code Appendable}, returned to the caller
      *            for chaining purposes
      * @return The writer.
-     * @throws JSONException
+     * @throws JSONException there was a problem appending the JSON value
      */
     public <T extends Appendable> T write(T writer, int indentFactor, int indent)
             throws JSONException {

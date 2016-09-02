@@ -299,7 +299,7 @@ public class JSONWriter implements Closeable {
      * <code>false</code>.
      * @param b A boolean.
      * @return this
-     * @throws JSONException
+     * @throws JSONException there was a problem writing the boolean value
      */
     public JSONWriter value(boolean b) throws JSONException {
         String string = Boolean.toString(b);
@@ -328,7 +328,7 @@ public class JSONWriter implements Closeable {
      * Append a long value.
      * @param l A long.
      * @return this
-     * @throws JSONException
+     * @throws JSONException there was a problem writing the long value
      */
     public JSONWriter value(long l) throws JSONException {
         String string = Long.toString(l);

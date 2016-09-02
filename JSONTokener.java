@@ -76,6 +76,8 @@ public class JSONTokener extends Scanner {
     /**
      * Construct a JSONTokener from an InputStream, using the default
      * character set.
+     *
+     * @param inputStream an input stream from which to tokenize the JSON text
      */
     public JSONTokener(InputStream inputStream) {
         super(new InputStreamReader(inputStream));
@@ -83,6 +85,9 @@ public class JSONTokener extends Scanner {
 
     /**
      * Construct a JSONTokener from an InputStream and supplied Charset.
+     *
+     * @param inputStream an input stream from which to tokenize the JSON text
+     * @param charset the character set with which to interpret the input stream
      */
     public JSONTokener(InputStream inputStream, Charset charset) {
         super(inputStream, charset);

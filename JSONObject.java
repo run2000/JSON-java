@@ -674,6 +674,7 @@ public class JSONObject {
     /**
      * Get an array of field names from a JSONObject.
      *
+     * @param jo a JSON object from which to get the field names
      * @return An array of field names, or null if there are no names.
      */
     public static String[] getNames(JSONObject jo) {
@@ -687,6 +688,7 @@ public class JSONObject {
     /**
      * Get an array of field names from an Object.
      *
+     * @param object an Object from which to get the field names
      * @return An array of field names, or null if there are no names.
      */
     public static String[] getNames(Object object) {
@@ -1288,7 +1290,7 @@ public class JSONObject {
      * @param value
      *            A Collection value.
      * @return this.
-     * @throws JSONException
+     * @throws JSONException If the key is null.
      */
     public JSONObject put(String key, Collection<?> value) throws JSONException {
         this.put(key, new JSONArray(value));
@@ -1352,7 +1354,8 @@ public class JSONObject {
      * @param value
      *            A Map value.
      * @return this.
-     * @throws JSONException
+     * @throws JSONException If the key is null, or any of the map entries
+     * is invalid
      */
     public JSONObject put(String key, Map<?, ?> value) throws JSONException {
         this.put(key, new JSONObject(value));
@@ -1821,7 +1824,7 @@ public class JSONObject {
      *            a subtype of {@code Appendable}, returned to the caller
      *            for chaining purposes
      * @return The writer.
-     * @throws JSONException
+     * @throws JSONException there was a problem appending the JSON value
      */
     public <T extends Appendable> T write(T writer) throws JSONException {
         return JSONWriter.writeJSONObject(this, writer, 0, 0);
@@ -1843,7 +1846,7 @@ public class JSONObject {
      *            A subtype of {@code Appendable}, returned to the caller
      *            for chaining purposes
      * @return The writer.
-     * @throws JSONException
+     * @throws JSONException there was a problem appending the JSON value
      */
     public <T extends Appendable> T write(T writer, int indentFactor, int indent)
             throws JSONException {

@@ -59,6 +59,8 @@ public interface JSONAppendable {
      *
      * @param appender an {@code Appendable} to which a strictly syntactically
      * correct JSON value must be written
+     * @throws IOException there was an I/O error appending the JSON value
+     * @throws JSONException there was a problem creating the JSON value
      */
     void appendJSON(Appendable appender) throws IOException, JSONException;
 

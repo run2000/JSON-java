@@ -52,6 +52,9 @@ public class JSONStrictTokener extends JSONTokener {
 
     /**
      * Construct a JSONStrictTokener from an InputStream and supplied Charset.
+     *
+     * @param inputStream an input stream from which to tokenize the JSON text
+     * @param charset the character set with which to interpret the input stream
      */
     public JSONStrictTokener(InputStream inputStream, Charset charset) {
         super(inputStream, charset);
@@ -71,7 +74,7 @@ public class JSONStrictTokener extends JSONTokener {
      * Control characters less than U+0020, apart from newline and
      * carriage return, result in an error.
      *
-     * @throws JSONException
+     * @throws JSONException there was a problem tokenizing the JSON text
      * @return  A character, or 0 if there are no more characters.
      */
     public char nextClean() throws JSONException {
