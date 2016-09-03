@@ -29,8 +29,8 @@ import java.io.OutputStream;
 import java.nio.CharBuffer;
 
 /**
- * Adapts an OutputStream of Latin1 bytes onto an Appendable sink.
- * A modest buffer is used to batch up append operations.
+ * Adapts an {@code java.io.OutputStream} of Latin1 bytes onto an {@code Appendable}
+ * sink. A modest buffer is used to batch up append operations.
  * <p>
  * In addition, the {@code Appendable} to be buffered is supplied using the
  * {@link #with(Appendable)} method, rather than at construction time. This

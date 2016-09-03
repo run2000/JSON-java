@@ -36,8 +36,9 @@ import java.math.BigInteger;
 import java.nio.charset.Charset;
 
 /**
- * Reads a JSON document as a stream of JSON events. Uses an iterator model
- * to produce each event. Similar to a StAX event model in XML processing.
+ * Reads a JSON document as a stream of JSON events, using secure principles
+ * derived from XML parsers. Uses an iterator model to produce each event.
+ * Similar to a StAX event model in XML processing.
  * <p>
  * The {@code JSONLimitStreamReader} class is similar to the {@code JSONStreamReader}
  * class, but intended to be more robust against untrusted JSON sources.
