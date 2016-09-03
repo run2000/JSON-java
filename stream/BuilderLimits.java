@@ -39,7 +39,7 @@ public class BuilderLimits implements Cloneable {
     private int contentNodes = Integer.MAX_VALUE;
     private int nestingDepth = Integer.MAX_VALUE;
 
-    public LimitFilter filter;
+    private LimitFilter filter;
 
     // Secure defaults. Cloned for mutability reasons.
     private static final BuilderLimits SECURE_DEFAULTS =
