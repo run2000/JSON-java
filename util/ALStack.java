@@ -55,7 +55,6 @@ public final class ALStack<E> implements SizedIterable<E> {
     }
 
     /**
-    /**
      * Push an element onto the stack.
      *
      * @param elem the element to be pushed

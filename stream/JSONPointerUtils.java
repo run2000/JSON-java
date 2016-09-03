@@ -43,7 +43,6 @@ public final class JSONPointerUtils {
      * @param builder the string builder to which the encoded value will
      *                be appended
      * @param name the key to be encoded
-     * @return the encoded key
      */
     private static void encodePointer(StringBuilder builder, String name) {
         final int len = (name == null) ? 0 : name.length();

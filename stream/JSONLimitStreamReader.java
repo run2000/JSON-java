@@ -67,7 +67,10 @@ import java.nio.charset.Charset;
  *     }
  * }
  * </pre>
- *
+ * <p>
+ * For a streaming equivalent for writing JSON data, see the {@link org.json.JSONWriter}
+ * and {@link org.json.JSONStringer} classes.</p>
+
  * @author JSON.org
  * @version 2016-06-26
  */

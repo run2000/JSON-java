@@ -37,8 +37,24 @@ import org.json.util.ALStack;
  */
 public interface StructureBuilder {
 
+    /**
+     * Accepts a structure to be parsed. Nested structures are pushed and
+     * popped on the stack as required.
+     *
+     * @param state the current ParseState
+     * @param stack the stack with which to push and pop nested structures
+     * @param reader the stream reader from which to read the structure content
+     * @throws JSONException there was a problem constructing the structure
+     */
     void accept(ParseState state, ALStack<StructureBuilder> stack, JSONStreamReader reader) throws JSONException;
 
+    /**
+     * Returns an identifier fragment for this structure. This fragment
+     * can then be used to construct a JSON Pointer value.
+     *
+     * @return an identifier fragment for the current structure, as a String
+     * @see JSONPointerUtils#toJSONPointer(Iterable)
+     */
     String getIdentifier();
 
 }

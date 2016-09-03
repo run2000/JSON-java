@@ -43,6 +43,9 @@ import java.nio.charset.Charset;
  * Reads a JSON document as a stream of JSON events. Uses an iterator model
  * to produce each event. Similar to a StAX event model in XML processing.
  * <p>
+ * For a streaming equivalent for writing JSON data, see the {@link org.json.JSONWriter}
+ * and {@link org.json.JSONStringer} classes.</p>
+ * <p>
  * A simple example of how to use this class:</p>
  * <pre>
  * JSONStreamReader reader = new JSONStreamReader(JSON_TEXT);
@@ -88,6 +91,11 @@ public class JSONStreamReader {
      * States of the internal state machine. Tokens returned from the
      * {@link JSONStreamReader#nextState() nextState()} loop are a subset of
      * these states.
+     * <p>
+     * The states are similar in convention to the write methods in
+     * {@code JSONWriter}, such as pairing {@code OBJECT} with {@code END_OBJECT},
+     * and {@code ARRAY} with {@code END_ARRAY}.
+     * </p>
      */
     public enum ParseState {
         /** <em>Internal state</em> -- before the DOCUMENT state */
@@ -102,7 +110,7 @@ public class JSONStreamReader {
         ARRAY(BEGIN_STRUCTURE | ARRAY_DELIMITER),
         /** End a JSON array */
         END_ARRAY(END_STRUCTURE | ARRAY_DELIMITER),
-        /** <em>Internal state</em> -- between a KEY and *_VALUE state */
+        /** <em>Internal state</em> -- between a KEY and *_VALUE states */
         KEY_SEPARATOR(INTERNAL | SEPARATOR),
         /** <em>Internal state</em> -- after a *_VALUE state */
         VALUE_SEPARATOR(INTERNAL | SEPARATOR),

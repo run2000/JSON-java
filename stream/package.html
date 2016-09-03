@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>org.json.stream</title>
+</head>
+<body>
+<p>A streaming parser implementation and related tools for JSON. Implements a
+streaming pull parser with the following components:</p>
+<h2>Stream Reader</h2>
+<p>{@code JSONStreamReader} provides an implementation of a streaming pull-parser,
+similar to JSR 353 for JavaEE, or the Jackson JSON parser. The stream reader
+reads strictly conforming JSON data, and has "hooks" to allow reading of
+long data, such as base64-encoded data within a JSON string.</p>
+<p>This reader should be considered when the source JSON data is from a known
+safe origin.</p>
+<h2>Object Builder</h2>
+<p>{@code JSONObjectBuilder} is a builder of JSONObject and JSONArray structures
+built on top of the stream reader. The implementation ends up simpler than
+{@code JSONTokener}, mainly because a lot of the heavy lifting is done in the
+stream reader.</p>
+<h2>Limit Stream Reader</h2>
+<p>{@code JSONLimitStreamReader} provides a stream reader that is better at
+dealing with JSON data from untrusted origins, such as unknown internet
+connections. It is build with deliberate boundaries that avoid memory exhaustion
+and other data storage limits, for the purposes of denial-of-service attacks.</p>
+<h2>Limit Object Builder</h2>
+<p>{@code JSONLimitBuilder} is built on top of the limit stream reader above,
+it limits its use of the runtime stack to avoid stack smashing attempts from
+untrusted JSON sources.</p>
+<p>This parser may be slower than the other object builder above -- &lt;20%
+in informal testing -- due to its use of trampolining for creating nested
+structures.</p>
+<h2>Builder Limits</h2>
+<p>{@code BuilderLimits} limits that are applied to a limit stream reader and
+limit object builder. These are based on similar limits found in secure
+XML processing parsers.</p>
+<h2>Limit Filter</h2>
+<p>{@code LimitFilter} provides an easy interface for accepting or rejecting
+particular structures during a JSON parse process.</p>
+</body>
+</html>
