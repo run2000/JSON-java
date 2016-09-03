@@ -43,8 +43,8 @@ import java.nio.CharBuffer;
  * Does <em>not</em> propagate the {@code flush()} or {@code close()} methods
  * to the wrapped Appendable.</p>
  *
- * @author run2000
- * @version 2016-7-8
+ * @author JSON.org
+ * @version 2016-07-08
  */
 public final class BufferedAppendable extends Writer {
     /** The default buffer size of 1024 characters, if none is specified. */
@@ -55,8 +55,6 @@ public final class BufferedAppendable extends Writer {
 
     /**
      * Buffer a given {@code Appendable} with the default buffer size.
-     *
-     * @throws NullPointerException the supplied Appendable is null
      */
     public BufferedAppendable() {
         this.buffer = CharBuffer.allocate(DEFAULT_BUFFER_SIZE);
