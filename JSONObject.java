@@ -387,8 +387,10 @@ public class JSONObject {
      * @param value
      *            An object to be accumulated under the key.
      * @return this.
+     * @throws NullPointerException
+     *             If the key is null.
      * @throws JSONException
-     *             If the value is an invalid number or if the key is null.
+     *             If the value is an invalid number.
      */
     public JSONObject accumulate(String key, Object value) throws JSONException {
         testValidity(value);
@@ -744,6 +746,8 @@ public class JSONObject {
      * @param key
      *            A key string.
      * @return this.
+     * @throws NullPointerException
+     *             If the key is null.
      * @throws JSONException
      *             If there is already a property with this name that is not an
      *             Integer, Long, Double, or Float.
@@ -1273,7 +1277,7 @@ public class JSONObject {
      * @param value
      *            A boolean which is the value.
      * @return this.
-     * @throws JSONException
+     * @throws NullPointerException
      *             If the key is null.
      */
     public JSONObject put(String key, boolean value) throws JSONException {
@@ -1290,7 +1294,10 @@ public class JSONObject {
      * @param value
      *            A Collection value.
      * @return this.
-     * @throws JSONException If the key is null.
+     * @throws NullPointerException
+     *             If the key is null.
+     * @throws JSONException
+     *             If any of the values is non-finite number
      */
     public JSONObject put(String key, Collection<?> value) throws JSONException {
         this.put(key, new JSONArray(value));
@@ -1305,8 +1312,10 @@ public class JSONObject {
      * @param value
      *            A double which is the value.
      * @return this.
+     * @throws NullPointerException
+     *             If the key is null.
      * @throws JSONException
-     *             If the key is null or if the number is invalid.
+     *             If the number is invalid.
      */
     public JSONObject put(String key, double value) throws JSONException {
         this.put(key, Double.valueOf(value));
@@ -1321,7 +1330,7 @@ public class JSONObject {
      * @param value
      *            An int which is the value.
      * @return this.
-     * @throws JSONException
+     * @throws NullPointerException
      *             If the key is null.
      */
     public JSONObject put(String key, int value) throws JSONException {
@@ -1337,7 +1346,7 @@ public class JSONObject {
      * @param value
      *            A long which is the value.
      * @return this.
-     * @throws JSONException
+     * @throws NullPointerException
      *             If the key is null.
      */
     public JSONObject put(String key, long value) throws JSONException {
@@ -1354,8 +1363,9 @@ public class JSONObject {
      * @param value
      *            A Map value.
      * @return this.
-     * @throws JSONException If the key is null, or any of the map entries
-     * is invalid
+     * @throws NullPointerException
+     *             If the key is null.
+     * @throws JSONException If any of the map entries is invalid
      */
     public JSONObject put(String key, Map<?, ?> value) throws JSONException {
         this.put(key, new JSONObject(value));
@@ -1373,8 +1383,10 @@ public class JSONObject {
      *            types: Boolean, Double, Integer, JSONArray, JSONObject, Long,
      *            String, or the JSONObject.NULL object.
      * @return this.
+     * @throws NullPointerException
+     *             If the key is null.
      * @throws JSONException
-     *             If the value is non-finite number or if the key is null.
+     *             If the value is non-finite number
      */
     public JSONObject put(String key, Object value) throws JSONException {
         if (key == null) {
@@ -1398,7 +1410,7 @@ public class JSONObject {
      * @param value object
      * @return this.
      * @throws JSONException
-     *             if the key is a duplicate
+     *             If the value is non-finite number, or the key is a duplicate
      */
     public JSONObject putOnce(String key, Object value) throws JSONException {
         if (key != null && value != null) {

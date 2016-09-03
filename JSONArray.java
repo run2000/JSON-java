@@ -882,6 +882,8 @@ public class JSONArray implements Iterable<Object> {
      *            Integer, JSONArray, JSONObject, Long, or String, or the
      *            JSONObject.NULL object.
      * @return this.
+     * @throws JSONException
+     *             If the value is an invalid number.
      */
     public JSONArray put(Object value) {
         JSONObject.testValidity(value);
