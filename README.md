@@ -56,7 +56,7 @@ JSON Pointers both in the form of string representation and URI fragment
 representation.
 
 `JSONAppendable.java:` The JSONAppendable interface requires an `appendJSON()`
-method, allowing an object to provide its own JSON serialization as an
+method, allowing an object to provide its own JSON serialization using an
 `Appendable`.
 
 `JSONString.java:` The JSONString interface requires a `toJSONString()` method,
