@@ -39,9 +39,16 @@ import java.nio.charset.Charset;
  * Reads a JSON document as a stream of JSON events. Uses an iterator model
  * to produce each event. Similar to a StAX event model in XML processing.
  * <p>
+ * The {@code JSONLimitStreamReader} class is similar to the {@code JSONStreamReader}
+ * class, but intended to be more robust against untrusted JSON sources.
+ * For a more robust solution to building object structures, see
+ * {@link JSONLimitBuilder}.
+ * </p>
+ * <p>
  * A simple example of how to use this class:</p>
  * <pre>
- * JSONStreamReader reader = new JSONStreamReader(JSON_TEXT);
+ * JSONLimitStreamReader reader = new JSONLimitStreamReader(JSON_TEXT);
+ * reader.withLimits(BuilderLimits.secureDefaults());
  *
  * while(reader.hasNext()) {
  *     ParseState state = reader.nextState();
@@ -60,9 +67,6 @@ import java.nio.charset.Charset;
  *     }
  * }
  * </pre>
- * <p>
- * A more complete example can be found by reading the {@link JSONObjectBuilder}
- * source code.</p>
  *
  * @author JSON.org
  * @version 2016-06-26
@@ -107,6 +111,8 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     /**
      * Set keyLength, stringLength, mantissaDigits, and exponentDigits
      * using values from the supplied {@link BuilderLimits} object.
+     * <p>
+     * See {@link BuilderLimits#secureDefaults()} for some practical limits.</p>
      *
      * @param limits the limits to be set
      * @return this object

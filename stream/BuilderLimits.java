@@ -181,8 +181,8 @@ public class BuilderLimits implements Cloneable {
 
     /**
      * Soft filtering for any object, array, or value that passes the other
-     * limits provided. If the filter rejects the value, it will be skipped
-     * and parsing continues.
+     * limits provided. If the filter rejects the value, it will be skipped,
+     * along with any nested content, and parsing continues.
      *
      * @return the filter for accepting or rejecting values
      */
@@ -204,6 +204,18 @@ public class BuilderLimits implements Cloneable {
     /**
      * Return a BuilderLimits object that contains some limits for
      * secure processing. These can be customised as needed.
+     * <p>
+     * The limits specify:</p>
+     * <ul>
+     * <li>Number limits sufficient for parsing Long and Double values</li>
+     * <li>Key length limits sufficient for most typical requirements,
+     * similar to XML attribute name limits</li>
+     * <li>String length sufficient to fit in a Java String object</li>
+     * <li>Content node limits sufficient for most typical requirements,
+     * similar to XML content node limits</li>
+     * <li>Nesting level limits sufficient to avoid stack limits when
+     * using recursive algorithms</li>
+     * </ul>
      *
      * @return a BuilderLimits object with secure processing limits
      */

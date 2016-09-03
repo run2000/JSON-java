@@ -36,9 +36,16 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 
 /**
- * Builds a JSON object model using events supplied from {@link JSONStreamReader}.
- * This uses minimal stack space than parsing via {@link org.json.JSONTokener},
- * since only a few stack frames are allocated, by using a trampoline.
+ * Builds a JSON object model using events supplied from {@link JSONStreamReader},
+ * using secure principles derived from XML parsers.
+ * <p>
+ * This class is similar in its external contract to the {@link JSONObjectBuilder}
+ * class, but intended to be more robust against untrusted JSON sources.
+ * For instance, by not using runtime stack for parsing nested JSON structures,
+ * it is less susceptible to stack smashing attempts.</p>
+ * <p>
+ * For some practical limits for parsing JSON data, see {@link BuilderLimits#secureDefaults()}.
+ * </p>
  *
  * @author JSON.org
  * @version 2016-08-01
