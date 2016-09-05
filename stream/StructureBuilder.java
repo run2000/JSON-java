@@ -32,11 +32,11 @@ import org.json.util.ALStack;
  * Structure builder interface, used by the {@link JSONLimitBuilder}
  * class to create arrays and objects without requiring a recursive algorithm.
  *
- * @param <T> the result type of structure to be built
+ * @param <R> the result type of structure to be built
  * @author JSON.org
  * @version 2016-08-02
  */
-public interface StructureBuilder<T> {
+public interface StructureBuilder<R> {
 
     /**
      * Accepts a structure to be parsed. Nested structures are pushed and
@@ -73,6 +73,6 @@ public interface StructureBuilder<T> {
      *
      * @return the structure being built
      */
-    T getResult();
+    R getResult();
 
 }
