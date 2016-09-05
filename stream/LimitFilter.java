@@ -47,7 +47,7 @@ public interface LimitFilter {
      * {@code false} to skip the value
      * @see JSONPointerUtils#toJSONPointer(Iterable)
      */
-    boolean acceptIndex(int index, ParseState state, SizedIterable<StructureBuilder> stack);
+    boolean acceptIndex(int index, ParseState state, SizedIterable<StructureBuilder<?>> stack);
 
     /**
      * Determine whether to accept or reject a value within an object.
@@ -60,6 +60,6 @@ public interface LimitFilter {
      * {@code false} to skip the value
      * @see JSONPointerUtils#toJSONPointer(Iterable)
      */
-    boolean acceptField(String fieldName, ParseState state, SizedIterable<StructureBuilder> stack);
+    boolean acceptField(String fieldName, ParseState state, SizedIterable<StructureBuilder<?>> stack);
 
 }

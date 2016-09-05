@@ -221,7 +221,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
         switch(token) {
             case NULL_VALUE:
                 state = ParseState.VALUE_SEPARATOR;
-                return JSONObject.NULL;
+                return decodeNull();
             case TRUE_VALUE:
                 state = ParseState.VALUE_SEPARATOR;
                 return Boolean.TRUE;

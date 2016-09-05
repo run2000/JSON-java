@@ -32,10 +32,11 @@ import org.json.util.ALStack;
  * Structure builder interface, used by the {@link JSONLimitBuilder}
  * class to create arrays and objects without requiring a recursive algorithm.
  *
+ * @param <T> the result type of structure to be built
  * @author JSON.org
  * @version 2016-08-02
  */
-public interface StructureBuilder {
+public interface StructureBuilder<T> {
 
     /**
      * Accepts a structure to be parsed. Nested structures are pushed and
@@ -46,7 +47,13 @@ public interface StructureBuilder {
      * @param reader the stream reader from which to read the structure content
      * @throws JSONException there was a problem constructing the structure
      */
-    void accept(ParseState state, ALStack<StructureBuilder> stack, JSONStreamReader reader) throws JSONException;
+    StructureBuilder<?> accept(ParseState state, ALStack<StructureBuilder<?>> stack, JSONStreamReader reader) throws JSONException;
+
+    /**
+     * Accept the value result constructed by the child builder, and
+     * populate the current field or index with the value.
+     */
+    void acceptChildValue(Object childValue) throws JSONException;
 
     /**
      * Returns an identifier fragment for this structure. This fragment
@@ -56,5 +63,12 @@ public interface StructureBuilder {
      * @see JSONPointerUtils#toJSONPointer(Iterable)
      */
     String getIdentifier();
+
+    /**
+     * Return the resulting structure result being built by this StructureBuilder.
+     *
+     * @return the structure being built
+     */
+    T getResult();
 
 }

@@ -87,12 +87,12 @@ public final class JSONPointerUtils {
      *              JSON Pointer is created
      * @return an encoded JSON Pointer
      */
-    public static String toJSONPointer(Iterable<StructureBuilder> stack) {
+    public static String toJSONPointer(Iterable<StructureBuilder<?>> stack) {
         if(stack == null) {
             return "";
         }
         StringBuilder builder = new StringBuilder();
-        for(StructureBuilder item : stack) {
+        for(StructureBuilder<?> item : stack) {
             builder.append('/');
             encodePointer(builder, item.getIdentifier());
         }

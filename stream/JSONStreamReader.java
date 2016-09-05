@@ -546,7 +546,7 @@ public class JSONStreamReader {
         switch(token) {
             case NULL_VALUE:
                 state = ParseState.VALUE_SEPARATOR;
-                return JSONObject.NULL;
+                return decodeNull();
             case TRUE_VALUE:
                 state = ParseState.VALUE_SEPARATOR;
                 return Boolean.TRUE;
@@ -678,7 +678,7 @@ public class JSONStreamReader {
         Token token = objectStack.pop();
         if(token == Token.NULL_VALUE) {
             state = ParseState.VALUE_SEPARATOR;
-            return JSONObject.NULL;
+            return decodeNull();
         } else {
             throw new JSONParseException("Invalid state", lexer.parsePosition());
         }
@@ -1084,6 +1084,15 @@ public class JSONStreamReader {
             }
         }
         throw new JSONParseException("Could not parse big integer", lexer.parsePosition());
+    }
+
+    /**
+     * Return an object that represents a JSON null value.
+     *
+     * @return a JSON null value
+     */
+    protected Object decodeNull() throws JSONException {
+        return JSONObject.NULL;
     }
 
     /**
