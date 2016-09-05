@@ -8,7 +8,7 @@ import org.json.JSONObject;
  * Structure collector that creates {@code JSONObject}, {@code JSONArray}, and
  * {@code JSONObject.NULL} instances.
  * <p>
- * This collector holds no state, so a singleton is used.</p>
+ * This collector holds no state, so a singleton is provided.</p>
  */
 public final class JSONCollector implements StructureCollector
         <JSONObject, JSONArray, JSONObject, JSONArray> {

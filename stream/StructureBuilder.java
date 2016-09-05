@@ -69,7 +69,7 @@ public interface StructureBuilder<T> {
     String getIdentifier();
 
     /**
-     * Return the resulting structure result being built by this StructureBuilder.
+     * Return the resulting structure result created by this StructureBuilder.
      *
      * @return the structure being built
      */

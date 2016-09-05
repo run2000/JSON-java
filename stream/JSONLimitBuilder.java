@@ -773,7 +773,7 @@ public final class JSONLimitBuilder {
             BuilderLimits limits, StructureCollector<OA, AA, OR, AR> collector)
             throws JSONException {
         ALStack<StructureBuilder<?>> stack = new ALStack<StructureBuilder<?>>();
-        StructureArrayBuilder<?, ?, ?, AR> builder = new StructureArrayBuilder<OA, AA, OR, AR>(limits, collector);
+        StructureArrayBuilder<?, ?, ?, AR> builder = new StructureArrayBuilder<OA, AA, OR, AR>(null, limits, collector);
         stack.push(builder);
         ParseState state;
 
@@ -805,7 +805,7 @@ public final class JSONLimitBuilder {
             BuilderLimits limits, StructureCollector<OA, AA, OR, AR> collector)
             throws JSONException {
         ALStack<StructureBuilder<?>> stack = new ALStack<StructureBuilder<?>>();
-        StructureObjectBuilder<?, ?, OR, ?> builder = new StructureObjectBuilder<OA, AA, OR, AR>(limits, collector);
+        StructureObjectBuilder<?, ?, OR, ?> builder = new StructureObjectBuilder<OA, AA, OR, AR>(null, limits, collector);
         stack.push(builder);
         ParseState state;
 

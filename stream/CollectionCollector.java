@@ -13,7 +13,7 @@ import java.util.Map;
  * {@code null} instances. The result types are finished using
  * {@code Collections.unmodifiableMap()} and {@code Collections.unmodifiableList()}.
  * <p>
- * This collector holds no state, so a singleton is used.</p>
+ * This collector holds no state, so a singleton is provided.</p>
  */
 public final class CollectionCollector implements StructureCollector
         <Map<String, Object>, List<Object>, Map<String, Object>, List<Object>> {

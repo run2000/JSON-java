@@ -30,20 +30,23 @@ import org.json.stream.JSONStreamReader.ParseState;
 import org.json.util.ALStack;
 
 /**
- * Build values onto a given JSONObject.
+ * Build values onto a given JSON object.
  *
  * @author JSON.org
  * @version 2016-08-02
  */
 final class StructureObjectBuilder<OA, AA, OR, AR> implements StructureBuilder<OR> {
-    private final OA object;
+    private final OA objectAccumulator;
+    private final StructureBuilder<?> parentBuilder;
     private final BuilderLimits limits;
     private final StructureCollector<OA, AA, OR, AR> collector;
     private String key = null;
     private int index;
 
-    public StructureObjectBuilder(BuilderLimits limits, StructureCollector<OA, AA, OR, AR> collector) {
-        this.object = collector.createObjectAccumulator();
+    public StructureObjectBuilder(StructureBuilder<?> parentBuilder,
+            BuilderLimits limits, StructureCollector<OA, AA, OR, AR> collector) {
+        this.parentBuilder = parentBuilder;
+        this.objectAccumulator = collector.createObjectAccumulator();
         this.limits = limits;
         this.index = -1;
         this.collector = collector;
@@ -64,7 +67,7 @@ final class StructureObjectBuilder<OA, AA, OR, AR> implements StructureBuilder<O
                 if (index >= limits.getContentNodes()) {
                     throw new JSONParseException("Too many content nodes", reader.getParsePosition());
                 } else if((filter == null) || (filter.acceptField(key, state, stack))) {
-                    collector.addNull(object, key);
+                    collector.addNull(objectAccumulator, key);
                 }
                 break;
             case BOOLEAN_VALUE:
@@ -75,7 +78,7 @@ final class StructureObjectBuilder<OA, AA, OR, AR> implements StructureBuilder<O
                     throw new JSONParseException("Too many content nodes", reader.getParsePosition());
                 } else if((filter == null) || (filter.acceptField(key, state, stack))) {
                     Object value = reader.nextValue();
-                    collector.addValue(object, key, value);
+                    collector.addValue(objectAccumulator, key, value);
                 }
                 break;
             case ARRAY:
@@ -85,7 +88,7 @@ final class StructureObjectBuilder<OA, AA, OR, AR> implements StructureBuilder<O
                 } else if (stack.size() >= limits.getNestingDepth()) {
                     throw new JSONParseException("Object nesting too deep", reader.getParsePosition());
                 } else if((filter == null) || (filter.acceptField(key, state, stack))) {
-                    StructureArrayBuilder<OA, AA, OR, AR> builder = new StructureArrayBuilder<OA, AA, OR, AR>(limits, collector);
+                    StructureArrayBuilder<OA, AA, OR, AR> builder = new StructureArrayBuilder<OA, AA, OR, AR>(this, limits, collector);
                     stack.push(builder);
                     return builder;
                 } else {
@@ -99,7 +102,7 @@ final class StructureObjectBuilder<OA, AA, OR, AR> implements StructureBuilder<O
                 } else if (stack.size() >= limits.getNestingDepth()) {
                     throw new JSONParseException("Object nesting too deep", reader.getParsePosition());
                 } else if((filter == null) || (filter.acceptField(key, state, stack))) {
-                    StructureObjectBuilder<OA, AA, OR, AR> builder = new StructureObjectBuilder<OA, AA, OR, AR>(limits, collector);
+                    StructureObjectBuilder<OA, AA, OR, AR> builder = new StructureObjectBuilder<OA, AA, OR, AR>(this, limits, collector);
                     stack.push(builder);
                     return builder;
                 } else {
@@ -108,13 +111,10 @@ final class StructureObjectBuilder<OA, AA, OR, AR> implements StructureBuilder<O
                 break;
             case END_OBJECT:
                 stack.pop();
-                if(stack.isEmpty()) {
-                    return null;
-                } else {
-                    StructureBuilder<?> parent = stack.peek();
-                    parent.acceptChildValue(collector.finishObject(object));
-                    return parent;
+                if(parentBuilder != null) {
+                    parentBuilder.acceptChildValue(collector.finishObject(objectAccumulator));
                 }
+                return parentBuilder;
             default:
                 throw new JSONParseException("Expected value", reader.getParsePosition());
         }
@@ -123,7 +123,7 @@ final class StructureObjectBuilder<OA, AA, OR, AR> implements StructureBuilder<O
 
     @Override
     public void acceptChildValue(Object childValue) throws JSONException {
-        collector.addValue(object, key, childValue);
+        collector.addValue(objectAccumulator, key, childValue);
     }
 
     public String getIdentifier() {
@@ -137,6 +137,6 @@ final class StructureObjectBuilder<OA, AA, OR, AR> implements StructureBuilder<O
 
     @Override
     public OR getResult() {
-        return collector.finishObject(object);
+        return collector.finishObject(objectAccumulator);
     }
 }
