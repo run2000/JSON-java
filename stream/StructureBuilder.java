@@ -45,13 +45,17 @@ public interface StructureBuilder<T> {
      * @param state the current ParseState
      * @param stack the stack with which to push and pop nested structures
      * @param reader the stream reader from which to read the structure content
+     * @return a next structure builder to build the next structure
      * @throws JSONException there was a problem constructing the structure
      */
-    StructureBuilder<?> accept(ParseState state, ALStack<StructureBuilder<?>> stack, JSONStreamReader reader) throws JSONException;
+    StructureBuilder<?> accept(ParseState state, ALStack<StructureBuilder<?>> stack,
+            JSONStreamReader reader) throws JSONException;
 
     /**
      * Accept the value result constructed by the child builder, and
      * populate the current field or index with the value.
+     *
+     * @param childValue the value created by the child StructureBuilder
      */
     void acceptChildValue(Object childValue) throws JSONException;
 

@@ -68,7 +68,28 @@ public final class JSONObjectBuilder {
      * @return a JSON value of the type defined above
      */
     public static Object buildJSONValue(Reader reader) throws JSONException {
-        return buildJSONValue(new JSONStreamReader(reader));
+        return buildJSONValue(new JSONStreamReader(reader), JSONCollector.INSTANCE);
+    }
+
+    /**
+     * Build a JSON value from a {@code Reader}. The value may be one of:
+     * <ul>
+     *     <li>{@code JSONObject.NULL}</li>
+     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     *     <li>A {@code Double}, {@code Long}, {@code Integer},
+     *         {@code BigDecimal}, or {@code BigInteger}</li>
+     *     <li>A {@code String}</li>
+     *     <li>A {@code JSONObject}</li>
+     *     <li>A {@code JSONArray}</li>
+     * </ul>
+     *
+     * @param reader     A reader.
+     * @param collector  A collector object for creating structures
+     * @return a JSON value of the type defined above
+     */
+    public static Object buildJSONValue(Reader reader,
+            StructureCollector<?, ?, ?, ?> collector) throws JSONException {
+        return buildJSONValue(new JSONStreamReader(reader), collector);
     }
 
     /**
@@ -91,7 +112,31 @@ public final class JSONObjectBuilder {
      */
     public static Object buildJSONValue(InputStream inputStream, Charset charset)
             throws JSONException {
-        return buildJSONValue(new JSONStreamReader(inputStream, charset));
+        return buildJSONValue(new JSONStreamReader(inputStream, charset), JSONCollector.INSTANCE);
+    }
+
+    /**
+     * Build a JSON value from a {@code InputStream} and supplied
+     * {@code Charset}. The value may be one of:
+     * <ul>
+     *     <li>{@code JSONObject.NULL}</li>
+     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     *     <li>A {@code Double}, {@code Long}, {@code Integer},
+     *         {@code BigDecimal}, or {@code BigInteger}</li>
+     *     <li>A {@code String}</li>
+     *     <li>A {@code JSONObject}</li>
+     *     <li>A {@code JSONArray}</li>
+     * </ul>
+     *
+     * @param inputStream   the input stream containing the JSON data
+     * @param charset       the character set with which to interpret the
+     *                      input stream
+     * @param collector     A collector object for creating structures
+     * @return a JSON value of the type defined above
+     */
+    public static Object buildJSONValue(InputStream inputStream, Charset charset,
+            StructureCollector<?, ?, ?, ?> collector) throws JSONException {
+        return buildJSONValue(new JSONStreamReader(inputStream, charset), collector);
     }
 
     /**
@@ -110,7 +155,28 @@ public final class JSONObjectBuilder {
      * @return a JSON value of the type defined above
      */
     public static Object buildJSONValue(String s) throws JSONException {
-        return buildJSONValue(new JSONStreamReader(s));
+        return buildJSONValue(new JSONStreamReader(s), JSONCollector.INSTANCE);
+    }
+
+    /**
+     * Build a JSON value from a {@code String}. The value may be one of:
+     * <ul>
+     *     <li>{@code JSONObject.NULL}</li>
+     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     *     <li>A {@code Double}, {@code Long}, {@code Integer},
+     *         {@code BigDecimal}, or {@code BigInteger}</li>
+     *     <li>A {@code String}</li>
+     *     <li>A {@code JSONObject}</li>
+     *     <li>A {@code JSONArray}</li>
+     * </ul>
+     *
+     * @param s     A source string.
+     * @param collector A collector object for creating structures
+     * @return a JSON value of the type defined above
+     */
+    public static Object buildJSONValue(String s,
+            StructureCollector<?, ?, ?, ?> collector) throws JSONException {
+        return buildJSONValue(new JSONStreamReader(s), collector);
     }
 
     /**
@@ -131,6 +197,29 @@ public final class JSONObjectBuilder {
      * @return a JSON value of the type defined above
      */
     public static Object buildJSONValue(JSONStreamReader reader) throws JSONException {
+        return buildJSONValue(reader, JSONCollector.INSTANCE);
+    }
+
+    /**
+     * Build a JSON value from a {@code JSONStreamReader}. The value may be one
+     * of:
+     * <ul>
+     *     <li>{@code JSONObject.NULL}</li>
+     *     <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
+     *     <li>A {@code Double}, {@code Long}, {@code Integer},
+     *         {@code BigDecimal}, or {@code BigInteger}</li>
+     *     <li>A {@code String}</li>
+     *     <li>A {@code JSONObject}</li>
+     *     <li>A {@code JSONArray}</li>
+     * </ul>
+     * <p> The reader must be at the beginning of the document.</p>
+     *
+     * @param reader    A source stream reader.
+     * @param collector A collector object for creating structures
+     * @return a JSON value of the type defined above
+     */
+    public static Object buildJSONValue(JSONStreamReader reader,
+            StructureCollector<?, ?, ?, ?> collector) throws JSONException {
         ParseState state = reader.nextState();
 
         if(state != ParseState.DOCUMENT) {
@@ -143,11 +232,11 @@ public final class JSONObjectBuilder {
 
         switch(state) {
             case OBJECT:
-                result = parseObjectTree(reader);
+                result = parseObjectTree(reader, collector);
                 break;
 
             case ARRAY:
-                result = parseArrayTree(reader);
+                result = parseArrayTree(reader, collector);
                 break;
 
             case NULL_VALUE:
@@ -176,7 +265,20 @@ public final class JSONObjectBuilder {
      * @return a JSONObject value
      */
     public static JSONObject buildJSONObject(Reader reader) throws JSONException {
-        return buildJSONObject(new JSONStreamReader(reader));
+        return buildJSONObject(new JSONStreamReader(reader), JSONCollector.INSTANCE);
+    }
+
+    /**
+     * Build a {@code JSONObject} from a {@code Reader}.
+     *
+     * @param reader     A reader.
+     * @param collector  A collector object for creating structures
+     * @param <OR>       The resulting JSON object type
+     * @return the parsed JSON object value
+     */
+    public static <OR> OR buildJSONObject(Reader reader,
+            StructureCollector<?, ?, OR, ?> collector) throws JSONException {
+        return buildJSONObject(new JSONStreamReader(reader), collector);
     }
 
     /**
@@ -190,7 +292,23 @@ public final class JSONObjectBuilder {
      */
     public static JSONObject buildJSONObject(InputStream inputStream, Charset charset)
             throws JSONException {
-        return buildJSONObject(new JSONStreamReader(inputStream, charset));
+        return buildJSONObject(new JSONStreamReader(inputStream, charset), JSONCollector.INSTANCE);
+    }
+
+    /**
+     * Build a {@code JSONObject} from a {@code InputStream} and a supplied
+     * {@code Charset}.
+     *
+     * @param inputStream   the input stream containing the JSON data
+     * @param charset       the character set with which to interpret the
+     *                      input stream
+     * @param collector     A collector object for creating structures
+     * @param <OR>          The resulting JSON object type
+     * @return the parsed JSON object value
+     */
+    public static <OR> OR buildJSONObject(InputStream inputStream, Charset charset,
+            StructureCollector<?, ?, OR, ?> collector) throws JSONException {
+        return buildJSONObject(new JSONStreamReader(inputStream, charset), collector);
     }
 
     /**
@@ -200,7 +318,20 @@ public final class JSONObjectBuilder {
      * @return a JSONObject value
      */
     public static JSONObject buildJSONObject(String s) throws JSONException {
-        return buildJSONObject(new JSONStreamReader(s));
+        return buildJSONObject(new JSONStreamReader(s), JSONCollector.INSTANCE);
+    }
+
+    /**
+     * Build a {@code JSONObject} from a {@code String}.
+     *
+     * @param s         A source string.
+     * @param collector A collector object for creating structures
+     * @param <OR>      The resulting JSON object type
+     * @return the parsed JSON object value
+     */
+    public static <OR> OR buildJSONObject(String s,
+            StructureCollector<?, ?, OR, ?> collector) throws JSONException {
+        return buildJSONObject(new JSONStreamReader(s), collector);
     }
 
     /**
@@ -210,7 +341,25 @@ public final class JSONObjectBuilder {
      * @param reader    A source stream reader.
      * @return a JSONObject value
      */
-    public static JSONObject buildJSONObject(JSONStreamReader reader) throws JSONException {
+    public static JSONObject buildJSONObject(JSONStreamReader reader)
+            throws JSONException {
+        return buildJSONObject(reader, JSONCollector.INSTANCE);
+    }
+    /**
+     * Build a {@code JSONObject} from a {@code JSONStreamReader}. The reader must be
+     * at the beginning of the document.
+     *
+     * @param reader    A source stream reader.
+     * @param collector A collector object for creating structures
+     * @param <OR>      The resulting JSON object type
+     * @return the parsed JSON object value
+     */
+    public static <OR> OR buildJSONObject(JSONStreamReader reader,
+            StructureCollector<?, ?, OR, ?> collector) throws JSONException {
+
+        if(collector == null) {
+            throw new NullPointerException("collector is null");
+        }
         ParseState state = reader.nextState();
 
         if(state != ParseState.DOCUMENT) {
@@ -218,12 +367,12 @@ public final class JSONObjectBuilder {
                     reader.getParsePosition());
         }
 
-        JSONObject result;
+        OR result;
         state = reader.nextState();
 
         switch(state) {
             case OBJECT:
-                result = parseObjectTree(reader);
+                result = parseObjectTree(reader, collector);
                 break;
 
             default:
@@ -242,10 +391,23 @@ public final class JSONObjectBuilder {
      * Build a {@code JSONArray} from a {@code Reader}.
      *
      * @param reader     A reader.
+     * @param collector  A collector object for creating structures
+     * @param <AR>       The resulting JSON array type
+     * @return the parsed JSON array value
+     */
+    public static <AR> AR buildJSONArray(Reader reader,
+            StructureCollector<?, ?, ?, AR> collector) throws JSONException {
+        return buildJSONArray(new JSONStreamReader(reader), collector);
+    }
+
+    /**
+     * Build a {@code JSONArray} from a {@code Reader}.
+     *
+     * @param reader     A reader.
      * @return a JSONArray value
      */
     public static JSONArray buildJSONArray(Reader reader) throws JSONException {
-        return buildJSONArray(new JSONStreamReader(reader));
+        return buildJSONArray(new JSONStreamReader(reader), JSONCollector.INSTANCE);
     }
 
     /**
@@ -259,7 +421,24 @@ public final class JSONObjectBuilder {
      */
     public static JSONArray buildJSONArray(InputStream inputStream, Charset charset)
             throws JSONException {
-        return buildJSONArray(new JSONStreamReader(inputStream, charset));
+        return buildJSONArray(new JSONStreamReader(inputStream, charset), JSONCollector.INSTANCE);
+    }
+
+    /**
+     * Build a {@code JSONArray} from a {@code InputStream} and a supplied
+     * {@code Charset}.
+     *
+     * @param inputStream   the input stream containing the JSON data
+     * @param charset       the character set with which to interpret the
+     *                      input stream
+     * @param collector     A collector object for creating structures
+     * @param <AR>          The resulting JSON array type
+     * @return the parsed JSON array value
+     */
+    public static <AR> AR buildJSONArray(InputStream inputStream,
+            Charset charset, StructureCollector<?, ?, ?, AR> collector)
+            throws JSONException {
+        return buildJSONArray(new JSONStreamReader(inputStream, charset), collector);
     }
 
     /**
@@ -269,7 +448,20 @@ public final class JSONObjectBuilder {
      * @return a JSONArray value
      */
     public static JSONArray buildJSONArray(String s) throws JSONException {
-        return buildJSONArray(new JSONStreamReader(s));
+        return buildJSONArray(new JSONStreamReader(s), JSONCollector.INSTANCE);
+    }
+
+    /**
+     * Build a {@code JSONArray} from a {@code String}.
+     *
+     * @param s     A source string.
+     * @param collector A collector object for creating structures
+     * @param <AR>      The resulting JSON array type
+     * @return the parsed JSON array value
+     */
+    public static <AR> AR buildJSONArray(String s,
+            StructureCollector<?, ?, ?, AR> collector) throws JSONException {
+        return buildJSONArray(new JSONStreamReader(s), collector);
     }
 
     /**
@@ -280,6 +472,24 @@ public final class JSONObjectBuilder {
      * @return a JSONArray value
      */
     public static JSONArray buildJSONArray(JSONStreamReader reader) throws JSONException {
+        return buildJSONArray(reader, JSONCollector.INSTANCE);
+    }
+
+    /**
+     * Build a {@code JSONArray} from a {@code JSONStreamReader}. The reader must be
+     * at the beginning of the document.
+     *
+     * @param reader    A source stream.
+     * @param collector A collector object for creating structures
+     * @param <AR>      The resulting JSON array type
+     * @return the parsed JSON array value
+     */
+    public static <AR> AR buildJSONArray(JSONStreamReader reader,
+            StructureCollector<?, ?, ?, AR> collector) throws JSONException {
+
+        if(collector == null) {
+            throw new NullPointerException("collector is null");
+        }
         ParseState state = reader.nextState();
 
         if(state != ParseState.DOCUMENT) {
@@ -287,12 +497,12 @@ public final class JSONObjectBuilder {
                     reader.getParsePosition());
         }
 
-        JSONArray result;
+        AR result;
         state = reader.nextState();
 
         switch(state) {
             case ARRAY:
-                result = parseArrayTree(reader);
+                result = parseArrayTree(reader, collector);
                 break;
 
             default:
@@ -307,36 +517,42 @@ public final class JSONObjectBuilder {
         return result;
     }
 
-    private static JSONArray parseArrayTree(JSONStreamReader reader) throws JSONException {
-        JSONArray array = new JSONArray();
+    private static <AA, AR> AR parseArrayTree(JSONStreamReader reader,
+             StructureCollector<?, AA, ?, AR> collector) throws JSONException {
+        AA array = collector.createArrayAccumulator();
         ParseState state = reader.nextState();
         Object value;
 
         while (state != ParseState.END_ARRAY) {
             switch(state) {
                 case NULL_VALUE:
+                    collector.addNull(array);
+                    break;
                 case BOOLEAN_VALUE:
                 case NUMBER_VALUE:
                 case STRING_VALUE:
                     value = reader.nextValue();
+                    collector.addValue(array, value);
                     break;
                 case ARRAY:
-                    value = parseArrayTree(reader);
+                    value = parseArrayTree(reader, collector);
+                    collector.addValue(array, value);
                     break;
                 case OBJECT:
-                    value = parseObjectTree(reader);
+                    value = parseObjectTree(reader, collector);
+                    collector.addValue(array, value);
                     break;
                 default:
                     throw new JSONParseException("Expected value", reader.getParsePosition());
             }
-            array.put(value);
             state = reader.nextState();
         }
-        return array;
+        return collector.finishArray(array);
     }
 
-    private static JSONObject parseObjectTree(JSONStreamReader reader) throws JSONException {
-        JSONObject object = new JSONObject();
+    private static <OA, OR> OR parseObjectTree(JSONStreamReader reader,
+            StructureCollector<OA, ?, OR, ?> collector) throws JSONException {
+        OA object = collector.createObjectAccumulator();
         ParseState state = reader.nextState();
         String key;
         Object value;
@@ -351,25 +567,29 @@ public final class JSONObjectBuilder {
             state = reader.nextState();
             switch(state) {
                 case NULL_VALUE:
+                    collector.addNull(object, key);
+                    break;
                 case BOOLEAN_VALUE:
                 case NUMBER_VALUE:
                 case STRING_VALUE:
                     value = reader.nextValue();
+                    collector.addValue(object, key, value);
                     break;
                 case ARRAY:
-                    value = parseArrayTree(reader);
+                    value = parseArrayTree(reader, collector);
+                    collector.addValue(object, key, value);
                     break;
                 case OBJECT:
-                    value = parseObjectTree(reader);
+                    value = parseObjectTree(reader, collector);
+                    collector.addValue(object, key, value);
                     break;
                 default:
                     throw new JSONParseException("Expected value", reader.getParsePosition());
             }
 
-            object.putOnce(key, value);
             state = reader.nextState();
         }
-        return object;
+        return collector.finishObject(object);
     }
 
     /**
@@ -389,7 +609,30 @@ public final class JSONObjectBuilder {
         if((reader.currentState() != ParseState.OBJECT) || (reader.getStackDepth() == 0)) {
             throw new JSONParseException("Expected OBJECT state", reader.getParsePosition());
         }
-        return parseObjectTree(reader);
+        return parseObjectTree(reader, JSONCollector.INSTANCE);
+    }
+
+    /**
+     * If the given JSONStreamReader's ParseState was {@link ParseState#OBJECT},
+     * return the entire subtree as a JSONObject value. This method advances the
+     * parser onto the {@link ParseState#END_OBJECT} state.
+     * <p>
+     * If the JSON stream is not parseable as an object, a JSONException
+     * will be thrown.
+     * </p>
+     *
+     * @param reader A source stream reader.
+     * @param collector A collector object for creating structures
+     * @param <OR> The resulting JSON object type
+     * @return a JSONObject representing the subtree starting at the current
+     * OBJECT state
+     */
+    public static <OR> OR buildObjectSubTree(JSONStreamReader reader,
+            StructureCollector<?, ?, OR, ?> collector) throws JSONException {
+        if((reader.currentState() != ParseState.OBJECT) || (reader.getStackDepth() == 0)) {
+            throw new JSONParseException("Expected OBJECT state", reader.getParsePosition());
+        }
+        return parseObjectTree(reader, collector);
     }
 
     /**
@@ -409,6 +652,29 @@ public final class JSONObjectBuilder {
         if((reader.currentState() != ParseState.ARRAY) || (reader.getStackDepth() == 0)) {
             throw new JSONParseException("Expected ARRAY state", reader.getParsePosition());
         }
-        return parseArrayTree(reader);
+        return parseArrayTree(reader, JSONCollector.INSTANCE);
+    }
+
+    /**
+     * If the given JSONStreamReader's ParseState was {@link ParseState#ARRAY},
+     * return the entire subtree as a JSONArray value. This method advances the
+     * parser onto the {@link ParseState#END_ARRAY} state.
+     * <p>
+     * If the JSON stream is not parseable as an array, a JSONException
+     * will be thrown.
+     * </p>
+     *
+     * @param reader A source stream reader.
+     * @param collector A collector object for creating structures
+     * @param <AR>      The resulting JSON array type
+     * @return the JSON array representing the subtree starting at the current
+     * ARRAY state
+     */
+    public static <AR> AR buildArraySubTree(JSONStreamReader reader,
+            StructureCollector<?, ?, ?, AR> collector) throws JSONException {
+        if((reader.currentState() != ParseState.ARRAY) || (reader.getStackDepth() == 0)) {
+            throw new JSONParseException("Expected ARRAY state", reader.getParsePosition());
+        }
+        return parseArrayTree(reader, collector);
     }
 }

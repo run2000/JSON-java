@@ -52,7 +52,7 @@ import java.nio.charset.Charset;
  */
 public final class JSONLimitBuilder {
 
-    private static final BuilderLimits DEFAULT_PARAMS = new BuilderLimits();
+    private static final BuilderLimits DEFAULT_LIMITS = new BuilderLimits();
 
     private JSONLimitBuilder() {
     }
@@ -69,13 +69,13 @@ public final class JSONLimitBuilder {
      * </ul>
      *
      * @param reader A reader.
-     * @param params the limits imposed on the builder
-     * @param factory factory object for creating JSON structures
+     * @param limits the limits imposed on the builder
+     * @param collector collector object for creating JSON structures
      * @return a JSON value of the type defined above
      */
-    public static Object buildJSONValue(Reader reader, BuilderLimits params,
-            StructureCollector<?, ?, ?, ?> factory) throws JSONException {
-        return buildJSONValue(new JSONLimitStreamReader(reader), params, factory);
+    public static Object buildJSONValue(Reader reader, BuilderLimits limits,
+            StructureCollector<?, ?, ?, ?> collector) throws JSONException {
+        return buildJSONValue(new JSONLimitStreamReader(reader), limits, collector);
     }
 
     /**
@@ -90,12 +90,12 @@ public final class JSONLimitBuilder {
      * </ul>
      *
      * @param reader A reader.
-     * @param params the limits imposed on the builder
+     * @param limits the limits imposed on the builder
      * @return a JSON value of the type defined above
      */
-    public static Object buildJSONValue(Reader reader, BuilderLimits params)
+    public static Object buildJSONValue(Reader reader, BuilderLimits limits)
             throws JSONException {
-        return buildJSONValue(new JSONLimitStreamReader(reader), params,
+        return buildJSONValue(new JSONLimitStreamReader(reader), limits,
                 JSONCollector.INSTANCE);
     }
 
@@ -114,7 +114,7 @@ public final class JSONLimitBuilder {
      * @return a JSON value of the type defined above
      */
     public static Object buildJSONValue(Reader reader) throws JSONException {
-        return buildJSONValue(new JSONLimitStreamReader(reader), DEFAULT_PARAMS,
+        return buildJSONValue(new JSONLimitStreamReader(reader), DEFAULT_LIMITS,
                 JSONCollector.INSTANCE);
     }
 
@@ -133,15 +133,15 @@ public final class JSONLimitBuilder {
      * @param inputStream the input stream containing the JSON data
      * @param charset     the character set with which to interpret the
      *                    input stream
-     * @param params      the limits imposed on the builder
-     * @param factory     factory object for creating JSON structures
+     * @param limits      the limits imposed on the builder
+     * @param collector   collector object for creating JSON structures
      * @return a JSON value of the type defined above
      */
     public static Object buildJSONValue(InputStream inputStream, Charset charset,
-            BuilderLimits params, StructureCollector<?, ?, ?, ?> factory)
+            BuilderLimits limits, StructureCollector<?, ?, ?, ?> collector)
             throws JSONException {
         return buildJSONValue(new JSONLimitStreamReader(inputStream, charset),
-                params, factory);
+                limits, collector);
     }
 
     /**
@@ -159,13 +159,13 @@ public final class JSONLimitBuilder {
      * @param inputStream the input stream containing the JSON data
      * @param charset     the character set with which to interpret the
      *                    input stream
-     * @param params      the limits imposed on the builder
+     * @param limits      the limits imposed on the builder
      * @return a JSON value of the type defined above
      */
     public static Object buildJSONValue(InputStream inputStream, Charset charset,
-            BuilderLimits params) throws JSONException {
+            BuilderLimits limits) throws JSONException {
         return buildJSONValue(new JSONLimitStreamReader(inputStream, charset),
-                params, JSONCollector.INSTANCE);
+                limits, JSONCollector.INSTANCE);
     }
 
     /**
@@ -188,7 +188,7 @@ public final class JSONLimitBuilder {
     public static Object buildJSONValue(InputStream inputStream, Charset charset)
             throws JSONException {
         return buildJSONValue(new JSONLimitStreamReader(inputStream, charset),
-                DEFAULT_PARAMS, JSONCollector.INSTANCE);
+                DEFAULT_LIMITS, JSONCollector.INSTANCE);
     }
 
     /**
@@ -203,13 +203,13 @@ public final class JSONLimitBuilder {
      * </ul>
      *
      * @param s      A source string.
-     * @param params the limits imposed on the builder
-     * @param factory factory object for creating JSON structures
+     * @param limits the limits imposed on the builder
+     * @param collector collector object for creating JSON structures
      * @return a JSON value of the type defined above
      */
-    public static Object buildJSONValue(String s, BuilderLimits params,
-            StructureCollector<?, ?, ?, ?> factory) throws JSONException {
-        return buildJSONValue(new JSONLimitStreamReader(s), params, factory);
+    public static Object buildJSONValue(String s, BuilderLimits limits,
+            StructureCollector<?, ?, ?, ?> collector) throws JSONException {
+        return buildJSONValue(new JSONLimitStreamReader(s), limits, collector);
     }
 
     /**
@@ -224,11 +224,11 @@ public final class JSONLimitBuilder {
      * </ul>
      *
      * @param s      A source string.
-     * @param params the limits imposed on the builder
+     * @param limits the limits imposed on the builder
      * @return a JSON value of the type defined above
      */
-    public static Object buildJSONValue(String s, BuilderLimits params) throws JSONException {
-        return buildJSONValue(new JSONLimitStreamReader(s), params,
+    public static Object buildJSONValue(String s, BuilderLimits limits) throws JSONException {
+        return buildJSONValue(new JSONLimitStreamReader(s), limits,
                 JSONCollector.INSTANCE);
     }
 
@@ -247,7 +247,7 @@ public final class JSONLimitBuilder {
      * @return a JSON value of the type defined above
      */
     public static Object buildJSONValue(String s) throws JSONException {
-        return buildJSONValue(new JSONLimitStreamReader(s), DEFAULT_PARAMS,
+        return buildJSONValue(new JSONLimitStreamReader(s), DEFAULT_LIMITS,
                 JSONCollector.INSTANCE);
     }
 
@@ -268,7 +268,7 @@ public final class JSONLimitBuilder {
      * @return a JSON value of the type defined above
      */
     public static Object buildJSONValue(JSONLimitStreamReader reader) throws JSONException {
-        return buildJSONValue(reader, DEFAULT_PARAMS, JSONCollector.INSTANCE);
+        return buildJSONValue(reader, DEFAULT_LIMITS, JSONCollector.INSTANCE);
     }
 
     /**
@@ -285,12 +285,12 @@ public final class JSONLimitBuilder {
      * <p>The reader must be at the beginning of the document.</p>
      *
      * @param reader A source stream.
-     * @param params the limits imposed on the builder
+     * @param limits the limits imposed on the builder
      * @return a JSON value of the type defined above
      */
     public static Object buildJSONValue(JSONLimitStreamReader reader,
-            BuilderLimits params) throws JSONException {
-        return buildJSONValue(reader, params, JSONCollector.INSTANCE);
+            BuilderLimits limits) throws JSONException {
+        return buildJSONValue(reader, limits, JSONCollector.INSTANCE);
     }
 
     /**
@@ -307,22 +307,22 @@ public final class JSONLimitBuilder {
      * <p>The reader must be at the beginning of the document.</p>
      *
      * @param reader A source stream.
-     * @param params the limits imposed on the builder
-     * @param factory factory object for creating JSON structures
+     * @param limits the limits imposed on the builder
+     * @param collector collector object for creating JSON structures
      * @return a JSON value of the type defined above
      */
     public static Object buildJSONValue(JSONLimitStreamReader reader,
-            BuilderLimits params, StructureCollector<?, ?, ?, ?> factory) throws JSONException {
+            BuilderLimits limits, StructureCollector<?, ?, ?, ?> collector) throws JSONException {
         if(reader == null) {
             throw new NullPointerException("reader is null");
         }
-        if(params == null) {
+        if(limits == null) {
             throw new NullPointerException("limits is null");
         }
-        if(factory == null) {
-            throw new NullPointerException("factory is null");
+        if(collector == null) {
+            throw new NullPointerException("collector is null");
         }
-        reader.withLimits(params);
+        reader.withLimits(limits);
         ParseState state = reader.nextState();
 
         if (state != ParseState.DOCUMENT) {
@@ -335,11 +335,11 @@ public final class JSONLimitBuilder {
 
         switch (state) {
             case OBJECT:
-                result = parseObjectTree(reader, params, factory);
+                result = parseObjectTree(reader, limits, collector);
                 break;
 
             case ARRAY:
-                result = parseArrayTree(reader, params, factory);
+                result = parseArrayTree(reader, limits, collector);
                 break;
 
             case NULL_VALUE:
@@ -365,26 +365,26 @@ public final class JSONLimitBuilder {
      * Build a JSONObject from a {@code Reader}.
      *
      * @param reader A reader.
-     * @param params the limits imposed on the builder
-     * @param factory factory object for creating JSON structures
+     * @param limits the limits imposed on the builder
+     * @param collector collector object for creating JSON structures
      * @param <OR> the result type of the JSON object constructed by the factory
      * @return a JSON object value
      */
-    public static <OR> OR buildJSONObject(Reader reader, BuilderLimits params,
-            StructureCollector<?, ?, OR, ?> factory) throws JSONException {
-        return buildJSONObject(new JSONLimitStreamReader(reader), params, factory);
+    public static <OR> OR buildJSONObject(Reader reader, BuilderLimits limits,
+            StructureCollector<?, ?, OR, ?> collector) throws JSONException {
+        return buildJSONObject(new JSONLimitStreamReader(reader), limits, collector);
     }
 
     /**
      * Build a JSONObject from a {@code Reader}.
      *
      * @param reader A reader.
-     * @param params the limits imposed on the builder
+     * @param limits the limits imposed on the builder
      * @return a JSONObject value
      */
-    public static JSONObject buildJSONObject(Reader reader, BuilderLimits params)
+    public static JSONObject buildJSONObject(Reader reader, BuilderLimits limits)
             throws JSONException {
-        return buildJSONObject(new JSONLimitStreamReader(reader), params,
+        return buildJSONObject(new JSONLimitStreamReader(reader), limits,
                 JSONCollector.INSTANCE);
     }
 
@@ -395,7 +395,7 @@ public final class JSONLimitBuilder {
      * @return a JSONObject value
      */
     public static JSONObject buildJSONObject(Reader reader) throws JSONException {
-        return buildJSONObject(new JSONLimitStreamReader(reader), DEFAULT_PARAMS,
+        return buildJSONObject(new JSONLimitStreamReader(reader), DEFAULT_LIMITS,
                 JSONCollector.INSTANCE);
     }
 
@@ -406,16 +406,16 @@ public final class JSONLimitBuilder {
      * @param inputStream the input stream containing the JSON data
      * @param charset     the character set with which to interpret the
      *                    input stream
-     * @param params      the limits imposed on the builder
-     * @param factory factory object for creating JSON structures
+     * @param limits      the limits imposed on the builder
+     * @param collector   collector object for creating JSON structures
      * @param <OR> the result type of the JSON object constructed by the factory
      * @return a JSON object value
      */
     public static <OR> OR buildJSONObject(InputStream inputStream, Charset charset,
-            BuilderLimits params, StructureCollector<?, ?, OR, ?> factory)
+            BuilderLimits limits, StructureCollector<?, ?, OR, ?> collector)
             throws JSONException {
         return buildJSONObject(new JSONLimitStreamReader(inputStream, charset),
-                params, factory);
+                limits, collector);
     }
 
     /**
@@ -425,13 +425,13 @@ public final class JSONLimitBuilder {
      * @param inputStream the input stream containing the JSON data
      * @param charset     the character set with which to interpret the
      *                    input stream
-     * @param params      the limits imposed on the builder
+     * @param limits      the limits imposed on the builder
      * @return a JSONObject value
      */
     public static JSONObject buildJSONObject(InputStream inputStream,
-            Charset charset, BuilderLimits params) throws JSONException {
+            Charset charset, BuilderLimits limits) throws JSONException {
         return buildJSONObject(new JSONLimitStreamReader(inputStream, charset),
-                params, JSONCollector.INSTANCE);
+                limits, JSONCollector.INSTANCE);
     }
 
     /**
@@ -446,33 +446,33 @@ public final class JSONLimitBuilder {
     public static JSONObject buildJSONObject(InputStream inputStream,
             Charset charset) throws JSONException {
         return buildJSONObject(new JSONLimitStreamReader(inputStream, charset),
-                DEFAULT_PARAMS, JSONCollector.INSTANCE);
+                DEFAULT_LIMITS, JSONCollector.INSTANCE);
     }
 
     /**
      * Build a JSONObject from a {@code String}.
      *
      * @param s      A source string.
-     * @param params the limits imposed on the builder
-     * @param factory factory object for creating JSON structures
+     * @param limits the limits imposed on the builder
+     * @param collector collector object for creating JSON structures
      * @param <OR> the result type of the JSON object constructed by the factory
      * @return a JSON object value
      */
-    public static <OR> OR buildJSONObject(String s, BuilderLimits params,
-            StructureCollector<?, ?, OR, ?> factory) throws JSONException {
-        return buildJSONObject(new JSONLimitStreamReader(s), params, factory);
+    public static <OR> OR buildJSONObject(String s, BuilderLimits limits,
+            StructureCollector<?, ?, OR, ?> collector) throws JSONException {
+        return buildJSONObject(new JSONLimitStreamReader(s), limits, collector);
     }
 
     /**
      * Build a JSONObject from a {@code String}.
      *
      * @param s      A source string.
-     * @param params the limits imposed on the builder
+     * @param limits the limits imposed on the builder
      * @return a JSONObject value
      */
-    public static JSONObject buildJSONObject(String s, BuilderLimits params)
+    public static JSONObject buildJSONObject(String s, BuilderLimits limits)
             throws JSONException {
-        return buildJSONObject(new JSONLimitStreamReader(s), params,
+        return buildJSONObject(new JSONLimitStreamReader(s), limits,
                 JSONCollector.INSTANCE);
     }
 
@@ -483,7 +483,7 @@ public final class JSONLimitBuilder {
      * @return a JSONObject value
      */
     public static JSONObject buildJSONObject(String s) throws JSONException {
-        return buildJSONObject(new JSONLimitStreamReader(s), DEFAULT_PARAMS,
+        return buildJSONObject(new JSONLimitStreamReader(s), DEFAULT_LIMITS,
                 JSONCollector.INSTANCE);
     }
 
@@ -495,7 +495,7 @@ public final class JSONLimitBuilder {
      */
     public static JSONObject buildJSONObject(JSONLimitStreamReader reader)
             throws JSONException {
-        return buildJSONObject(reader, DEFAULT_PARAMS, JSONCollector.INSTANCE);
+        return buildJSONObject(reader, DEFAULT_LIMITS, JSONCollector.INSTANCE);
     }
 
     /**
@@ -503,12 +503,12 @@ public final class JSONLimitBuilder {
      * at the beginning of the document.
      *
      * @param reader    A source stream.
-     * @param params the limits imposed on the builder
+     * @param limits the limits imposed on the builder
      * @return a JSONObject value
      */
     public static JSONObject buildJSONObject(JSONLimitStreamReader reader,
-            BuilderLimits params) throws JSONException {
-        return buildJSONObject(reader, params, JSONCollector.INSTANCE);
+            BuilderLimits limits) throws JSONException {
+        return buildJSONObject(reader, limits, JSONCollector.INSTANCE);
     }
 
     /**
@@ -516,23 +516,23 @@ public final class JSONLimitBuilder {
      * at the beginning of the document.
      *
      * @param reader    A source stream.
-     * @param params the limits imposed on the builder
-     * @param factory factory for creating structures
+     * @param limits the limits imposed on the builder
+     * @param collector collector for creating JSON structures
      * @param <OR> the result type of the JSON object constructed by the factory
      * @return a JSON object value
      */
-    public static <OR> OR buildJSONObject(JSONLimitStreamReader reader, BuilderLimits params,
-            StructureCollector<?, ?, OR, ?> factory) throws JSONException {
+    public static <OR> OR buildJSONObject(JSONLimitStreamReader reader, BuilderLimits limits,
+            StructureCollector<?, ?, OR, ?> collector) throws JSONException {
         if(reader == null) {
             throw new NullPointerException("reader is null");
         }
-        if(params == null) {
+        if(limits == null) {
             throw new NullPointerException("limits is null");
         }
-        if(factory == null) {
-            throw new NullPointerException("factory is null");
+        if(collector == null) {
+            throw new NullPointerException("collector is null");
         }
-        reader.withLimits(params);
+        reader.withLimits(limits);
         ParseState state = reader.nextState();
 
         if(state != ParseState.DOCUMENT) {
@@ -545,7 +545,7 @@ public final class JSONLimitBuilder {
 
         switch(state) {
             case OBJECT:
-                result = parseObjectTree(reader, params, factory);
+                result = parseObjectTree(reader, limits, collector);
                 break;
 
             default:
@@ -565,26 +565,26 @@ public final class JSONLimitBuilder {
      * Build a JSONArray from a {@code Reader}.
      *
      * @param reader     A reader.
-     * @param params the limits imposed on the builder
-     * @param factory factory object for creating JSON structures
+     * @param limits the limits imposed on the builder
+     * @param collector collector object for creating JSON structures
      * @param <AR> the result type of the JSON array constructed by the factory
      * @return a JSON array value
      */
-    public static <AR> AR buildJSONArray(Reader reader, BuilderLimits params,
-            StructureCollector<?, ?, ?, AR> factory) throws JSONException {
-        return buildJSONArray(new JSONLimitStreamReader(reader), params, factory);
+    public static <AR> AR buildJSONArray(Reader reader, BuilderLimits limits,
+            StructureCollector<?, ?, ?, AR> collector) throws JSONException {
+        return buildJSONArray(new JSONLimitStreamReader(reader), limits, collector);
     }
 
     /**
      * Build a JSONArray from a {@code Reader}.
      *
      * @param reader     A reader.
-     * @param params the limits imposed on the builder
+     * @param limits the limits imposed on the builder
      * @return a JSONArray value
      */
-    public static JSONArray buildJSONArray(Reader reader, BuilderLimits params)
+    public static JSONArray buildJSONArray(Reader reader, BuilderLimits limits)
             throws JSONException {
-        return buildJSONArray(new JSONLimitStreamReader(reader), params,
+        return buildJSONArray(new JSONLimitStreamReader(reader), limits,
                 JSONCollector.INSTANCE);
     }
 
@@ -595,7 +595,7 @@ public final class JSONLimitBuilder {
      * @return a JSONArray value
      */
     public static JSONArray buildJSONArray(Reader reader) throws JSONException {
-        return buildJSONArray(new JSONLimitStreamReader(reader), DEFAULT_PARAMS,
+        return buildJSONArray(new JSONLimitStreamReader(reader), DEFAULT_LIMITS,
                 JSONCollector.INSTANCE);
     }
 
@@ -606,15 +606,16 @@ public final class JSONLimitBuilder {
      * @param inputStream   the input stream containing the JSON data
      * @param charset       the character set with which to interpret the
      *                      input stream
-     * @param params the limits imposed on the builder
-     * @param factory factory object for creating JSON structures
+     * @param limits the limits imposed on the builder
+     * @param collector collector object for creating JSON structures
      * @param <AR> the result type of the JSON array constructed by the factory
      * @return a JSON array value
      */
     public static <AR> AR buildJSONArray(InputStream inputStream, Charset charset,
-            BuilderLimits params, StructureCollector<?, ?, ?, AR> factory) throws JSONException {
+            BuilderLimits limits, StructureCollector<?, ?, ?, AR> collector)
+            throws JSONException {
         return buildJSONArray(new JSONLimitStreamReader(inputStream, charset),
-                params, factory);
+                limits, collector);
     }
 
     /**
@@ -624,13 +625,13 @@ public final class JSONLimitBuilder {
      * @param inputStream   the input stream containing the JSON data
      * @param charset       the character set with which to interpret the
      *                      input stream
-     * @param params the limits imposed on the builder
+     * @param limits the limits imposed on the builder
      * @return a JSONArray value
      */
     public static JSONArray buildJSONArray(InputStream inputStream, Charset charset,
-            BuilderLimits params) throws JSONException {
+            BuilderLimits limits) throws JSONException {
         return buildJSONArray(new JSONLimitStreamReader(inputStream, charset),
-                params, JSONCollector.INSTANCE);
+                limits, JSONCollector.INSTANCE);
     }
 
     /**
@@ -645,32 +646,32 @@ public final class JSONLimitBuilder {
     public static JSONArray buildJSONArray(InputStream inputStream, Charset charset)
             throws JSONException {
         return buildJSONArray(new JSONLimitStreamReader(inputStream, charset),
-                DEFAULT_PARAMS, JSONCollector.INSTANCE);
+                DEFAULT_LIMITS, JSONCollector.INSTANCE);
     }
 
     /**
      * Build a JSONArray from a {@code String}.
      *
      * @param s     A source string.
-     * @param params the limits imposed on the builder
-     * @param factory factory object for creating JSON structures
+     * @param limits the limits imposed on the builder
+     * @param collector collector object for creating JSON structures
      * @param <AR> the result type of the JSON array constructed by the factory
      * @return a JSON array value
      */
-    public static <AR> AR buildJSONArray(String s, BuilderLimits params,
-            StructureCollector<?, ?, ?, AR> factory) throws JSONException {
-        return buildJSONArray(new JSONLimitStreamReader(s), params, factory);
+    public static <AR> AR buildJSONArray(String s, BuilderLimits limits,
+            StructureCollector<?, ?, ?, AR> collector) throws JSONException {
+        return buildJSONArray(new JSONLimitStreamReader(s), limits, collector);
     }
 
     /**
      * Build a JSONArray from a {@code String}.
      *
      * @param s     A source string.
-     * @param params the limits imposed on the builder
+     * @param limits the limits imposed on the builder
      * @return a JSONArray value
      */
-    public static JSONArray buildJSONArray(String s, BuilderLimits params) throws JSONException {
-        return buildJSONArray(new JSONLimitStreamReader(s), params,
+    public static JSONArray buildJSONArray(String s, BuilderLimits limits) throws JSONException {
+        return buildJSONArray(new JSONLimitStreamReader(s), limits,
                 JSONCollector.INSTANCE);
     }
 
@@ -681,7 +682,7 @@ public final class JSONLimitBuilder {
      * @return a JSONArray value
      */
     public static JSONArray buildJSONArray(String s) throws JSONException {
-        return buildJSONArray(new JSONLimitStreamReader(s), DEFAULT_PARAMS,
+        return buildJSONArray(new JSONLimitStreamReader(s), DEFAULT_LIMITS,
                 JSONCollector.INSTANCE);
     }
 
@@ -692,7 +693,7 @@ public final class JSONLimitBuilder {
      * @return a JSONArray value
      */
     public static JSONArray buildJSONArray(JSONLimitStreamReader reader) throws JSONException {
-        return buildJSONArray(reader, DEFAULT_PARAMS, JSONCollector.INSTANCE);
+        return buildJSONArray(reader, DEFAULT_LIMITS, JSONCollector.INSTANCE);
     }
 
     /**
@@ -700,11 +701,12 @@ public final class JSONLimitBuilder {
      * at the beginning of the document.
      *
      * @param reader    A source stream.
-     * @param params the limits imposed on the builder
+     * @param limits the limits imposed on the builder
      * @return a JSONArray value
      */
-    public static JSONArray buildJSONArray(JSONLimitStreamReader reader, BuilderLimits params) throws JSONException {
-        return buildJSONArray(reader, params, JSONCollector.INSTANCE);
+    public static JSONArray buildJSONArray(JSONLimitStreamReader reader,
+            BuilderLimits limits) throws JSONException {
+        return buildJSONArray(reader, limits, JSONCollector.INSTANCE);
     }
 
     /**
@@ -712,23 +714,23 @@ public final class JSONLimitBuilder {
      * at the beginning of the document.
      *
      * @param reader    A source stream.
-     * @param params the limits imposed on the builder
-     * @param factory factory object for creating structures
+     * @param limits the limits imposed on the builder
+     * @param collector collector object for creating structures
      * @param <AR> the result type of the JSON array constructed by the factory
      * @return a JSON array value
      */
-    public static <AR> AR buildJSONArray(JSONLimitStreamReader reader, BuilderLimits params,
-            StructureCollector<?, ?, ?, AR> factory) throws JSONException {
+    public static <AR> AR buildJSONArray(JSONLimitStreamReader reader, BuilderLimits limits,
+            StructureCollector<?, ?, ?, AR> collector) throws JSONException {
         if(reader == null) {
             throw new NullPointerException("reader is null");
         }
-        if(params == null) {
+        if(limits == null) {
             throw new NullPointerException("limits is null");
         }
-        if(factory == null) {
-            throw new NullPointerException("factory is null");
+        if(collector == null) {
+            throw new NullPointerException("collector is null");
         }
-        reader.withLimits(params);
+        reader.withLimits(limits);
         ParseState state = reader.nextState();
 
         if(state != ParseState.DOCUMENT) {
@@ -741,7 +743,7 @@ public final class JSONLimitBuilder {
 
         switch(state) {
             case ARRAY:
-                result = parseArrayTree(reader, params, factory);
+                result = parseArrayTree(reader, limits, collector);
                 break;
 
             default:
@@ -763,15 +765,15 @@ public final class JSONLimitBuilder {
      * instead of recursion is known as trampolining.
      *
      * @param reader the stream reader
-     * @param params the limits imposed on the builder
-     * @param factory the factory object for creating new objects and arrays
+     * @param limits the limits imposed on the builder
+     * @param collector collector object for creating new objects and arrays
      * @return the populated JSON array
      */
     private static <OA, AA, OR, AR> AR parseArrayTree(JSONLimitStreamReader reader,
-            BuilderLimits params, StructureCollector<OA, AA, OR, AR> factory)
+            BuilderLimits limits, StructureCollector<OA, AA, OR, AR> collector)
             throws JSONException {
         ALStack<StructureBuilder<?>> stack = new ALStack<StructureBuilder<?>>();
-        StructureArrayBuilder<?, ?, ?, AR> builder = new StructureArrayBuilder<OA, AA, OR, AR>(params, factory);
+        StructureArrayBuilder<?, ?, ?, AR> builder = new StructureArrayBuilder<OA, AA, OR, AR>(limits, collector);
         stack.push(builder);
         ParseState state;
 
@@ -795,15 +797,15 @@ public final class JSONLimitBuilder {
      * instead of recursion is known as trampolining.
      *
      * @param reader the stream reader
-     * @param params the limits imposed on the builder
-     * @param factory the factory object for creating new objects and arrays
+     * @param limits the limits imposed on the builder
+     * @param collector collector object for creating new objects and arrays
      * @return the populated JSON object
      */
     private static <OA, AA, OR, AR> OR parseObjectTree(JSONLimitStreamReader reader,
-            BuilderLimits params, StructureCollector<OA, AA, OR, AR> factory)
+            BuilderLimits limits, StructureCollector<OA, AA, OR, AR> collector)
             throws JSONException {
         ALStack<StructureBuilder<?>> stack = new ALStack<StructureBuilder<?>>();
-        StructureObjectBuilder<?, ?, OR, ?> builder = new StructureObjectBuilder<OA, AA, OR, AR>(params, factory);
+        StructureObjectBuilder<?, ?, OR, ?> builder = new StructureObjectBuilder<OA, AA, OR, AR>(limits, collector);
         stack.push(builder);
         ParseState state;
 
@@ -857,13 +859,13 @@ public final class JSONLimitBuilder {
      *
      * @param reader A source stream reader.
      * @param limits the limits imposed on the builder
-     * @param factory factory object for creating JSON structures
+     * @param collector collector object for creating JSON structures
      * @param <OR> the result type of the JSON object constructed by the factory
      * @return a JSONObject representing the subtree starting at the current
      * OBJECT state
      */
     public static <OR> OR buildObjectSubTree(JSONLimitStreamReader reader,
-            BuilderLimits limits, StructureCollector<?, ?, OR, ?> factory)
+            BuilderLimits limits, StructureCollector<?, ?, OR, ?> collector)
             throws JSONException {
         if((reader.currentState() != ParseState.OBJECT) || (reader.getStackDepth() == 0)) {
             throw new JSONParseException("Expected OBJECT state", reader.getParsePosition());
@@ -871,10 +873,10 @@ public final class JSONLimitBuilder {
         if(limits == null) {
             throw new NullPointerException("limits is null");
         }
-        if(factory == null) {
-            throw new NullPointerException("factory is null");
+        if(collector == null) {
+            throw new NullPointerException("collector is null");
         }
-        return parseObjectTree(reader, limits, factory);
+        return parseObjectTree(reader, limits, collector);
     }
 
     /**
@@ -913,13 +915,13 @@ public final class JSONLimitBuilder {
      *
      * @param reader A source stream reader.
      * @param limits the limits imposed on the builder
-     * @param factory factory object for creating JSON structures
-     * @param <AR> the result type of the JSON array constructed by the factory
+     * @param collector collector object for creating JSON structures
+     * @param <AR> the result type of the JSON array constructed by the collector
      * @return a JSON array representing the subtree starting at the current
      * ARRAY state
      */
     public static <AR> AR buildArraySubTree(JSONLimitStreamReader reader,
-            BuilderLimits limits, StructureCollector<?, ?, ?, AR> factory)
+            BuilderLimits limits, StructureCollector<?, ?, ?, AR> collector)
             throws JSONException {
         if((reader.currentState() != ParseState.ARRAY) || (reader.getStackDepth() == 0)) {
             throw new JSONParseException("Expected ARRAY state", reader.getParsePosition());
@@ -927,9 +929,9 @@ public final class JSONLimitBuilder {
         if(limits == null) {
             throw new NullPointerException("limits is null");
         }
-        if(factory == null) {
-            throw new NullPointerException("factory is null");
+        if(collector == null) {
+            throw new NullPointerException("collector is null");
         }
-        return parseArrayTree(reader, limits, factory);
+        return parseArrayTree(reader, limits, collector);
     }
 }

@@ -12,10 +12,13 @@ import java.util.Map;
  * Structure collector that creates {@code HashMap}, {@code ArrayList}, and
  * {@code null} instances. The result types are finished using
  * {@code Collections.unmodifiableMap()} and {@code Collections.unmodifiableList()}.
+ * <p>
+ * This collector holds no state, so a singleton is used.</p>
  */
 public final class CollectionCollector implements StructureCollector
         <Map<String, Object>, List<Object>, Map<String, Object>, List<Object>> {
 
+    /** The singleton instance of this collector. */
     public static final CollectionCollector INSTANCE = new CollectionCollector();
 
     private CollectionCollector() {
