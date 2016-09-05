@@ -43,7 +43,7 @@ final class StructureObjectBuilder<OA, AA, OR, AR> implements StructureBuilder<O
     private int index;
 
     public StructureObjectBuilder(BuilderLimits params, StructureCollector<OA, AA, OR, AR> factory) {
-        this.object = factory.createObjectAccumulator(params);
+        this.object = factory.createObjectAccumulator();
         this.params = params;
         this.index = -1;
         this.factory = factory;

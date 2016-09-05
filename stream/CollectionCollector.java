@@ -24,11 +24,10 @@ public final class CollectionCollector implements StructureCollector
     /**
      * Create a new {@code HashMap} into which JSON object entries are added.
      *
-     * @param params limits imposed by the object builder
      * @return a new {@code HashMap} instance
      */
     @Override
-    public Map<String, Object> createObjectAccumulator(BuilderLimits params) {
+    public Map<String, Object> createObjectAccumulator() {
         return new HashMap<String, Object>();
     }
 
@@ -61,11 +60,10 @@ public final class CollectionCollector implements StructureCollector
     /**
      * Create a new {@code ArrayList} into which JSON array entries are added.
      *
-     * @param params limits imposed by the object builder
      * @return a new {@code ArrayList} instance
      */
     @Override
-    public List<Object> createArrayAccumulator(BuilderLimits params) {
+    public List<Object> createArrayAccumulator() {
         return new ArrayList<Object>();
     }
 

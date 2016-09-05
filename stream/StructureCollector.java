@@ -24,10 +24,9 @@ public interface StructureCollector<OA, AA, OR, AR> {
      * Create an instance of an object into which JSON object entries are
      * added.
      *
-     * @param params limits imposed by the object builder
      * @return a new object instance
      */
-    OA createObjectAccumulator(BuilderLimits params);
+    OA createObjectAccumulator();
 
     /**
      * Adds the given entry to the given JSON object.
@@ -63,10 +62,9 @@ public interface StructureCollector<OA, AA, OR, AR> {
      * Create an instance of an object into which JSON array entries are
      * added.
      *
-     * @param params limits imposed by the object builder
      * @return a new array instance
      */
-    AA createArrayAccumulator(BuilderLimits params);
+    AA createArrayAccumulator();
 
     /**
      * Adds the given value to the given JSON array.

@@ -18,11 +18,10 @@ public final class JSONCollector implements StructureCollector
     /**
      * Create a new {@code JSONObject} into which JSON object entries are added.
      *
-     * @param params limits imposed by the object builder
      * @return a new {@code JSONObject} instance
      */
     @Override
-    public JSONObject createObjectAccumulator(BuilderLimits params) {
+    public JSONObject createObjectAccumulator() {
         return new JSONObject();
     }
 
@@ -51,11 +50,10 @@ public final class JSONCollector implements StructureCollector
     /**
      * Create a new {@code JSONArray} into which JSON array entries are added.
      *
-     * @param params limits imposed by the object builder
      * @return a new {@code JSONArray} instance
      */
     @Override
-    public JSONArray createArrayAccumulator(BuilderLimits params) {
+    public JSONArray createArrayAccumulator() {
         return new JSONArray();
     }
 

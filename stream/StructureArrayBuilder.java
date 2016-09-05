@@ -42,7 +42,7 @@ final class StructureArrayBuilder<OA, AA, OR, AR> implements StructureBuilder<AR
     private int index;
 
     public StructureArrayBuilder(BuilderLimits params, StructureCollector<OA, AA, OR, AR> factory) {
-        this.array = factory.createArrayAccumulator(params);
+        this.array = factory.createArrayAccumulator();
         this.params = params;
         this.index = -1;
         this.factory = factory;
