@@ -787,7 +787,7 @@ public final class JSONLimitBuilder {
     private static <OA, AA, OR, AR> AR parseArrayTree(JSONLimitStreamReader reader,
             BuilderLimits limits, StructureCollector<OA, AA, OR, AR> collector)
             throws JSONException {
-        ALStack<StructureBuilder<?>> stack = new ALStack<StructureBuilder<?>>();
+        ALStack<StructureIdentifier> stack = new ALStack<StructureIdentifier>();
         StructureArrayBuilder<?, ?, ?, AR> builder = new StructureArrayBuilder<OA, AA, OR, AR>(null, limits, collector);
         stack.push(builder);
         ParseState state;
@@ -819,7 +819,7 @@ public final class JSONLimitBuilder {
     private static <OA, AA, OR, AR> OR parseObjectTree(JSONLimitStreamReader reader,
             BuilderLimits limits, StructureCollector<OA, AA, OR, AR> collector)
             throws JSONException {
-        ALStack<StructureBuilder<?>> stack = new ALStack<StructureBuilder<?>>();
+        ALStack<StructureIdentifier> stack = new ALStack<StructureIdentifier>();
         StructureObjectBuilder<?, ?, OR, ?> builder = new StructureObjectBuilder<OA, AA, OR, AR>(null, limits, collector);
         stack.push(builder);
         ParseState state;

@@ -36,7 +36,7 @@ import org.json.util.ALStack;
  * @author JSON.org
  * @version 2016-08-02
  */
-public interface StructureBuilder<R> {
+interface StructureBuilder<R> extends StructureIdentifier {
 
     /**
      * Accepts a structure to be parsed. Nested structures are pushed and
@@ -48,7 +48,7 @@ public interface StructureBuilder<R> {
      * @return a next structure builder to build the next structure
      * @throws JSONException there was a problem constructing the structure
      */
-    StructureBuilder<?> accept(ParseState state, ALStack<StructureBuilder<?>> stack,
+    StructureBuilder<?> accept(ParseState state, ALStack<StructureIdentifier> stack,
             JSONStreamReader reader) throws JSONException;
 
     /**
@@ -58,15 +58,6 @@ public interface StructureBuilder<R> {
      * @param childValue the value created by the child StructureBuilder
      */
     void acceptChildValue(Object childValue) throws JSONException;
-
-    /**
-     * Returns an identifier fragment for this structure. This fragment
-     * can then be used to construct a JSON Pointer value.
-     *
-     * @return an identifier fragment for the current structure, as a String
-     * @see JSONPointerUtils#toJSONPointer(Iterable)
-     */
-    String getIdentifier();
 
     /**
      * Return the resulting structure result created by this StructureBuilder.

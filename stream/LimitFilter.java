@@ -41,25 +41,25 @@ public interface LimitFilter {
      *
      * @param index the array index within the current array
      * @param state the type of value that will be built
-     * @param stack can be used to construct a JSON Pointer expression, or
+     * @param ids can be used to construct a JSON Pointer expression, or
      *              determine the depth of the current structure
      * @return {@code true} to allow the value to be created, otherwise
      * {@code false} to skip the value
      * @see JSONPointerUtils#toJSONPointer(Iterable)
      */
-    boolean acceptIndex(int index, ParseState state, SizedIterable<StructureBuilder<?>> stack);
+    boolean acceptIndex(int index, ParseState state, SizedIterable<StructureIdentifier> ids);
 
     /**
      * Determine whether to accept or reject a value within an object.
      *
      * @param fieldName the key name within the current object
      * @param state the type of value that will be built
-     * @param stack can be used to construct a JSON Pointer expression, or
+     * @param ids can be used to construct a JSON Pointer expression, or
      *              determine the depth of the current structure
      * @return {@code true} to allow the value to be created, otherwise
      * {@code false} to skip the value
      * @see JSONPointerUtils#toJSONPointer(Iterable)
      */
-    boolean acceptField(String fieldName, ParseState state, SizedIterable<StructureBuilder<?>> stack);
+    boolean acceptField(String fieldName, ParseState state, SizedIterable<StructureIdentifier> ids);
 
 }

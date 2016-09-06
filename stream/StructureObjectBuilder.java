@@ -53,7 +53,9 @@ final class StructureObjectBuilder<OA, AA, OR, AR> implements StructureBuilder<O
     }
 
     @Override
-    public StructureBuilder<?> accept(ParseState state, ALStack<StructureBuilder<?>> stack, JSONStreamReader reader) throws JSONException {
+    public StructureBuilder<?> accept(ParseState state,
+            ALStack<StructureIdentifier> stack, JSONStreamReader reader)
+            throws JSONException {
         final LimitFilter filter = limits.getFilter();
 
         if(state == ParseState.KEY) {
