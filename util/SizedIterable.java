@@ -32,15 +32,15 @@ public interface SizedIterable<T> extends Iterable<T> {
     /**
      * Returns the number of elements in this {@code Iterable}.
      *
-     * @return the number of element
+     * @return the number of elements in the {@code Iterable}
      */
     int size();
 
     /**
      * Determine whether the {@code Iterable} has any elements.
      *
-     * @return {@code true} if this collection contains no elements, otherwise
-     * {@code false}
+     * @return {@code true} if this {@code Iterable} contains no elements,
+     * otherwise {@code false}
      */
     boolean isEmpty();
 

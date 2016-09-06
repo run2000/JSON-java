@@ -124,7 +124,7 @@ public final class ALStack<E> implements SizedIterable<E> {
     /**
      * Returns an unmodifiable iterator over all the elements on the stack.
      *
-     * @return an Iterator of elements on the stack
+     * @return an {@code Iterator} of elements on the stack
      */
     @Override
     public Iterator<E> iterator() {
