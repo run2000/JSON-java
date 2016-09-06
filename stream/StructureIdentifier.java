@@ -26,6 +26,7 @@ SOFTWARE.
 
 /**
  * Holds an identifier that can be used to create a JSON Pointer expression.
+ * See RFC 6901 for details of JSON Pointer.
  *
  * @author JSON.org
  * @version 2016-09-06
