@@ -57,7 +57,7 @@ public interface StructureCollector<OA, AA, OR, AR> {
     /**
      * Adds the given entry to the given JSON object.
      *
-     * @param object the Object accumulator to which the entry will be added
+     * @param object the JSON object accumulator to which the entry will be added
      * @param key the key of the entry
      * @param value the value of the entry
      * @throws JSONException may be thrown if a duplicate key is encountered
@@ -68,19 +68,19 @@ public interface StructureCollector<OA, AA, OR, AR> {
      * Adds a JSON null entry to the given JSON object. Implementations may
      * choose to add a sentinel value, or omit the entry entirely.
      *
-     * @param object the Object accumulator to which the entry will be added
+     * @param object the JSON object accumulator to which the entry will be added
      * @param key the key of the entry
      * @throws JSONException may be thrown if a duplicate key is encountered
      */
     void addNull(OA object, String key) throws JSONException;
 
     /**
-     * Finish the given Object accumulator, returning the Object result.
+     * Finish the given JSON object accumulator, returning the object result.
      * This gives the collector an opportunity to create an immutable result.
      *
-     * @param accumulator the Object accumulator to be finished
-     * @return the finished Object result
-     * @throws JSONException there was a problem finishing the Object
+     * @param accumulator the JSON object accumulator to be finished
+     * @return the finished object result
+     * @throws JSONException there was a problem finishing the object
      */
     OR finishObject(OA accumulator) throws JSONException;
 
@@ -93,28 +93,29 @@ public interface StructureCollector<OA, AA, OR, AR> {
     AA createArrayAccumulator();
 
     /**
-     * Adds the given value to the given JSON array.
+     * Adds the given value to the given JSON array accumulator.
      *
-     * @param array the Array accumulator to which the value will be added
+     * @param array the JSON array accumulator to which the value will be added
      * @param value the value to be added
      */
     void addValue(AA array, Object value) throws JSONException;
 
     /**
-     * Adds a JSON null value to the given JSON array. Implementations can
-     * choose the sentinel value to be added.
+     * Adds a JSON null value to the given JSON array accumulator.
+     * Implementations can choose the sentinel value to be added.
      *
-     * @param array the Array accumulator to which the null value will be added
+     * @param array the JSON array accumulator to which the null value
+     * will be added
      */
     void addNull(AA array) throws JSONException;
 
     /**
-     * Finish the given Array accumulator, returning the Array result.
+     * Finish the given JSON array accumulator, returning the array result.
      * This gives the collector an opportunity to create an immutable result.
      *
-     * @param accumulator the Array accumulator to be finished
-     * @return the finished Array result
-     * @throws JSONException there was a problem finishing the Array
+     * @param accumulator the JSON array accumulator to be finished
+     * @return the finished array result
+     * @throws JSONException there was a problem finishing the array
      */
     AR finishArray(AA accumulator) throws JSONException;
 

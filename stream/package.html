@@ -38,5 +38,14 @@ XML processing parsers.</p>
 <h2>Limit Filter</h2>
 <p>{@code LimitFilter} provides an easy interface for accepting or rejecting
 particular structures during a JSON parse process.</p>
+<h2>Structure Collector</h2>
+<p>{@code StructureCollector} parameterizes the type of structures to be
+created by the object builders. Two provided collectors are:</p>
+<ul>
+<li>{@code JSONCollector},
+which creates {@code JSONObject} and {@code JSONArray} objects; and</li>
+<li>{@code CollectionCollector}, which creates {@code HashMap} and {@code ArrayList}
+objects.</li>
+</ul>
 </body>
 </html>

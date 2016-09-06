@@ -25,7 +25,6 @@ SOFTWARE.
 */
 
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.json.JSONParseException;
 import org.json.stream.JSONLexer.Token;
 
@@ -169,8 +168,8 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link JSONStreamReader.ParseState#KEY}, return the text of the
-     * key name.
+     * If the {@code ParseState} was {@link JSONStreamReader.ParseState#KEY},
+     * return the text of the key name.
      * <p>
      * This method advances the parser onto the next state.</p>
      *
@@ -194,7 +193,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link JSONStreamReader.ParseState#NULL_VALUE},
+     * If the {@code ParseState} was {@link JSONStreamReader.ParseState#NULL_VALUE},
      * {@link JSONStreamReader.ParseState#BOOLEAN_VALUE},
      * {@link JSONStreamReader.ParseState#NUMBER_VALUE}, or
      * {@link JSONStreamReader.ParseState#STRING_VALUE}, return the value as
@@ -243,7 +242,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link JSONStreamReader.ParseState#STRING_VALUE},
+     * If the {@code ParseState} was {@link JSONStreamReader.ParseState#STRING_VALUE},
      * return the value as a {@code String}.
      * <p>
      * This method advances the parser onto the next state.</p>
@@ -266,7 +265,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
+     * If the {@code ParseState} was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
      * return the value as a {@code Number}.
      * <p>
      * The number type returned is one of:</p>
@@ -300,7 +299,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
+     * If the {@code ParseState} was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
      * append the number sequence to the given {@code Appendable}.
      * <p>
      * This method is suitable for cases where the caller wishes to perform
@@ -330,7 +329,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
+     * If the {@code ParseState} was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
      * return the value as a {@code BigDecimal}.
      * <p>
      * This method advances the parser onto the next state.</p>
@@ -355,11 +354,11 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
+     * If the {@code ParseState} was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
      * return the value as a {@code BigInteger}.
      * <p>
      * If the JSON value is not parseable as a big integer, as defined by the
-     * JSON grammar, a JSONException will be thrown.</p>
+     * JSON grammar, a {@code JSONException} will be thrown.</p>
      * <p>
      * This method advances the parser onto the next state.</p>
      *
@@ -383,7 +382,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
+     * If the {@code ParseState} was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
      * return the value as a double.
      * <p>
      * This method advances the parser onto the next state.</p>
@@ -408,7 +407,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
+     * If the {@code ParseState} was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
      * return the value as an int.
      * <p>
      * If the JSON value is not parseable as an int, as defined by the JSON
@@ -436,7 +435,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
+     * If the {@code ParseState} was {@link JSONStreamReader.ParseState#NUMBER_VALUE},
      * return the value as a long.
      * <p>
      * If the JSON value is not parseable as a long, as defined by the JSON

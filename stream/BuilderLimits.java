@@ -59,7 +59,7 @@ public class BuilderLimits implements Cloneable {
     }
 
     /**
-     * Create a new BuilderLimits class with large, but bounded, limits
+     * Create a new {@code BuilderLimits} class with large, but bounded, limits
      * on object building.
      */
     public BuilderLimits() {
@@ -202,32 +202,33 @@ public class BuilderLimits implements Cloneable {
     }
 
     /**
-     * Return a BuilderLimits object that contains some limits for
+     * Return a {@code BuilderLimits} object that contains some limits for
      * secure processing. These can be customised as needed.
      * <p>
      * The limits specify:</p>
      * <ul>
-     * <li>Number limits sufficient for parsing Long and Double values</li>
+     * <li>Number limits sufficient for parsing {@code Long} and {@code Double}
+     * values</li>
      * <li>Key length limits sufficient for most typical requirements,
      * similar to XML attribute name limits</li>
-     * <li>String length sufficient to fit in a Java String object</li>
+     * <li>String length sufficient to fit in a Java {@code String} object</li>
      * <li>Content node limits sufficient for most typical requirements,
      * similar to XML content node limits</li>
      * <li>Nesting level limits sufficient to avoid stack limits when
      * using recursive algorithms</li>
      * </ul>
      *
-     * @return a BuilderLimits object with secure processing limits
+     * @return a {@code BuilderLimits} object with secure processing limits
      */
     public static BuilderLimits secureDefaults() {
         return SECURE_DEFAULTS.clone();
     }
 
     /**
-     * Clone this BuilderLimits object for customisation, or to avoid
+     * Clone this {@code BuilderLimits} object for customisation, or to avoid
      * mutation from outside code.
      *
-     * @return a clone of this BuilderLimits object
+     * @return a clone of this {@code BuilderLimits} object
      */
     @Override
     public BuilderLimits clone() {

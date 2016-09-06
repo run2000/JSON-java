@@ -83,11 +83,11 @@ public final class CollectionCollector implements StructureCollector
     }
 
     /**
-     * Finish the given Object accumulator, returning the Object result.
+     * Finish the given JSON object accumulator, returning the object result.
      * The result is an unmodifiable {@code Map}.
      *
-     * @param accumulator the Object accumulator to be finished
-     * @return the finished Object result, as an unmodifiable {@code Map}
+     * @param accumulator the JSON object accumulator to be finished
+     * @return the finished object result, as an unmodifiable {@code Map}
      */
     @Override
     public Map<String, Object> finishObject(Map<String, Object> accumulator) {
@@ -120,11 +120,11 @@ public final class CollectionCollector implements StructureCollector
     }
 
     /**
-     * Finish the given Array accumulator, returning the Array result.
+     * Finish the given JSON array accumulator, returning the array result.
      * The result in an unmodifiable {@code List}.
      *
-     * @param accumulator the Array accumulator to be finished
-     * @return the finished Array result, as an unmodifiable {@code List}
+     * @param accumulator the JSON array accumulator to be finished
+     * @return the finished array result, as an unmodifiable {@code List}
      */
     @Override
     public List<Object> finishArray(List<Object> accumulator) {

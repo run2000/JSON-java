@@ -62,7 +62,8 @@ public final class JSONCollector implements StructureCollector
     }
 
     /**
-     * Adds a {@code JSONObject.NULL} value an an entry to the given JSONObject.
+     * Adds a {@code JSONObject.NULL} value an an entry to the given
+     * {@code JSONObject}.
      *
      * @param object the target to which the entry will be added
      * @param key the key of the entry
@@ -94,7 +95,7 @@ public final class JSONCollector implements StructureCollector
     }
 
     /**
-     * Adds a {@code JSONObject.NULL} value to the given JSON array.
+     * Adds a {@code JSONObject.NULL} value to the given {@code JSONArray}.
      *
      * @param array the target to which the null value will be added
      */

@@ -79,8 +79,8 @@ public final class JSONObjectBuilder {
      * <li>A {@code Double}, {@code Long}, {@code Integer},
      *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
-     * <li>A JSON Object, as specified by the collector result type</li>
-     * <li>A JSON Array, as specified by the collector result type</li>
+     * <li>A JSON object, as specified by the collector result type</li>
+     * <li>A JSON array, as specified by the collector result type</li>
      * </ul>
      *
      * @param reader     A reader.
@@ -124,8 +124,8 @@ public final class JSONObjectBuilder {
      * <li>A {@code Double}, {@code Long}, {@code Integer},
      *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
-     * <li>A JSON Object, as specified by the collector result type</li>
-     * <li>A JSON Array, as specified by the collector result type</li>
+     * <li>A JSON object, as specified by the collector result type</li>
+     * <li>A JSON array, as specified by the collector result type</li>
      * </ul>
      *
      * @param inputStream   the input stream containing the JSON data
@@ -166,8 +166,8 @@ public final class JSONObjectBuilder {
      * <li>A {@code Double}, {@code Long}, {@code Integer},
      *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
-     * <li>A JSON Object, as specified by the collector result type</li>
-     * <li>A JSON Array, as specified by the collector result type</li>
+     * <li>A JSON object, as specified by the collector result type</li>
+     * <li>A JSON array, as specified by the collector result type</li>
      * </ul>
      *
      * @param s     A source string.
@@ -209,10 +209,10 @@ public final class JSONObjectBuilder {
      * <li>A {@code Double}, {@code Long}, {@code Integer},
      *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
-     * <li>A JSON Object, as specified by the collector result type</li>
-     * <li>A JSON Array, as specified by the collector result type</li>
+     * <li>A JSON object, as specified by the collector result type</li>
+     * <li>A JSON array, as specified by the collector result type</li>
      * </ul>
-     * <p> The reader must be at the beginning of the document.</p>
+     * <p>The reader must be at the beginning of the document.</p>
      *
      * @param reader    A source stream reader.
      * @param collector A collector object for creating structures
@@ -596,16 +596,16 @@ public final class JSONObjectBuilder {
     }
 
     /**
-     * If the given JSONStreamReader's ParseState was {@link ParseState#OBJECT},
-     * return the entire subtree as a JSONObject value. This method advances the
-     * parser onto the {@link ParseState#END_OBJECT} state.
+     * If the given {@code JSONStreamReader}'s {@code ParseState} was {@link ParseState#OBJECT},
+     * return the entire subtree as a {@code JSONObject} value. This method
+     * advances the parser onto the {@link ParseState#END_OBJECT} state.
      * <p>
-     * If the JSON stream is not parseable as an object, a JSONException
+     * If the JSON stream is not parseable as an object, a {@code JSONException}
      * will be thrown.
      * </p>
      *
      * @param reader A source stream reader.
-     * @return a JSONObject representing the subtree starting at the current
+     * @return a {@code JSONObject} representing the subtree starting at the current
      * OBJECT state
      */
     public static JSONObject buildObjectSubTree(JSONStreamReader reader) throws JSONException {
@@ -616,12 +616,12 @@ public final class JSONObjectBuilder {
     }
 
     /**
-     * If the given JSONStreamReader's ParseState was {@link ParseState#OBJECT},
+     * If the given {@code JSONStreamReader}'s {@code ParseState} was {@link ParseState#OBJECT},
      * return the entire subtree as an object type, as specified by the given
      * collector. This method advances the parser onto the
      * {@link ParseState#END_OBJECT} state.
      * <p>
-     * If the JSON stream is not parseable as an object, a JSONException
+     * If the JSON stream is not parseable as an object, a {@code JSONException}
      * will be thrown.
      * </p>
      *
@@ -640,16 +640,16 @@ public final class JSONObjectBuilder {
     }
 
     /**
-     * If the given JSONStreamReader's ParseState was {@link ParseState#ARRAY},
-     * return the entire subtree as a JSONArray value. This method advances the
-     * parser onto the {@link ParseState#END_ARRAY} state.
+     * If the given {@code JSONStreamReader}'s {@code ParseState} was {@link ParseState#ARRAY},
+     * return the entire subtree as a {@code JSONArray} value. This method
+     * advances the parser onto the {@link ParseState#END_ARRAY} state.
      * <p>
-     * If the JSON stream is not parseable as an array, a JSONException
+     * If the JSON stream is not parseable as an array, a {@code JSONException}
      * will be thrown.
      * </p>
      *
      * @param reader A source stream reader.
-     * @return a JSONArray representing the subtree starting at the current
+     * @return a {@code JSONArray} representing the subtree starting at the current
      * ARRAY state
      */
     public static JSONArray buildArraySubTree(JSONStreamReader reader) throws JSONException {
@@ -660,12 +660,12 @@ public final class JSONObjectBuilder {
     }
 
     /**
-     * If the given JSONStreamReader's ParseState was {@link ParseState#ARRAY},
+     * If the given {@code JSONStreamReader}'s {@code ParseState} was {@link ParseState#ARRAY},
      * return the entire subtree as an array type, as specified by the given
      * collector. This method advances the parser onto the
      * {@link ParseState#END_ARRAY} state.
      * <p>
-     * If the JSON stream is not parseable as an array, a JSONException
+     * If the JSON stream is not parseable as an array, a {@code JSONException}
      * will be thrown.
      * </p>
      *

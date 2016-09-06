@@ -497,8 +497,8 @@ public class JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#KEY}, return the text of the
-     * key name.
+     * If the {@code ParseState} was {@link ParseState#KEY}, return the text
+     * of the key name.
      * <p>
      * This method advances the parser onto the next state.</p>
      *
@@ -521,7 +521,7 @@ public class JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#NULL_VALUE},
+     * If the {@code ParseState} was {@link ParseState#NULL_VALUE},
      * {@link ParseState#BOOLEAN_VALUE}, {@link ParseState#NUMBER_VALUE}, or
      * {@link ParseState#STRING_VALUE}, return the value as an {@code Object}.
      * The values that can be returned here are:
@@ -568,7 +568,7 @@ public class JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#STRING_VALUE},
+     * If the {@code ParseState} was {@link ParseState#STRING_VALUE},
      * return the value as a {@code String}.
      * <p>
      * This method advances the parser onto the next state.</p>
@@ -590,10 +590,10 @@ public class JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#STRING_VALUE},
+     * If the {@code ParseState} was {@link ParseState#STRING_VALUE},
      * append the decoded value to the given {@code Appendable}.
      * <p>
-     * This method is suitable for cases where very long String data is
+     * This method is suitable for cases where very long {@code String} data is
      * expected, for instance for base-64 encoded data.</p>
      * <p>
      * This method advances the parser onto the next state.</p>
@@ -631,7 +631,7 @@ public class JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#BOOLEAN_VALUE},
+     * If the {@code ParseState} was {@link ParseState#BOOLEAN_VALUE},
      * return the value as a boolean.
      * <p>
      * If the JSON value is not parseable as a boolean, as defined by the JSON
@@ -660,7 +660,7 @@ public class JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#NULL_VALUE},
+     * If the {@code ParseState} was {@link ParseState#NULL_VALUE},
      * return the value as a NULL object.
      * <p>
      * If the JSON value is not parseable as a null, as defined by the JSON
@@ -668,7 +668,7 @@ public class JSONStreamReader {
      * <p>
      * This method advances the parser onto the next state.</p>
      *
-     * @return the JSONObject.NULL value
+     * @return the {@code JSONObject.NULL} value
      */
     public Object nextNullValue() throws JSONException {
         if((state != ParseState.NULL_VALUE) || (objectStack.isEmpty())) {
@@ -685,7 +685,7 @@ public class JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * If the {@code ParseState} was {@link ParseState#NUMBER_VALUE},
      * return the value as a {@code Number}.
      * <p>
      * The number type returned is one of:</p>
@@ -718,7 +718,7 @@ public class JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * If the {@code ParseState} was {@link ParseState#NUMBER_VALUE},
      * append the number sequence to the given {@code Appendable}.
      * <p>
      * This method is suitable for cases where the caller wishes to perform
@@ -747,7 +747,7 @@ public class JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * If the {@code ParseState} was {@link ParseState#NUMBER_VALUE},
      * return the value as a {@code BigDecimal}.
      * <p>
      * This method advances the parser onto the next state.</p>
@@ -771,7 +771,7 @@ public class JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * If the {@code ParseState} was {@link ParseState#NUMBER_VALUE},
      * return the value as a {@code BigInteger}.
      * <p>
      * If the JSON value is not parseable as a big integer, as defined by the
@@ -798,7 +798,7 @@ public class JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * If the {@code ParseState} was {@link ParseState#NUMBER_VALUE},
      * return the value as a double.
      * <p>
      * This method advances the parser onto the next state.</p>
@@ -822,7 +822,7 @@ public class JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * If the {@code ParseState} was {@link ParseState#NUMBER_VALUE},
      * return the value as an int.
      * <p>
      * If the JSON value is not parseable as an int, as defined by the JSON
@@ -849,7 +849,7 @@ public class JSONStreamReader {
     }
 
     /**
-     * If the ParseState was {@link ParseState#NUMBER_VALUE},
+     * If the {@code ParseState} was {@link ParseState#NUMBER_VALUE},
      * return the value as a long.
      * <p>
      * If the JSON value is not parseable as a long, as defined by the JSON
@@ -908,7 +908,7 @@ public class JSONStreamReader {
      * Skip over the content of the current object or array, including any
      * nested objects or arrays.
      *
-     * @return the closing ParseState of the object or array
+     * @return the closing {@code ParseState} of the object or array
      */
     public ParseState skipToEndStructure() throws JSONException {
         if(state.isValue()) {

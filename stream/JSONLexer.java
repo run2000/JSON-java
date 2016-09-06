@@ -333,7 +333,7 @@ public final class JSONLexer {
      * Backslash escape sequences are processed. The formal JSON format only
      * allows string values within double quotes.
      * <p>
-     * Most practical parsers will limit the length of a String to one
+     * Most practical parsers will limit the length of a string to one
      * expressible by a {@code String} object, or writable to a {@code File}.
      * </p>
      *

@@ -65,8 +65,8 @@ public final class JSONLimitBuilder {
      * <li>A {@code Double}, {@code Long}, {@code Integer},
      *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
-     * <li>A JSON Object, as specified by the collector result type</li>
-     * <li>A JSON Array, as specified by the collector result type</li>
+     * <li>A JSON object, as specified by the collector result type</li>
+     * <li>A JSON array, as specified by the collector result type</li>
      * </ul>
      *
      * @param reader A reader.
@@ -130,8 +130,8 @@ public final class JSONLimitBuilder {
      * <li>A {@code Double}, {@code Long}, {@code Integer},
      *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
-     * <li>A JSON Object, as specified by the collector result type</li>
-     * <li>A JSON Array, as specified by the collector result type</li>
+     * <li>A JSON object, as specified by the collector result type</li>
+     * <li>A JSON array, as specified by the collector result type</li>
      * </ul>
      *
      * @param inputStream the input stream containing the JSON data
@@ -205,8 +205,8 @@ public final class JSONLimitBuilder {
      * <li>A {@code Double}, {@code Long}, {@code Integer},
      *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
-     * <li>A JSON Object, as specified by the collector result type</li>
-     * <li>A JSON Array, as specified by the collector result type</li>
+     * <li>A JSON object, as specified by the collector result type</li>
+     * <li>A JSON array, as specified by the collector result type</li>
      * </ul>
      *
      * @param s      A source string.
@@ -313,8 +313,8 @@ public final class JSONLimitBuilder {
      * <li>A {@code Double}, {@code Long}, {@code Integer},
      *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
-     * <li>A JSON Object, as specified by the collector result type</li>
-     * <li>A JSON Array, as specified by the collector result type</li>
+     * <li>A JSON object, as specified by the collector result type</li>
+     * <li>A JSON array, as specified by the collector result type</li>
      * </ul>
      * <p>The reader must be at the beginning of the document.</p>
      *
@@ -377,7 +377,7 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONObject from a {@code Reader}.
+     * Build a JSON object from a {@code Reader}.
      *
      * @param reader A reader.
      * @param limits the limits imposed on the builder
@@ -391,11 +391,11 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONObject from a {@code Reader}.
+     * Build a {@code JSONObject} from a {@code Reader}.
      *
      * @param reader A reader.
      * @param limits the limits imposed on the builder
-     * @return a JSONObject value
+     * @return a {@code JSONObject} value
      */
     public static JSONObject buildJSONObject(Reader reader, BuilderLimits limits)
             throws JSONException {
@@ -404,10 +404,10 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONObject from a {@code Reader}.
+     * Build a {@code JSONObject} from a {@code Reader}.
      *
      * @param reader A reader.
-     * @return a JSONObject value
+     * @return a {@code JSONObject} value
      */
     public static JSONObject buildJSONObject(Reader reader) throws JSONException {
         return buildJSONObject(new JSONLimitStreamReader(reader), DEFAULT_LIMITS,
@@ -415,7 +415,7 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONObject from a {@code InputStream} and supplied
+     * Build a JSON object from a {@code InputStream} and supplied
      * {@code Charset}.
      *
      * @param inputStream the input stream containing the JSON data
@@ -434,14 +434,14 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONObject from a {@code InputStream} and supplied
+     * Build a {@code JSONObject} from a {@code InputStream} and supplied
      * {@code Charset}.
      *
      * @param inputStream the input stream containing the JSON data
      * @param charset     the character set with which to interpret the
      *                    input stream
      * @param limits      the limits imposed on the builder
-     * @return a JSONObject value
+     * @return a {@code JSONObject} value
      */
     public static JSONObject buildJSONObject(InputStream inputStream,
             Charset charset, BuilderLimits limits) throws JSONException {
@@ -450,13 +450,13 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONObject from a {@code InputStream} and supplied
+     * Build a {@code JSONObject} from a {@code InputStream} and supplied
      * {@code Charset}.
      *
      * @param inputStream the input stream containing the JSON data
      * @param charset     the character set with which to interpret the
      *                    input stream
-     * @return a JSONObject value
+     * @return a {@code JSONObject} value
      */
     public static JSONObject buildJSONObject(InputStream inputStream,
             Charset charset) throws JSONException {
@@ -465,7 +465,7 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONObject from a {@code String}.
+     * Build a JSON object from a {@code String}.
      *
      * @param s      A source string.
      * @param limits the limits imposed on the builder
@@ -479,11 +479,11 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONObject from a {@code String}.
+     * Build a {@code JSONObject} from a {@code String}.
      *
      * @param s      A source string.
      * @param limits the limits imposed on the builder
-     * @return a JSONObject value
+     * @return a {@code JSONObject} value
      */
     public static JSONObject buildJSONObject(String s, BuilderLimits limits)
             throws JSONException {
@@ -492,10 +492,10 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONObject from a {@code String}.
+     * Build a {@code JSONObject} from a {@code String}.
      *
      * @param s      A source string.
-     * @return a JSONObject value
+     * @return a {@code JSONObject} value
      */
     public static JSONObject buildJSONObject(String s) throws JSONException {
         return buildJSONObject(new JSONLimitStreamReader(s), DEFAULT_LIMITS,
@@ -503,10 +503,10 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONObject from a {@code JSONLimitStreamReader}.
+     * Build a {@code JSONObject} from a {@code JSONLimitStreamReader}.
      *
      * @param reader A source stream.
-     * @return a JSONObject value
+     * @return a {@code JSONObject} value
      */
     public static JSONObject buildJSONObject(JSONLimitStreamReader reader)
             throws JSONException {
@@ -514,12 +514,12 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONObject from a {@code JSONStreamReader}. The reader must be
-     * at the beginning of the document.
+     * Build a {@code JSONObject} from a {@code JSONStreamReader}. The reader
+     * must be at the beginning of the document.
      *
      * @param reader    A source stream.
      * @param limits the limits imposed on the builder
-     * @return a JSONObject value
+     * @return a {@code JSONObject} value
      */
     public static JSONObject buildJSONObject(JSONLimitStreamReader reader,
             BuilderLimits limits) throws JSONException {
@@ -577,7 +577,7 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONArray from a {@code Reader}.
+     * Build a JSON array from a {@code Reader}.
      *
      * @param reader     A reader.
      * @param limits the limits imposed on the builder
@@ -591,11 +591,11 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONArray from a {@code Reader}.
+     * Build a {@code JSONArray} from a {@code Reader}.
      *
      * @param reader     A reader.
      * @param limits the limits imposed on the builder
-     * @return a JSONArray value
+     * @return a {@code JSONArray} value
      */
     public static JSONArray buildJSONArray(Reader reader, BuilderLimits limits)
             throws JSONException {
@@ -604,10 +604,10 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONArray from a {@code Reader}.
+     * Build a {@code JSONArray} from a {@code Reader}.
      *
      * @param reader     A reader.
-     * @return a JSONArray value
+     * @return a {@code JSONArray} value
      */
     public static JSONArray buildJSONArray(Reader reader) throws JSONException {
         return buildJSONArray(new JSONLimitStreamReader(reader), DEFAULT_LIMITS,
@@ -615,7 +615,7 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONArray from a {@code InputStream} and supplied
+     * Build a JSON array from a {@code InputStream} and supplied
      * {@code Charset}.
      *
      * @param inputStream   the input stream containing the JSON data
@@ -634,14 +634,14 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONArray from a {@code InputStream} and supplied
+     * Build a {@code JSONArray} from a {@code InputStream} and supplied
      * {@code Charset}.
      *
      * @param inputStream   the input stream containing the JSON data
      * @param charset       the character set with which to interpret the
      *                      input stream
      * @param limits the limits imposed on the builder
-     * @return a JSONArray value
+     * @return a {@code JSONArray} value
      */
     public static JSONArray buildJSONArray(InputStream inputStream, Charset charset,
             BuilderLimits limits) throws JSONException {
@@ -650,13 +650,13 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONArray from a {@code InputStream} and supplied
+     * Build a {@code JSONArray} from a {@code InputStream} and supplied
      * {@code Charset}.
      *
      * @param inputStream   the input stream containing the JSON data
      * @param charset       the character set with which to interpret the
      *                      input stream
-     * @return a JSONArray value
+     * @return a {@code JSONArray} value
      */
     public static JSONArray buildJSONArray(InputStream inputStream, Charset charset)
             throws JSONException {
@@ -665,7 +665,7 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONArray from a {@code String}.
+     * Build a JSON array from a {@code String}.
      *
      * @param s     A source string.
      * @param limits the limits imposed on the builder
@@ -679,11 +679,11 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONArray from a {@code String}.
+     * Build a {@code JSONArray} from a {@code String}.
      *
      * @param s     A source string.
      * @param limits the limits imposed on the builder
-     * @return a JSONArray value
+     * @return a {@code JSONArray} value
      */
     public static JSONArray buildJSONArray(String s, BuilderLimits limits) throws JSONException {
         return buildJSONArray(new JSONLimitStreamReader(s), limits,
@@ -691,10 +691,10 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONArray from a {@code String}.
+     * Build a {@code JSONArray} from a {@code String}.
      *
      * @param s     A source string.
-     * @return a JSONArray value
+     * @return a {@code JSONArray} value
      */
     public static JSONArray buildJSONArray(String s) throws JSONException {
         return buildJSONArray(new JSONLimitStreamReader(s), DEFAULT_LIMITS,
@@ -702,22 +702,22 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Build a JSONArray from a {@code JSONLimitStreamReader}.
+     * Build a {@code JSONArray} from a {@code JSONLimitStreamReader}.
      *
      * @param reader A source reader.
-     * @return a JSONArray value
+     * @return a {@code JSONArray} value
      */
     public static JSONArray buildJSONArray(JSONLimitStreamReader reader) throws JSONException {
         return buildJSONArray(reader, DEFAULT_LIMITS, JSONCollector.INSTANCE);
     }
 
     /**
-     * Build a JSONArray from a {@code JSONStreamReader}. The reader must be
+     * Build a {@code JSONArray} from a {@code JSONStreamReader}. The reader must be
      * at the beginning of the document.
      *
      * @param reader    A source stream.
      * @param limits the limits imposed on the builder
-     * @return a JSONArray value
+     * @return a {@code JSONArray} value
      */
     public static JSONArray buildJSONArray(JSONLimitStreamReader reader,
             BuilderLimits limits) throws JSONException {
@@ -775,8 +775,8 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Iterate over a stack of StructureBuilder objects, starting from an
-     * initial {@code JSONArray} builder. Using this type of iterative approach
+     * Loop over a sequence of {@code StructureBuilder} objects, starting from an
+     * initial {@code JSONArray} builder. Using this type of loop approach
      * instead of recursion is known as trampolining.
      *
      * @param reader the stream reader
@@ -807,8 +807,8 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * Iterate over a stack of StructureBuilder objects, starting from an
-     * initial {@code JSONObject} builder. Using this type of iterative approach
+     * Loop over a sequence of {@code StructureBuilder} objects, starting from an
+     * initial {@code JSONObject} builder. Using this type of loop approach
      * instead of recursion is known as trampolining.
      *
      * @param reader the stream reader
@@ -839,11 +839,11 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * If the given JSONLimitStreamReader's ParseState was {@link ParseState#OBJECT},
+     * If the given {@code JSONLimitStreamReader}'s {@code ParseState} was {@link ParseState#OBJECT},
      * return the entire subtree as a JSONObject value. This method advances the
      * parser onto the {@link ParseState#END_OBJECT} state.
      * <p>
-     * If the JSON stream is not parseable as an object, a JSONException
+     * If the JSON stream is not parseable as an object, a {@code JSONException}
      * will be thrown.
      * </p>
      *
@@ -864,12 +864,12 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * If the given JSONLimitStreamReader's ParseState was {@link ParseState#OBJECT},
+     * If the given {@code JSONLimitStreamReader}'s {@code ParseState} was {@link ParseState#OBJECT},
      * return the entire subtree as an object type, as specified by the given
      * collector. This method advances the parser onto the
      * {@link ParseState#END_OBJECT} state.
      * <p>
-     * If the JSON stream is not parseable as an object, a JSONException
+     * If the JSON stream is not parseable as an object, a {@code JSONException}
      * will be thrown.
      * </p>
      *
@@ -896,18 +896,18 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * If the given JSONLimitStreamReader's ParseState was {@link ParseState#ARRAY},
+     * If the given {@code JSONLimitStreamReader}'s {@code ParseState} was {@link ParseState#ARRAY},
      * return the entire subtree as an array type, as specified by the given
      * collector. This method advances the parser onto the
      * {@link ParseState#END_ARRAY} state.
      * <p>
-     * If the JSON stream is not parseable as an array, a JSONException
+     * If the JSON stream is not parseable as an array, a {@code JSONException}
      * will be thrown.
      * </p>
      *
      * @param reader A source stream reader.
      * @param limits the limits imposed on the builder
-     * @return a JSON array representing the subtree starting at the current
+     * @return a {@code JSONArray} representing the subtree starting at the current
      * ARRAY state
      */
     public static JSONArray buildArraySubTree(JSONLimitStreamReader reader,
@@ -922,11 +922,11 @@ public final class JSONLimitBuilder {
     }
 
     /**
-     * If the given JSONLimitStreamReader's ParseState was {@link ParseState#ARRAY},
-     * return the entire subtree as a JSONArray value. This method advances the
+     * If the given {@code JSONLimitStreamReader}'s {@code ParseState} was {@link ParseState#ARRAY},
+     * return the entire subtree as an array type. This method advances the
      * parser onto the {@link ParseState#END_ARRAY} state.
      * <p>
-     * If the JSON stream is not parseable as an array, a JSONException
+     * If the JSON stream is not parseable as an array, a {@code JSONException}
      * will be thrown.
      * </p>
      *
