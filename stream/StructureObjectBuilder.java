@@ -43,7 +43,7 @@ final class StructureObjectBuilder<OA, AA, OR, AR> implements StructureBuilder<O
     private String key = null;
     private int index;
 
-    public StructureObjectBuilder(StructureBuilder<?> parentBuilder,
+    StructureObjectBuilder(StructureBuilder<?> parentBuilder,
             BuilderLimits limits, StructureCollector<OA, AA, OR, AR> collector) {
         this.parentBuilder = parentBuilder;
         this.objectAccumulator = collector.createObjectAccumulator();
