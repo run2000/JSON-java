@@ -40,7 +40,7 @@ import java.nio.CharBuffer;
  * Uses {@code java.nio.CharBuffer.allocate()} to create the backing buffer.</p>
  * <p>
  * Does <em>not</em> propagate the {@code flush()} or {@code close()} methods
- * to the wrapped Appendable.</p>
+ * to the wrapped {@code Appendable}.</p>
  *
  * @author JSON.org
  * @version 2016-09-03.
@@ -86,14 +86,14 @@ public final class Latin1AppendableOutputStream extends OutputStream {
     /**
      * Reset this latin1 appendable, setting it to buffer the given
      * appendable. Any existing buffered output is flushed to the old
-     * Appendable first.
+     * {@code Appendable} first.
      * <p>
      * This resets the state of the buffered reader to the open state
      * if the new appendable is non-{@code null}, otherwise resets the state to
      * closed.</p>
      *
-     * @param newAppendable the new Appendable to buffer
-     * @return this Latin1AppendableOutputStream
+     * @param newAppendable the new {@code Appendable} to buffer
+     * @return this {@code Latin1AppendableOutputStream}
      */
     public Latin1AppendableOutputStream with(Appendable newAppendable) {
         try {

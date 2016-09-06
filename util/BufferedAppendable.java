@@ -41,7 +41,7 @@ import java.nio.CharBuffer;
  * Uses {@code java.nio.CharBuffer.allocate()} to create the backing buffer.</p>
  * <p>
  * Does <em>not</em> propagate the {@code flush()} or {@code close()} methods
- * to the wrapped Appendable.</p>
+ * to the wrapped {@code Appendable}.</p>
  *
  * @author JSON.org
  * @version 2016-07-08
@@ -77,14 +77,14 @@ public final class BufferedAppendable extends Writer {
     /**
      * Reset this buffered appendable, setting it to buffer the given
      * appendable. Any existing buffered output is flushed to the old
-     * Appendable first.
+     * {@code Appendable} first.
      * <p>
      * This resets the state of the buffered reader to the open state
      * if the new appendable is non-{@code null}, otherwise resets the state to
      * closed.</p>
      *
-     * @param newAppendable the new Appendable to buffer
-     * @return this BufferedAppendable
+     * @param newAppendable the new {@code Appendable} to buffer
+     * @return this {@code BufferedAppendable}
      */
     public BufferedAppendable with(Appendable newAppendable) {
         try {
@@ -101,7 +101,7 @@ public final class BufferedAppendable extends Writer {
      * {@code BufferedAppendable}.
      *
      * @param csq the character sequence to be appended
-     * @return this BufferedAppendable
+     * @return this {@code BufferedAppendable}
      * @throws IOException there was a problem appending to the underlying
      *                     appendable
      */
@@ -135,7 +135,7 @@ public final class BufferedAppendable extends Writer {
      * @param start The index of the first character in the subsequence
      * @param end   The index of the character following the last character in the
      *              subsequence
-     * @return this BufferedAppendable
+     * @return this {@code BufferedAppendable}
      * @throws IOException there was a problem appending to the underlying
      *                     {@code Appendable}
      */
@@ -172,7 +172,7 @@ public final class BufferedAppendable extends Writer {
      * Appends the specified character to this {@code BufferedAppendable}.
      *
      * @param c The character to append
-     * @return this BufferedAppendable
+     * @return this {@code BufferedAppendable}
      * @throws IOException there was a problem appending to the underlying
      *                     {@code Appendable}
      */
