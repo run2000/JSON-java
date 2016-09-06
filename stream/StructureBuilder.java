@@ -42,7 +42,7 @@ interface StructureBuilder<R> extends StructureIdentifier {
      * Accepts a structure to be parsed. Nested structures are pushed and
      * popped on the stack as required.
      *
-     * @param state the current ParseState
+     * @param state the current {@code ParseState}
      * @param stack the stack with which to push and pop nested structures
      * @param reader the stream reader from which to read the structure content
      * @return a next structure builder to build the next structure
@@ -55,12 +55,13 @@ interface StructureBuilder<R> extends StructureIdentifier {
      * Accept the value result constructed by the child builder, and
      * populate the current field or index with the value.
      *
-     * @param childValue the value created by the child StructureBuilder
+     * @param childValue the value created by the child {@code StructureBuilder}
      */
     void acceptChildValue(Object childValue) throws JSONException;
 
     /**
-     * Return the resulting structure result created by this StructureBuilder.
+     * Return the resulting structure result created by this
+     * {@code StructureBuilder}.
      *
      * @return the structure being built
      */
