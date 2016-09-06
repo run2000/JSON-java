@@ -34,11 +34,11 @@ import org.json.JSONException;
  * <p>
  * For instance, structures may be created as {@code JSONObject} and
  * {@code JSONArray}, with {@code JSONObject.NULL} for JSON null. Another
- * factory may create structures as {@code HashMap} and {@code ArrayList}, and
+ * collector may create structures as {@code HashMap} and {@code ArrayList}, and
  * Java's {@code null} value for JSON null.
  * </p>
- * @param <OA> the JSON object accumulator type created by the factory
- * @param <AA> the JSON array accumulator type created by the factory
+ * @param <OA> the JSON object accumulator type created by the collector
+ * @param <AA> the JSON array accumulator type created by the collector
  * @param <OR> the JSON object result type
  * @param <AR> the JSON array result type
  * @author JSON.org
