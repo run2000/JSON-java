@@ -60,12 +60,13 @@ public final class JSONLimitBuilder {
     /**
      * Build a JSON value from a {@code Reader}. The value may be one of:
      * <ul>
-     * <li>{@code JSONObject.NULL}</li>
+     * <li>A null value, as defined by the collector</li>
      * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code Double}, {@code Long}, {@code Integer},
+     *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
-     * <li>A {@code JSONObject}</li>
-     * <li>A {@code JSONArray}</li>
+     * <li>A JSON Object, as specified by the collector result type</li>
+     * <li>A JSON Array, as specified by the collector result type</li>
      * </ul>
      *
      * @param reader A reader.
@@ -83,7 +84,8 @@ public final class JSONLimitBuilder {
      * <ul>
      * <li>{@code JSONObject.NULL}</li>
      * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code Double}, {@code Long}, {@code Integer},
+     *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
      * <li>A {@code JSONObject}</li>
      * <li>A {@code JSONArray}</li>
@@ -104,7 +106,8 @@ public final class JSONLimitBuilder {
      * <ul>
      * <li>{@code JSONObject.NULL}</li>
      * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code Double}, {@code Long}, {@code Integer},
+     *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
      * <li>A {@code JSONObject}</li>
      * <li>A {@code JSONArray}</li>
@@ -122,12 +125,13 @@ public final class JSONLimitBuilder {
      * Build a JSON value from a {@code InputStream} and supplied
      * {@code Charset}. The value may be one of:
      * <ul>
-     * <li>{@code JSONObject.NULL}</li>
+     * <li>A null value, as defined by the collector</li>
      * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code Double}, {@code Long}, {@code Integer},
+     *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
-     * <li>A {@code JSONObject}</li>
-     * <li>A {@code JSONArray}</li>
+     * <li>A JSON Object, as specified by the collector result type</li>
+     * <li>A JSON Array, as specified by the collector result type</li>
      * </ul>
      *
      * @param inputStream the input stream containing the JSON data
@@ -150,7 +154,8 @@ public final class JSONLimitBuilder {
      * <ul>
      * <li>{@code JSONObject.NULL}</li>
      * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code Double}, {@code Long}, {@code Integer},
+     *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
      * <li>A {@code JSONObject}</li>
      * <li>A {@code JSONArray}</li>
@@ -174,7 +179,8 @@ public final class JSONLimitBuilder {
      * <ul>
      * <li>{@code JSONObject.NULL}</li>
      * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code Double}, {@code Long}, {@code Integer},
+     *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
      * <li>A {@code JSONObject}</li>
      * <li>A {@code JSONArray}</li>
@@ -194,12 +200,13 @@ public final class JSONLimitBuilder {
     /**
      * Build a JSON value from a {@code String}. The value may be one of:
      * <ul>
-     * <li>{@code JSONObject.NULL}</li>
+     * <li>A null value, as defined by the collector</li>
      * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code Double}, {@code Long}, {@code Integer},
+     *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
-     * <li>A {@code JSONObject}</li>
-     * <li>A {@code JSONArray}</li>
+     * <li>A JSON Object, as specified by the collector result type</li>
+     * <li>A JSON Array, as specified by the collector result type</li>
      * </ul>
      *
      * @param s      A source string.
@@ -217,7 +224,8 @@ public final class JSONLimitBuilder {
      * <ul>
      * <li>{@code JSONObject.NULL}</li>
      * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code Double}, {@code Long}, {@code Integer},
+     *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
      * <li>A {@code JSONObject}</li>
      * <li>A {@code JSONArray}</li>
@@ -237,7 +245,8 @@ public final class JSONLimitBuilder {
      * <ul>
      * <li>{@code JSONObject.NULL}</li>
      * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code Double}, {@code Long}, {@code Integer},
+     *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
      * <li>A {@code JSONObject}</li>
      * <li>A {@code JSONArray}</li>
@@ -257,7 +266,8 @@ public final class JSONLimitBuilder {
      * <ul>
      * <li>{@code JSONObject.NULL}</li>
      * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code Double}, {@code Long}, {@code Integer},
+     *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
      * <li>A {@code JSONObject}</li>
      * <li>A {@code JSONArray}</li>
@@ -277,7 +287,8 @@ public final class JSONLimitBuilder {
      * <ul>
      * <li>{@code JSONObject.NULL}</li>
      * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code Double}, {@code Long}, {@code Integer},
+     *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
      * <li>A {@code JSONObject}</li>
      * <li>A {@code JSONArray}</li>
@@ -297,12 +308,13 @@ public final class JSONLimitBuilder {
      * Build a JSON value from a {@code JSONStreamReader}. The value may be one
      * of:
      * <ul>
-     * <li>{@code JSONObject.NULL}</li>
+     * <li>A null value, as defined by the collector</li>
      * <li>{@code Boolean.TRUE} or {@code Boolean.FALSE}</li>
-     * <li>A {@code Double}, {@code Long}, or {@code Integer}</li>
+     * <li>A {@code Double}, {@code Long}, {@code Integer},
+     *     {@code BigDecimal}, or {@code BigInteger}</li>
      * <li>A {@code String}</li>
-     * <li>A {@code JSONObject}</li>
-     * <li>A {@code JSONArray}</li>
+     * <li>A JSON Object, as specified by the collector result type</li>
+     * <li>A JSON Array, as specified by the collector result type</li>
      * </ul>
      * <p>The reader must be at the beginning of the document.</p>
      *
@@ -343,6 +355,9 @@ public final class JSONLimitBuilder {
                 break;
 
             case NULL_VALUE:
+                result = collector.nullValue();
+                break;
+
             case BOOLEAN_VALUE:
             case NUMBER_VALUE:
             case STRING_VALUE:
@@ -367,7 +382,7 @@ public final class JSONLimitBuilder {
      * @param reader A reader.
      * @param limits the limits imposed on the builder
      * @param collector collector object for creating JSON structures
-     * @param <OR> the result type of the JSON object constructed by the factory
+     * @param <OR> the result type of the JSON object constructed by the collector
      * @return a JSON object value
      */
     public static <OR> OR buildJSONObject(Reader reader, BuilderLimits limits,
@@ -408,7 +423,7 @@ public final class JSONLimitBuilder {
      *                    input stream
      * @param limits      the limits imposed on the builder
      * @param collector   collector object for creating JSON structures
-     * @param <OR> the result type of the JSON object constructed by the factory
+     * @param <OR> the result type of the JSON object constructed by the collector
      * @return a JSON object value
      */
     public static <OR> OR buildJSONObject(InputStream inputStream, Charset charset,
@@ -455,7 +470,7 @@ public final class JSONLimitBuilder {
      * @param s      A source string.
      * @param limits the limits imposed on the builder
      * @param collector collector object for creating JSON structures
-     * @param <OR> the result type of the JSON object constructed by the factory
+     * @param <OR> the result type of the JSON object constructed by the collector
      * @return a JSON object value
      */
     public static <OR> OR buildJSONObject(String s, BuilderLimits limits,
@@ -518,7 +533,7 @@ public final class JSONLimitBuilder {
      * @param reader    A source stream.
      * @param limits the limits imposed on the builder
      * @param collector collector for creating JSON structures
-     * @param <OR> the result type of the JSON object constructed by the factory
+     * @param <OR> the result type of the JSON object constructed by the collector
      * @return a JSON object value
      */
     public static <OR> OR buildJSONObject(JSONLimitStreamReader reader, BuilderLimits limits,
@@ -567,7 +582,7 @@ public final class JSONLimitBuilder {
      * @param reader     A reader.
      * @param limits the limits imposed on the builder
      * @param collector collector object for creating JSON structures
-     * @param <AR> the result type of the JSON array constructed by the factory
+     * @param <AR> the result type of the JSON array constructed by the collector
      * @return a JSON array value
      */
     public static <AR> AR buildJSONArray(Reader reader, BuilderLimits limits,
@@ -608,7 +623,7 @@ public final class JSONLimitBuilder {
      *                      input stream
      * @param limits the limits imposed on the builder
      * @param collector collector object for creating JSON structures
-     * @param <AR> the result type of the JSON array constructed by the factory
+     * @param <AR> the result type of the JSON array constructed by the collector
      * @return a JSON array value
      */
     public static <AR> AR buildJSONArray(InputStream inputStream, Charset charset,
@@ -655,7 +670,7 @@ public final class JSONLimitBuilder {
      * @param s     A source string.
      * @param limits the limits imposed on the builder
      * @param collector collector object for creating JSON structures
-     * @param <AR> the result type of the JSON array constructed by the factory
+     * @param <AR> the result type of the JSON array constructed by the collector
      * @return a JSON array value
      */
     public static <AR> AR buildJSONArray(String s, BuilderLimits limits,
@@ -716,7 +731,7 @@ public final class JSONLimitBuilder {
      * @param reader    A source stream.
      * @param limits the limits imposed on the builder
      * @param collector collector object for creating structures
-     * @param <AR> the result type of the JSON array constructed by the factory
+     * @param <AR> the result type of the JSON array constructed by the collector
      * @return a JSON array value
      */
     public static <AR> AR buildJSONArray(JSONLimitStreamReader reader, BuilderLimits limits,
@@ -860,7 +875,7 @@ public final class JSONLimitBuilder {
      * @param reader A source stream reader.
      * @param limits the limits imposed on the builder
      * @param collector collector object for creating JSON structures
-     * @param <OR> the result type of the JSON object constructed by the factory
+     * @param <OR> the result type of the JSON object constructed by the collector
      * @return a JSONObject representing the subtree starting at the current
      * OBJECT state
      */

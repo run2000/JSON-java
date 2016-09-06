@@ -82,6 +82,13 @@ public final class CollectionCollector implements StructureCollector
         }
     }
 
+    /**
+     * Finish the given Object accumulator, returning the Object result.
+     * The result is an unmodifiable {@code Map}.
+     *
+     * @param accumulator the Object accumulator to be finished
+     * @return the finished Object result, as an unmodifiable {@code Map}
+     */
     @Override
     public Map<String, Object> finishObject(Map<String, Object> accumulator) {
         return Collections.unmodifiableMap(accumulator);
@@ -112,8 +119,20 @@ public final class CollectionCollector implements StructureCollector
         array.add(null);
     }
 
+    /**
+     * Finish the given Array accumulator, returning the Array result.
+     * The result in an unmodifiable {@code List}.
+     *
+     * @param accumulator the Array accumulator to be finished
+     * @return the finished Array result, as an unmodifiable {@code List}
+     */
     @Override
     public List<Object> finishArray(List<Object> accumulator) {
         return Collections.unmodifiableList(accumulator);
+    }
+
+    @Override
+    public Object nullValue() {
+        return null;
     }
 }

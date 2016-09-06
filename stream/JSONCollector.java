@@ -107,4 +107,15 @@ public final class JSONCollector implements StructureCollector
     public JSONArray finishArray(JSONArray accumulator) {
         return accumulator;
     }
+
+    /**
+     * Provide a null value for circumstances where null is the complete result
+     * of a JSON parse.
+     *
+     * @return The {@code JSONObject.NULL} value
+     */
+    @Override
+    public Object nullValue() {
+        return JSONObject.NULL;
+    }
 }
