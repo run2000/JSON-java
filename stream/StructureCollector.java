@@ -119,8 +119,8 @@ public interface StructureCollector<OA, AA, OR, AR> {
     AR finishArray(AA accumulator) throws JSONException;
 
     /**
-     * Provide a null value for circumstances where null is the complete result
-     * of a JSON parse.
+     * Provide a null value for circumstances where JSON null is the complete
+     * result of a JSON parse.
      *
      * @return a JSON null value
      */

@@ -109,8 +109,8 @@ public final class JSONCollector implements StructureCollector
     }
 
     /**
-     * Provide a null value for circumstances where null is the complete result
-     * of a JSON parse.
+     * Provide a null value for circumstances where JSON null is the complete
+     * result of a JSON parse.
      *
      * @return The {@code JSONObject.NULL} value
      */
