@@ -27,7 +27,7 @@ SOFTWARE.
 import org.json.JSONException;
 
 /**
- * Allows {@code JSONLimitBuilder} to parameterise the creation and population
+ * Allows {@code JSONLimitBuilder} to parameterize the creation and population
  * of object and array structures, {@code null} values, and creation of
  * a "finished" result type. Similar to {@code Collector} in Java 8's stream
  * package.
@@ -37,8 +37,8 @@ import org.json.JSONException;
  * collector may create structures as {@code HashMap} and {@code ArrayList}, and
  * Java's {@code null} value for JSON null.
  * </p>
- * @param <OA> the JSON object accumulator type created by the collector
- * @param <AA> the JSON array accumulator type created by the collector
+ * @param <OA> the JSON object accumulator type
+ * @param <AA> the JSON array accumulator type
  * @param <OR> the JSON object result type
  * @param <AR> the JSON array result type
  * @author JSON.org
@@ -57,7 +57,7 @@ public interface StructureCollector<OA, AA, OR, AR> {
     /**
      * Adds the given entry to the given JSON object.
      *
-     * @param object the target to which the entry will be added
+     * @param object the Object accumulator to which the entry will be added
      * @param key the key of the entry
      * @param value the value of the entry
      * @throws JSONException may be thrown if a duplicate key is encountered
@@ -68,7 +68,7 @@ public interface StructureCollector<OA, AA, OR, AR> {
      * Adds a JSON null entry to the given JSON object. Implementations may
      * choose to add a sentinel value, or omit the entry entirely.
      *
-     * @param object the target to which the entry will be added
+     * @param object the Object accumulator to which the entry will be added
      * @param key the key of the entry
      * @throws JSONException may be thrown if a duplicate key is encountered
      */
@@ -95,7 +95,7 @@ public interface StructureCollector<OA, AA, OR, AR> {
     /**
      * Adds the given value to the given JSON array.
      *
-     * @param array the target to which the value will be added
+     * @param array the Array accumulator to which the value will be added
      * @param value the value to be added
      */
     void addValue(AA array, Object value) throws JSONException;
@@ -104,7 +104,7 @@ public interface StructureCollector<OA, AA, OR, AR> {
      * Adds a JSON null value to the given JSON array. Implementations can
      * choose the sentinel value to be added.
      *
-     * @param array the target to which the null value will be added
+     * @param array the Array accumulator to which the null value will be added
      */
     void addNull(AA array) throws JSONException;
 
