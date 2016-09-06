@@ -865,8 +865,9 @@ public final class JSONLimitBuilder {
 
     /**
      * If the given JSONLimitStreamReader's ParseState was {@link ParseState#OBJECT},
-     * return the entire subtree as a JSONObject value. This method advances the
-     * parser onto the {@link ParseState#END_OBJECT} state.
+     * return the entire subtree as an object type, as specified by the given
+     * collector. This method advances the parser onto the
+     * {@link ParseState#END_OBJECT} state.
      * <p>
      * If the JSON stream is not parseable as an object, a JSONException
      * will be thrown.
@@ -876,7 +877,7 @@ public final class JSONLimitBuilder {
      * @param limits the limits imposed on the builder
      * @param collector collector object for creating JSON structures
      * @param <OR> the result type of the JSON object constructed by the collector
-     * @return a JSONObject representing the subtree starting at the current
+     * @return a JSON object representing the subtree starting at the current
      * OBJECT state
      */
     public static <OR> OR buildObjectSubTree(JSONLimitStreamReader reader,
@@ -896,8 +897,9 @@ public final class JSONLimitBuilder {
 
     /**
      * If the given JSONLimitStreamReader's ParseState was {@link ParseState#ARRAY},
-     * return the entire subtree as a JSONArray value. This method advances the
-     * parser onto the {@link ParseState#END_ARRAY} state.
+     * return the entire subtree as an array type, as specified by the given
+     * collector. This method advances the parser onto the
+     * {@link ParseState#END_ARRAY} state.
      * <p>
      * If the JSON stream is not parseable as an array, a JSONException
      * will be thrown.
@@ -905,7 +907,7 @@ public final class JSONLimitBuilder {
      *
      * @param reader A source stream reader.
      * @param limits the limits imposed on the builder
-     * @return a JSONArray representing the subtree starting at the current
+     * @return a JSON array representing the subtree starting at the current
      * ARRAY state
      */
     public static JSONArray buildArraySubTree(JSONLimitStreamReader reader,

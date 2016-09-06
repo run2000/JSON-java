@@ -617,8 +617,9 @@ public final class JSONObjectBuilder {
 
     /**
      * If the given JSONStreamReader's ParseState was {@link ParseState#OBJECT},
-     * return the entire subtree as a JSONObject value. This method advances the
-     * parser onto the {@link ParseState#END_OBJECT} state.
+     * return the entire subtree as an object type, as specified by the given
+     * collector. This method advances the parser onto the
+     * {@link ParseState#END_OBJECT} state.
      * <p>
      * If the JSON stream is not parseable as an object, a JSONException
      * will be thrown.
@@ -627,7 +628,7 @@ public final class JSONObjectBuilder {
      * @param reader A source stream reader.
      * @param collector A collector object for creating structures
      * @param <OR> The resulting JSON object type
-     * @return a JSONObject representing the subtree starting at the current
+     * @return a JSON object representing the subtree starting at the current
      * OBJECT state
      */
     public static <OR> OR buildObjectSubTree(JSONStreamReader reader,
@@ -660,8 +661,9 @@ public final class JSONObjectBuilder {
 
     /**
      * If the given JSONStreamReader's ParseState was {@link ParseState#ARRAY},
-     * return the entire subtree as a JSONArray value. This method advances the
-     * parser onto the {@link ParseState#END_ARRAY} state.
+     * return the entire subtree as an array type, as specified by the given
+     * collector. This method advances the parser onto the
+     * {@link ParseState#END_ARRAY} state.
      * <p>
      * If the JSON stream is not parseable as an array, a JSONException
      * will be thrown.
