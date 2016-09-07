@@ -1776,10 +1776,12 @@ public class JSONObject {
                 if(((Double)object).isInfinite() || ((Double)object).isNaN()) {
                     return NULL;
                 }
+                return object;
             } else if(object instanceof Float) {
                 if (((Float)object).isInfinite() || ((Float)object).isNaN()) {
                     return NULL;
                 }
+                return object;
             }
             if (object instanceof JSONObject || object instanceof JSONArray
                     || NULL.equals(object) || object instanceof JSONString
