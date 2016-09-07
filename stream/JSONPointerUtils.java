@@ -63,16 +63,16 @@ public final class JSONPointerUtils {
                 case '~':
                     if(prev < curr) {
                         builder.append(name, prev, curr);
-                        builder.append("~0");
-                        prev = curr + 1;
                     }
+                    builder.append("~0");
+                    prev = curr + 1;
                     break;
                 case '/':
                     if(prev < curr) {
                         builder.append(name, prev, curr);
-                        builder.append("~1");
-                        prev = curr + 1;
                     }
+                    builder.append("~1");
+                    prev = curr + 1;
                     break;
             }
         }
