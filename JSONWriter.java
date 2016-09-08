@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -423,8 +424,15 @@ public class JSONWriter implements Closeable {
 
     // -- static writer methods
 
-    // 24 spaces, divides by 1, 2, 3, 4, 6, 8, 12.
-    private static final String PADDING_SPACES = "                        ";
+    // 120 spaces, divides by 1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, ...
+    private static final String PADDING_SPACES = makePaddingSpaces();
+    private static final int PADDING_LENGTH = 120;
+
+    private static String makePaddingSpaces() {
+        char[] padding = new char[PADDING_LENGTH];
+        Arrays.fill(padding, ' ');
+        return String.valueOf(padding);
+    }
 
     /**
      * Indent by the given number of spaces.
@@ -440,11 +448,10 @@ public class JSONWriter implements Closeable {
      * @throws IOException there was a problem writing the indentation
      */
     static <T extends Appendable> T indent(int indent, T writer) throws IOException {
-        final int padding = PADDING_SPACES.length();
 
-        while(indent >= padding) {
+        while(indent >= PADDING_LENGTH) {
             writer.append(PADDING_SPACES);
-            indent -= padding;
+            indent -= PADDING_LENGTH;
         }
         if(indent > 0) {
             writer.append(PADDING_SPACES, 0, indent);
