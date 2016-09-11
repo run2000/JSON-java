@@ -25,7 +25,7 @@ SOFTWARE.
 */
 
 /**
- * Utilities for conversion an iterable of {@link org.json.stream.StructureBuilder} objects
+ * Utilities for conversion an iterable of {@link StructureIdentifier} objects
  * into a JSON Pointer expression. See RFC 6901 for details of JSON Pointer.
  * <p>
  * A Java 8 implementation might fold these methods directly into the
@@ -84,14 +84,14 @@ public final class JSONPointerUtils {
     }
 
     /**
-     * Given a {@link org.json.stream.StructureBuilder} stack as an {@code Iterable},
+     * Given a {@link StructureIdentifier} stack as an {@code Iterable},
      * create a JSON Pointer string.
      *
-     * @param stack a stack of StructureBuilder objects, from which the
+     * @param stack a stack of StructureIdentifier objects, from which the
      *              JSON Pointer is created
      * @return an encoded JSON Pointer
      */
-    public static String toJSONPointer(Iterable<StructureIdentifier> stack) {
+    public static String toJSONPointer(Iterable<? extends StructureIdentifier> stack) {
         if(stack == null) {
             return "";
         }
