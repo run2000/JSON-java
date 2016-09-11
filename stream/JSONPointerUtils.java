@@ -49,7 +49,11 @@ public final class JSONPointerUtils {
      * @param name the key to be encoded
      */
     private static void encodePointer(StringBuilder builder, String name) {
-        final int len = (name == null) ? 0 : name.length();
+        if(name == null) {
+            return;
+        }
+        final int len = name.length();
+        builder.append('/');
         if(len == 0) {
             return;
         }
@@ -84,23 +88,21 @@ public final class JSONPointerUtils {
     }
 
     /**
-     * Given a {@link StructureIdentifier} stack as an {@code Iterable},
+     * Given a {@link StructureIdentifier} list as an {@code Iterable},
      * create a JSON Pointer string.
      *
-     * @param stack a stack of StructureIdentifier objects, from which the
+     * @param ids an Iterable of StructureIdentifier objects, from which the
      *              JSON Pointer is created
      * @return an encoded JSON Pointer
      */
-    public static String toJSONPointer(Iterable<? extends StructureIdentifier> stack) {
-        if(stack == null) {
+    public static String toJSONPointer(Iterable<? extends StructureIdentifier> ids) {
+        if(ids == null) {
             return "";
         }
         StringBuilder builder = new StringBuilder();
-        for(StructureIdentifier item : stack) {
-            builder.append('/');
+        for(StructureIdentifier item : ids) {
             encodePointer(builder, item.getIdentifier());
         }
         return builder.toString();
     }
-
 }
