@@ -30,6 +30,8 @@ import org.json.JSONObject;
 import org.json.JSONParseException;
 import org.json.stream.JSONStreamReader.ParseState;
 import org.json.util.ALStack;
+import org.json.util.JSONPointerUtils;
+import org.json.util.StructureIdentifier;
 
 import java.io.InputStream;
 import java.io.Reader;

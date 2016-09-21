@@ -461,7 +461,7 @@ public class JSONArray implements Iterable<Object> {
             if (i > 0) {
                 sb.append(separator);
             }
-            JSONWriter.writeValue(this.myArrayList.get(i), sb);
+            JSONObject.writeValue(this.myArrayList.get(i), sb, 0, 0);
         }
         return sb.toString();
     }
@@ -1154,7 +1154,7 @@ public class JSONArray implements Iterable<Object> {
     @Override
     public String toString() {
         try {
-            return JSONWriter.writeJSONArray(this, new StringBuilder(), 0, 0).toString();
+            return JSONObject.writeValue(this, new StringBuilder(), 0, 0).toString();
         } catch (Exception e) {
             return null;
         }
@@ -1173,7 +1173,7 @@ public class JSONArray implements Iterable<Object> {
      * @throws JSONException there was a problem creating the String value
      */
     public String toString(int indentFactor) throws JSONException {
-        return JSONWriter.writeJSONArray(this, new StringBuilder(), indentFactor, 0).toString();
+        return JSONObject.writeValue(this, new StringBuilder(), indentFactor, 0).toString();
     }
 
     /**
@@ -1190,7 +1190,7 @@ public class JSONArray implements Iterable<Object> {
      * @throws JSONException there was a problem appending the JSON value
      */
     public <T extends Appendable> T write(T writer) throws JSONException {
-        return JSONWriter.writeJSONArray(this, writer, 0, 0);
+        return JSONObject.writeValue(this, writer, 0, 0);
     }
 
     /**
@@ -1212,7 +1212,7 @@ public class JSONArray implements Iterable<Object> {
      */
     public <T extends Appendable> T write(T writer, int indentFactor, int indent)
             throws JSONException {
-        return JSONWriter.writeJSONArray(this, writer, indentFactor, indent);
+        return JSONObject.writeValue(this, writer, indentFactor, indent);
     }
 
     /**

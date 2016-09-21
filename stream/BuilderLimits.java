@@ -208,7 +208,7 @@ public class BuilderLimits implements Cloneable {
      * The limits specify:</p>
      * <ul>
      * <li>Number limits sufficient for parsing {@code Long} and {@code Double}
-     * values</li>
+     * values. These conform to the I-JSON requirements (RFC 7493)</li>
      * <li>Key length limits sufficient for most typical requirements,
      * similar to XML attribute name limits</li>
      * <li>String length sufficient to fit in a Java {@code String} object</li>

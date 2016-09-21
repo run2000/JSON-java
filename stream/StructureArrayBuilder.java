@@ -28,6 +28,7 @@ import org.json.JSONException;
 import org.json.JSONParseException;
 import org.json.stream.JSONStreamReader.ParseState;
 import org.json.util.ALStack;
+import org.json.util.StructureIdentifier;
 
 /**
  * Build values onto a given JSON array.

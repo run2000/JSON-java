@@ -1,4 +1,4 @@
-package org.json.stream;
+package org.json.util;
 
 /*
 Copyright (c) 2002 JSON.org
@@ -88,10 +88,10 @@ public final class JSONPointerUtils {
     }
 
     /**
-     * Given a {@link StructureIdentifier} list as an {@code Iterable},
+     * Given a {@link StructureIdentifier} stack as an {@code Iterable},
      * create a JSON Pointer string.
      *
-     * @param ids an Iterable of StructureIdentifier objects, from which the
+     * @param ids an Iterable of StructureBuilder objects, from which the
      *              JSON Pointer is created
      * @return an encoded JSON Pointer
      */
@@ -105,4 +105,5 @@ public final class JSONPointerUtils {
         }
         return builder.toString();
     }
+
 }

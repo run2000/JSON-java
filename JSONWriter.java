@@ -25,25 +25,30 @@ SOFTWARE.
 */
 
 import org.json.util.ALStack;
+import org.json.util.JSONPointerUtils;
+import org.json.write.CompactWriterFactory;
+import org.json.write.NullStructureWriter;
+import org.json.write.PrettyWriterFactory;
+import org.json.write.SimpleStructureWriter;
+import org.json.write.StructureWriter;
+import org.json.write.StructureWriterFactory;
+import org.json.write.WriterUtil;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.EmptyStackException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * JSONWriter provides a quick and convenient way of producing JSON text.
- * The texts produced strictly conform to JSON syntax rules. No whitespace is
- * added, so the results are ready for transmission or storage. Each instance of
- * JSONWriter can produce one JSON text.
+ * The texts produced strictly conform to JSON syntax rules. By default,
+ * no whitespace is added, so the results are ready for transmission or storage.
+ * Each instance of JSONWriter can produce one JSON text.
  * <p>
  * A JSONWriter instance provides a <code>value</code> method for appending
  * values to the
@@ -60,39 +65,41 @@ import java.util.Set;
  *     .endObject();</pre> which writes <pre>
  * {"JSON":"Hello, World!"}</pre>
  * <p>
- * The first method called must be <code>array</code> or <code>object</code>.
+ * The first method called must be <code>array</code> or <code>object</code>,
+ * unless this object has been constructed with {@code allowSimpleValues}
+ * set to true.
+ * <p>
  * There are no methods for adding commas or colons. JSONWriter adds them for
  * you. Objects and arrays can be nested arbitrarily deep.
  * <p>
- * This can sometimes be easier than using a JSONObject to build a string.
+ * This can be less memory intensive than using a JSONObject to build a string.
+ *
  * @author JSON.org
- * @version 2016-08-04
+ * @version 2016-09-18
  */
 public class JSONWriter implements Closeable {
     private static final int initdepth = 16;
 
     /**
-     * The comma flag determines if a comma should be output before the next
-     * value.
+     * Factory for creating strategy objects for writing a particular structure.
      */
-    private boolean comma;
+    private final StructureWriterFactory factory;
 
     /**
-     * The current mode. Values:
-     * 'a' (array),
-     * 'd' (done),
-     * 'i' (initial),
-     * 'k' (key),
-     * 'o' (object).
+     * Strategy for writing JSON structures, parameterizes writing of
+     * JSON Objects and JSON Arrays, as well as pretty printing or compact.
      */
-    protected char mode;
+    private StructureWriter currentStructure;
 
     /**
-     * The object/array stack, for duplicate key detection.
-     * Arrays are represented as null elements, while objects are
-     * represented as sets of key strings.
+     * Indicate when writing has finished.
      */
-    private final ALStack<Set<String>> stack;
+    protected boolean done;
+
+    /**
+     * The object/array stack.
+     */
+    private final ALStack<StructureWriter> stack;
 
     /**
      * The writer that will receive the output.
@@ -105,34 +112,92 @@ public class JSONWriter implements Closeable {
      * @param w the Writer to which JSON content will be written
      */
     public JSONWriter(Appendable w) {
-        this.comma = false;
-        this.mode = 'i';
-        this.stack = new ALStack<Set<String>>(initdepth);
+        this.done = false;
+        this.stack = new ALStack<StructureWriter>(initdepth);
         this.writer = w;
+        this.factory = CompactWriterFactory.INSTANCE;
+        this.currentStructure = NullStructureWriter.INSTANCE;
     }
 
     /**
-     * Prepare for the next value to be written. Append a comma if required,
-     * assert and advance the mode as needed.
+     * Make a fresh JSONWriter. It can be used to build one JSON text.
+     *
+     * @param w the Writer to which JSON content will be written
+     * @param allowSimpleValues {@code true} to allow the root value to be
+     * a simple value, otherwise {@code false} to only allow objects and arrays
+     * at the root level
      */
-    private void prepValue() throws JSONException {
-        try {
-            switch (this.mode) {
-                case 'a':
-                    if (this.comma) {
-                        this.writer.append(',');
-                    }
-                    break;
-                case 'o':
-                    this.mode = 'k';
-                    break;
-                default:
-                    throw new JSONException("Value out of sequence.");
-            }
-            this.comma = true;
-        } catch (IOException e) {
-            throw new JSONException(e);
-        }
+    public JSONWriter(Appendable w, boolean allowSimpleValues) {
+        this.done = false;
+        this.stack = new ALStack<StructureWriter>(initdepth);
+        this.writer = w;
+        this.factory = CompactWriterFactory.INSTANCE;
+        this.currentStructure = allowSimpleValues ?
+                SimpleStructureWriter.INSTANCE :
+                NullStructureWriter.INSTANCE;
+    }
+
+    /**
+     * Make a fresh JSONWriter with the given indent factor.
+     * It can be used to build one JSON text with pretty-printing.
+     *
+     * @param w the Writer to which JSON content will be written
+     * @param indentFactor indent level, or 0 for compact output
+     */
+    public JSONWriter(Appendable w, int indentFactor) {
+        this.done = false;
+        this.stack = new ALStack<StructureWriter>(initdepth);
+        this.writer = w;
+        this.factory = (indentFactor > 0)
+                ? new PrettyWriterFactory(indentFactor)
+                : CompactWriterFactory.INSTANCE;
+        this.currentStructure = NullStructureWriter.INSTANCE;
+    }
+
+    /**
+     * Make a fresh JSONWriter with the given indent factor and initial
+     * indentation. It can be used to build one JSON text with pretty-printing.
+     *
+     * @param w the Writer to which JSON content will be written
+     * @param indentFactor indent level, or 0 for compact output
+     * @param indent initial indent
+     */
+    public JSONWriter(Appendable w, int indentFactor, int indent) {
+        this.done = false;
+        this.stack = new ALStack<StructureWriter>(initdepth);
+        this.writer = w;
+        this.factory = (indentFactor > 0)
+                ? new PrettyWriterFactory(indentFactor, indent)
+                : CompactWriterFactory.INSTANCE;
+        this.currentStructure = NullStructureWriter.INSTANCE;
+    }
+
+    /**
+     * Make a fresh JSONWriter with the given indent factor and initial
+     * indentation. It can be used to build one JSON text with pretty-printing.
+     *
+     * @param w the Writer to which JSON content will be written
+     * @param indentFactor indent level, or 0 for compact output
+     * @param indent initial indent
+     * @param allowSimpleValues {@code true} to allow the root value to be
+     * a simple value, otherwise {@code false} to only allow objects and arrays
+     * at the root level
+     */
+    public JSONWriter(Appendable w, int indentFactor, int indent,
+            boolean allowSimpleValues) {
+        this.done = false;
+        this.stack = new ALStack<StructureWriter>(initdepth);
+        this.writer = w;
+        this.factory = (indentFactor > 0)
+                ? new PrettyWriterFactory(indentFactor, indent)
+                : CompactWriterFactory.INSTANCE;
+        this.currentStructure = allowSimpleValues ?
+                SimpleStructureWriter.INSTANCE :
+                NullStructureWriter.INSTANCE;
+    }
+
+    private String getLocation() {
+        return JSONPointerUtils.toJSONPointer(stack);
     }
 
     /**
@@ -145,40 +210,13 @@ public class JSONWriter implements Closeable {
      * outermost array or object).
      */
     public JSONWriter array() throws JSONException {
-        if (this.mode == 'i' || this.mode == 'o' || this.mode == 'a') {
-            this.push(false);
-            try {
-                this.prepValue();
-                this.writer.append('[');
-            } catch (IOException e) {
-                throw new JSONException(e);
-            }
-            this.comma = false;
-            return this;
+        if (done) {
+            throw new JSONWriterException("Misplaced array.", getLocation());
         }
-        throw new JSONException("Misplaced array.");
-    }
-
-    /**
-     * End something.
-     * @param mode Mode
-     * @param c Closing character
-     * @return this
-     * @throws JSONException If unbalanced.
-     */
-    private JSONWriter end(char mode, char c) throws JSONException {
-        if (this.mode != mode) {
-            throw new JSONException(mode == 'a'
-                ? "Misplaced endArray."
-                : "Misplaced endObject.");
-        }
-        this.pop(mode);
-        try {
-            this.writer.append(c);
-        } catch (IOException e) {
-            throw new JSONException(e);
-        }
-        this.comma = true;
+        currentStructure.subValue(writer);
+        currentStructure = factory.newArrayWriter(currentStructure);
+        stack.push(currentStructure);
+        currentStructure.beginStructure(writer);
         return this;
     }
 
@@ -189,7 +227,24 @@ public class JSONWriter implements Closeable {
      * @throws JSONException If incorrectly nested.
      */
     public JSONWriter endArray() throws JSONException {
-        return this.end('a', ']');
+        if(done || currentStructure.getStructureType() != 'a') {
+            throw new JSONWriterException("Misplaced endArray.", getLocation());
+        }
+        try {
+            done = currentStructure.endStructure(writer);
+            stack.pop();
+            if (stack.isEmpty()) {
+                currentStructure = null;
+                done = true;
+            } else {
+                currentStructure = stack.peek();
+            }
+        } catch (JSONException e) {
+            throw new JSONWriterException(e, getLocation());
+        } catch (EmptyStackException e) {
+            throw new JSONWriterException(e, getLocation());
+        }
+        return this;
     }
 
     /**
@@ -199,7 +254,24 @@ public class JSONWriter implements Closeable {
      * @throws JSONException If incorrectly nested.
      */
     public JSONWriter endObject() throws JSONException {
-        return this.end('k', '}');
+        if(done || currentStructure.getStructureType() != 'o') {
+            throw new JSONWriterException("Misplaced endObject.", getLocation());
+        }
+        try {
+            done = currentStructure.endStructure(writer);
+            stack.pop();
+            if (stack.isEmpty()) {
+                currentStructure = null;
+                done = true;
+            } else {
+                currentStructure = stack.peek();
+            }
+        } catch (JSONException e) {
+            throw new JSONWriterException(e, getLocation());
+        } catch (EmptyStackException e) {
+            throw new JSONWriterException(e, getLocation());
+        }
+        return this;
     }
 
     /**
@@ -211,26 +283,15 @@ public class JSONWriter implements Closeable {
      *  do not belong in arrays or if the key is null.
      */
     public JSONWriter key(String string) throws JSONException {
-        if (string == null) {
-            throw new JSONException("Null key.");
+        if(done) {
+            throw new JSONWriterException("Misplaced key.", getLocation());
         }
-        if (this.mode == 'k') {
-            try {
-                if(!this.stack.peek().add(string)) {
-                    throw new JSONException("Duplicate key \"" + string + "\"");
-                }
-                if (this.comma) {
-                    this.writer.append(',');
-                }
-                writeString(string, this.writer).append(':');
-                this.comma = false;
-                this.mode = 'o';
-                return this;
-            } catch (IOException e) {
-                throw new JSONException(e);
-            }
+        try {
+            currentStructure.key(string, writer);
+        } catch (JSONException e) {
+            throw new JSONWriterException(e, getLocation());
         }
-        throw new JSONException("Misplaced key.");
+        return this;
     }
 
 
@@ -244,56 +305,20 @@ public class JSONWriter implements Closeable {
      * outermost array or object).
      */
     public JSONWriter object() throws JSONException {
-        if (this.mode == 'i') {
-            this.mode = 'o';
+        if(done) {
+            throw new JSONWriterException("Misplaced object.", getLocation());
         }
-        if (this.mode == 'o' || this.mode == 'a') {
-            try {
-                this.prepValue();
-                this.writer.append('{');
-            } catch (IOException e) {
-                throw new JSONException(e);
-            }
-            this.push(true);
-            this.comma = false;
-            return this;
+        try {
+            currentStructure.subValue(writer);
+            currentStructure = factory.newObjectWriter(currentStructure);
+            stack.push(currentStructure);
+            currentStructure.beginStructure(writer);
+        } catch (JSONException e) {
+            throw new JSONWriterException(e, getLocation());
         }
-        throw new JSONException("Misplaced object.");
-
+        return this;
     }
 
-
-    /**
-     * Pop an array or object scope.
-     * @param c The scope to close.
-     * @throws JSONException If nesting is wrong.
-     */
-    private void pop(char c) throws JSONException {
-        if (this.stack.isEmpty()) {
-            throw new JSONException("Nesting error.");
-        }
-        char m = this.stack.pop() == null ? 'a' : 'k';
-        if (m != c) {
-            throw new JSONException("Nesting error.");
-        }
-        this.mode = this.stack.isEmpty()
-            ? 'd'
-            : this.stack.peek() == null
-            ? 'a'
-            : 'k';
-    }
-
-    /**
-     * Push an object or array scope.
-     *
-     * @param obj {@code true} to indicate an Object, otherwise {@code false}
-     *            to indicate an Array
-     * @throws JSONException If nesting is too deep.
-     */
-    private void push(boolean obj) throws JSONException {
-        this.stack.push(obj ? new HashSet<String>() : null);
-        this.mode = obj ? 'k' : 'a';
-    }
 
     /**
      * Append a <code>null</code> value.
@@ -301,8 +326,14 @@ public class JSONWriter implements Closeable {
      * @throws JSONException there was a problem writing the null value
      */
     public JSONWriter nullValue() throws JSONException {
-        this.prepValue();
-        writeNull(this.writer);
+        if (done) {
+            throw new JSONWriterException("Misplaced value.", getLocation());
+        }
+        try {
+            done = currentStructure.nullValue(writer);
+        } catch (JSONException e) {
+            throw new JSONWriterException(e, getLocation());
+        }
         return this;
     }
 
@@ -314,14 +345,15 @@ public class JSONWriter implements Closeable {
      * @throws JSONException there was a problem writing the boolean value
      */
     public JSONWriter value(boolean b) throws JSONException {
-        String string = Boolean.toString(b);
-        try {
-            this.prepValue();
-            this.writer.append(string);
-            return this;
-        } catch (IOException e) {
-            throw new JSONException(e);
+        if (done) {
+            throw new JSONWriterException("Misplaced value.", getLocation());
         }
+        try {
+            done = currentStructure.booleanValue(b, writer);
+        } catch (JSONException e) {
+            throw new JSONWriterException(e.getMessage(), e, getLocation());
+        }
+        return this;
     }
 
     /**
@@ -331,8 +363,14 @@ public class JSONWriter implements Closeable {
      * @throws JSONException If the number is not finite.
      */
     public JSONWriter value(double d) throws JSONException {
-        this.prepValue();
-        writeDouble(d, this.writer);
+        if (done) {
+            throw new JSONWriterException("Misplaced value.", getLocation());
+        }
+        try {
+            done = currentStructure.doubleValue(d, writer);
+        } catch (JSONException e) {
+            throw new JSONWriterException(e.getMessage(), e, getLocation());
+        }
         return this;
     }
 
@@ -343,16 +381,16 @@ public class JSONWriter implements Closeable {
      * @throws JSONException there was a problem writing the long value
      */
     public JSONWriter value(long l) throws JSONException {
-        String string = Long.toString(l);
-        try {
-            this.prepValue();
-            this.writer.append(string);
-            return this;
-        } catch (IOException e) {
-            throw new JSONException(e);
+        if (done) {
+            throw new JSONWriterException("Misplaced value.", getLocation());
         }
+        try {
+            done = currentStructure.longValue(l, writer);
+        } catch (JSONException e) {
+            throw new JSONWriterException(e, getLocation());
+        }
+        return this;
     }
-
 
     /**
      * Append an object value.
@@ -362,8 +400,16 @@ public class JSONWriter implements Closeable {
      * @throws JSONException If the value is out of sequence.
      */
     public JSONWriter value(Object object) throws JSONException {
-        this.prepValue();
-        writeValue(object, this.writer);
+        if (done) {
+            throw new JSONWriterException("Misplaced value.", getLocation());
+        }
+        try {
+            done = writeValue(object);
+        } catch (JSONWriterException e) {
+            throw e; // propagate
+        } catch (JSONException e) {
+            throw new JSONWriterException(e, getLocation());
+        }
         return this;
     }
 
@@ -377,9 +423,17 @@ public class JSONWriter implements Closeable {
      *  occurs where a key is expected.
      */
     public JSONWriter values(Iterable<?> values) throws JSONException {
-        for(Object obj : values) {
-            this.prepValue();
-            writeValue(obj, this.writer);
+        if (done) {
+            throw new JSONWriterException("Misplaced value.", getLocation());
+        }
+        try {
+            for(Object obj : values) {
+                writeValue(obj);
+            }
+        } catch (JSONWriterException e) {
+            throw e; // propagate
+        } catch (JSONException e) {
+            throw new JSONWriterException(e, getLocation());
         }
         return this;
     }
@@ -397,10 +451,18 @@ public class JSONWriter implements Closeable {
      *  do not belong in arrays or if the key is null.
      */
     public JSONWriter entries(Map<?, ?> kvPairs) throws JSONException {
-        for(Entry<?, ?> entry : kvPairs.entrySet()) {
-            this.key(String.valueOf(entry.getKey()));
-            this.prepValue();
-            writeValue(entry.getValue(), this.writer);
+        if (done) {
+            throw new JSONWriterException("Misplaced value.", getLocation());
+        }
+        try {
+            for(Entry<?, ?> entry : kvPairs.entrySet()) {
+                currentStructure.key(String.valueOf(entry.getKey()), writer);
+                writeValue(entry.getValue());
+            }
+        } catch (JSONWriterException e) {
+            throw e; // propagate
+        } catch (JSONException e) {
+            throw new JSONWriterException(e, getLocation());
         }
         return this;
     }
@@ -413,72 +475,14 @@ public class JSONWriter implements Closeable {
      */
     @Override
     public void close() throws IOException {
-        if(!this.stack.isEmpty()) {
+        if(!done) {
             throw new IOException("JSON stack is not empty");
         }
-
         if(writer instanceof Closeable) {
             ((Closeable)writer).close();
         }
     }
 
-    // -- static writer methods
-
-    // 120 spaces, divides by 1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, ...
-    private static final String PADDING_SPACES = makePaddingSpaces();
-    private static final int PADDING_LENGTH = 120;
-
-    private static String makePaddingSpaces() {
-        char[] padding = new char[PADDING_LENGTH];
-        Arrays.fill(padding, ' ');
-        return String.valueOf(padding);
-    }
-
-    /**
-     * Indent by the given number of spaces.
-     *
-     * @param indent
-     *            the number of character to indent.
-     * @param writer
-     *            the writer.
-     * @param <T>
-     *            A subtype of {@code Appendable}, returned to the caller
-     *            for chaining purposes
-     * @return The writer.
-     * @throws IOException there was a problem writing the indentation
-     */
-    static <T extends Appendable> T indent(int indent, T writer) throws IOException {
-
-        while(indent >= PADDING_LENGTH) {
-            writer.append(PADDING_SPACES);
-            indent -= PADDING_LENGTH;
-        }
-        if(indent > 0) {
-            writer.append(PADDING_SPACES, 0, indent);
-        }
-        return writer;
-    }
-
-    /**
-     * Write the contents of the Object as JSON text to a writer. For
-     * compactness, no whitespace is added.
-     * <p>
-     * Warning: This method assumes that the data structure is acyclical.
-     *
-     * @param value
-     *            The value to be written
-     * @param writer
-     *            Writes the serialized JSON
-     * @param <T>
-     *            A subtype of {@code Appendable}, returned to the caller
-     *            for chaining purposes
-     * @return The writer.
-     * @throws JSONException there was a problem writing the Object
-     */
-    static <T extends Appendable> T writeValue(Object value, T writer)
-            throws JSONException {
-        return writeValue(value, writer, 0, 0);
-    }
 
     /**
      * Write the contents of the Object as JSON text to a writer.
@@ -487,61 +491,38 @@ public class JSONWriter implements Closeable {
      *
      * @param value
      *            The value to be written
-     * @param writer
-     *            Writes the serialized JSON
-     * @param indentFactor
-     *            The number of spaces to add to each level of indentation.
-     * @param indent
-     *            The indention of the top level.
-     * @param <T>
-     *            A subtype of {@code Appendable}, returned to the caller
-     *            for chaining purposes
-     * @return The writer.
      * @throws JSONException there was a problem writing the Object
      */
-    static <T extends Appendable> T writeValue(Object value, T writer,
-            int indentFactor, int indent) throws JSONException {
+    private boolean writeValue(Object value) throws JSONException {
 
-        if ((value == null) || JSONObject.NULL.equals(value)) {
-            return writeNull(writer);
+        if(WriterUtil.isSimpleValue(value)) {
+            return currentStructure.simpleValue(value, writer);
         }
         if (value instanceof JSONAppendable) {
-            return writeJSONAppendable((JSONAppendable) value, writer);
+            return jsonAppendableValue((JSONAppendable) value);
         }
         if (value instanceof JSONString) {
-            return writeJSONString((JSONString) value, writer);
+            return jsonStringValue((JSONString) value);
         }
         if (value instanceof JSONObject) {
-            return writeJSONObject((JSONObject) value, writer, indentFactor, indent);
+            return jsonObjectValue((JSONObject) value);
         }
         if (value instanceof JSONArray) {
-            return writeJSONArray((JSONArray) value, writer, indentFactor, indent);
-        }
-        if (value instanceof Number) {
-            return writeNumber((Number) value, writer);
-        }
-        if (value instanceof Boolean) {
-            return writeBoolean((Boolean) value, writer);
-        }
-        if (value instanceof CharSequence) {
-            return writeString((CharSequence) value, writer);
+            return jsonArrayValue((JSONArray) value);
         }
         if (value instanceof Map) {
-            return writeMap((Map<?, ?>) value, writer, indentFactor, indent);
+            return mapValue((Map<?, ?>) value);
         }
         if (value instanceof Iterable) {
-            return writeIterable((Iterable<?>) value, writer, indentFactor, indent);
+            return iterableValue((Iterable<?>) value);
         }
         if (value.getClass().isArray()) {
-            return writeArray(value, writer, indentFactor, indent);
-        }
-        if (value instanceof Enum<?>) {
-            return writeEnum((Enum<?>) value, writer);
+            return arrayValue(value);
         }
         if (JSONObject.objectIsBean(value)) {
-            return writeBean(value, writer, indentFactor, indent);
+            return beanValue(value);
         }
-        return writeString(value.toString(), writer);
+        return currentStructure.simpleValue(value.toString(), writer);
     }
 
     /**
@@ -551,23 +532,14 @@ public class JSONWriter implements Closeable {
      *
      * @param value
      *            The JSONString to be written
-     * @param writer
-     *            Writes the serialized JSON
-     * @param <T> a subtype of {@code Appendable}, returned to the caller
-     *            for chaining purposes
-     * @return The writer.
      * @throws JSONException there was a problem writing the JSONAppendable
      */
-    static <T extends Appendable> T writeJSONAppendable(JSONAppendable value,
-            T writer) throws JSONException {
+    private boolean jsonAppendableValue(JSONAppendable value) throws JSONException {
         try {
-            value.appendJSON(writer);
-            return writer;
+            return currentStructure.jsonAppendableValue(value, writer);
         } catch(JSONException e) {
             // Propagate directly, because JSONException is a RuntimeException
             throw e;
-        } catch(IOException e) {
-            throw new JSONException(e);
         } catch(RuntimeException e) {
             throw new JSONException(e);
         }
@@ -580,30 +552,125 @@ public class JSONWriter implements Closeable {
      *
      * @param value
      *            The JSONString to be written
-     * @param writer
-     *            Writes the serialized JSON
-     * @param <T> a subtype of {@code Appendable}, returned to the caller
-     *            for chaining purposes
-     * @return The writer.
      * @throws JSONException there was a problem writing the JSONString
      */
-    static <T extends Appendable> T writeJSONString(JSONString value, T writer)
-            throws JSONException {
+    private boolean jsonStringValue(JSONString value) throws JSONException {
         try {
-            String o = value.toJSONString();
-            if (o != null) {
-                writer.append(o);
-            } else {
-                writeString(value.toString(), writer);
-            }
-            return writer;
+            return currentStructure.jsonStringValue(value, writer);
         } catch(JSONException e) {
             // Propagate directly, because JSONException is a RuntimeException
             throw e;
-        } catch (IOException e) {
-            throw new JSONException(e);
         } catch (RuntimeException e) {
             throw new JSONException(e);
+        }
+    }
+
+    /**
+     * Write the contents of the JSONObject as JSON object to a writer.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @param object
+     *            The JSONObject to be written
+     * @throws JSONException there was a problem writing the JSONObject
+     */
+    private boolean jsonObjectValue(JSONObject object) throws JSONException {
+        Iterator<String> keys = object.keys();
+        object();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            key(key).writeValue(object.opt(key));
+        }
+        endObject();
+        return stack.isEmpty();
+    }
+
+    /**
+     * Write the contents of the JSONArray as JSON array to a writer.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @param array
+     *            The JSONArray to be written
+     * @throws JSONException there was a problem writing the JSONArray
+     */
+    private boolean jsonArrayValue(JSONArray array) throws JSONException {
+        final int length = array.length();
+        array();
+        if (length != 0) {
+            for (int i = 0; i < length; i += 1) {
+                writeValue(array.get(i));
+            }
+        }
+        endArray();
+        return stack.isEmpty();
+    }
+
+    /**
+     * Write the contents of the Map as JSON object to a writer.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @param map
+     *            The Map to be written
+     * @throws JSONException there was a problem writing the Map
+     */
+    private boolean mapValue(Map<?, ?> map) throws JSONException {
+        final int length = map.size();
+        object();
+
+        if (length != 0) {
+            Iterator<?> keys = map.keySet().iterator();
+            while (keys.hasNext()) {
+                Object key = keys.next();
+                key(String.valueOf(key)).writeValue(map.get(key));
+            }
+        }
+        endObject();
+        return stack.isEmpty();
+    }
+
+    /**
+     * Write the contents of the Iterable as JSON array to a writer.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @param collection
+     *            The Iterable to be written
+     * @throws JSONException there was a problem writing the Iterable
+     */
+    private boolean iterableValue(Iterable<?> collection) throws JSONException {
+        Iterator<?> iterator = collection.iterator();
+        array();
+        while (iterator.hasNext()) {
+            writeValue(iterator.next());
+        }
+        endArray();
+        return stack.isEmpty();
+    }
+
+    /**
+     * Write the contents of the array as JSON array to a writer.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @param array
+     *            The array to be written
+     * @throws JSONException there was a problem writing the array
+     */
+    private boolean arrayValue(Object array) throws JSONException {
+        try {
+            final int length = Array.getLength(array);
+            array();
+            for (int i = 0; i < length; i += 1) {
+                writeValue(Array.get(array, i));
+            }
+            endArray();
+            return stack.isEmpty();
+        } catch (IllegalArgumentException e) {
+            throw new JSONWriterException(e, getLocation());
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new JSONWriterException(e, getLocation());
         }
     }
 
@@ -614,31 +681,17 @@ public class JSONWriter implements Closeable {
      *
      * @param bean
      *            The bean to be written
-     * @param writer
-     *            Writes the serialized JSON
-     * @param indentFactor
-     *            The number of spaces to add to each level of indentation.
-     * @param indent
-     *            The indention of the top level.
-     * @param <T>
-     *            A subtype of {@code Appendable}, returned to the caller
-     *            for chaining purposes
-     * @return The writer.
      * @throws JSONException there was a problem writing the bean
      */
-    static <T extends Appendable> T writeBean(Object bean, T writer,
-            int indentFactor, int indent) throws JSONException {
+    private boolean beanValue(Object bean) throws JSONException {
         try {
-            final int newindent = indent + indentFactor;
-            Class<?> klass = bean.getClass();
-
             // If klass is a System class then set includeSuperClass to false.
+            Class<?> klass = bean.getClass();
             boolean includeSuperClass = klass.getClassLoader() != null;
             Method[] methods = includeSuperClass ? klass.getMethods()
                     : klass.getDeclaredMethods();
-            boolean commanate = false;
 
-            writer.append('{');
+            object();
             for (int i = 0; i < methods.length; i += 1) {
                 try {
                     Method method = methods[i];
@@ -652,604 +705,19 @@ public class JSONWriter implements Closeable {
                                 && (method.getParameterTypes().length == 0)) {
                             Object result = method.invoke(bean, (Object[]) null);
                             if (result != null) {
-                                if (commanate) {
-                                    writer.append(',');
-                                }
-                                if (indentFactor > 0) {
-                                    writer.append('\n');
-                                }
-                                indent(newindent, writer);
-                                writeString(String.valueOf(key), writer).append(':');
-                                if (indentFactor > 0) {
-                                    writer.append(' ');
-                                }
-                                writeValue(result, writer, indentFactor, newindent);
-                                commanate = true;
+                                key(String.valueOf(key)).writeValue(result);
                             }
                         }
                     }
                 } catch (Exception ignore) {
                 }
             }
-            if(commanate) {
-                if (indentFactor > 0) {
-                    writer.append('\n');
-                }
-                indent(indent, writer);
-            }
-            writer.append('}');
-            return writer;
-        } catch (IOException exception) {
-            throw new JSONException(exception);
+            endObject();
+            return stack.isEmpty();
+        } catch (JSONException exception) {
+            throw exception;
         } catch (RuntimeException exception) {
             throw new JSONException(exception);
-        }
-    }
-
-    /**
-     * Write the contents of the Map as JSON object to a writer.
-     * <p>
-     * Warning: This method assumes that the data structure is acyclical.
-     *
-     * @param map
-     *            The Map to be written
-     * @param writer
-     *            Writes the serialized JSON
-     * @param indentFactor
-     *            The number of spaces to add to each level of indentation.
-     * @param indent
-     *            The indention of the top level.
-     * @param <T>
-     *            A subtype of {@code Appendable}, returned to the caller
-     *            for chaining purposes
-     * @return The writer.
-     * @throws JSONException there was a problem writing the Map
-     */
-    static <T extends Appendable> T writeMap(Map<?, ?> map, T writer,
-            int indentFactor, int indent) throws JSONException {
-        try {
-            boolean commanate = false;
-            final int length = map.size();
-            Iterator<?> keys = map.keySet().iterator();
-            writer.append('{');
-
-            if (length == 1) {
-                Object key = keys.next();
-                writeString(String.valueOf(key), writer).append(':');
-                if (indentFactor > 0) {
-                    writer.append(' ');
-                }
-                writeValue(map.get(key), writer, indentFactor, indent);
-            } else if (length != 0) {
-                final int newindent = indent + indentFactor;
-                while (keys.hasNext()) {
-                    Object key = keys.next();
-                    if (commanate) {
-                        writer.append(',');
-                    }
-                    if (indentFactor > 0) {
-                        writer.append('\n');
-                    }
-                    indent(newindent, writer);
-                    writeString(String.valueOf(key), writer).append(':');
-                    if (indentFactor > 0) {
-                        writer.append(' ');
-                    }
-                    writeValue(map.get(key), writer, indentFactor, newindent);
-                    commanate = true;
-                }
-                if (indentFactor > 0) {
-                    writer.append('\n');
-                }
-                indent(indent, writer);
-            }
-            writer.append('}');
-            return writer;
-        } catch (IOException exception) {
-            throw new JSONException(exception);
-        }
-    }
-
-    /**
-     * Determine whether this Iterable has exactly one element. If the
-     * Iterable is a Collection, just check the {@code size()} method.
-     * Otherwise, start iterating until we determine whether there is
-     * more than one element.
-     *
-     * @param iterable the Iterable
-     * @return {@code true} if there is exactly one element, otherwise
-     * {@code false}
-     */
-    private static boolean singleIterableElement(Iterable<?> iterable) {
-        if(iterable instanceof Collection) {
-            return ((Collection)iterable).size() == 1;
-        }
-        Iterator<?> iterator = iterable.iterator();
-        if(!iterator.hasNext()) {
-            return false;
-        }
-        iterator.next();
-        return !iterator.hasNext();
-    }
-
-    /**
-     * Write the contents of the Iterable as JSON array to a writer.
-     * <p>
-     * Warning: This method assumes that the data structure is acyclical.
-     *
-     * @param collection
-     *            The Iterable to be written
-     * @param writer
-     *            Writes the serialized JSON
-     * @param indentFactor
-     *            The number of spaces to add to each level of indentation.
-     * @param indent
-     *            The indention of the top level.
-     * @param <T> a subtype of {@code Appendable}, returned to the caller
-     *            for chaining purposes
-     * @return The writer.
-     * @throws JSONException there was a problem writing the Iterable
-     */
-    static <T extends Appendable> T writeIterable(Iterable<?> collection, T writer,
-            int indentFactor, int indent) throws JSONException {
-        try {
-            boolean singleElement = singleIterableElement(collection);
-            Iterator<?> iterator = collection.iterator();
-            boolean commanate = false;
-            writer.append('[');
-
-            if ((singleElement) && (iterator.hasNext())) {
-                writeValue(iterator.next(), writer,
-                        indentFactor, indent);
-            } else if (iterator.hasNext()) {
-                final int newindent = indent + indentFactor;
-
-                while (iterator.hasNext()) {
-                    if (commanate) {
-                        writer.append(',');
-                    }
-                    if (indentFactor > 0) {
-                        writer.append('\n');
-                    }
-                    indent(newindent, writer);
-                    writeValue(iterator.next(), writer,
-                            indentFactor, newindent);
-                    commanate = true;
-                }
-                if (indentFactor > 0) {
-                    writer.append('\n');
-                }
-                indent(indent, writer);
-            }
-            writer.append(']');
-            return writer;
-        } catch (IOException e) {
-            throw new JSONException(e);
-        }
-    }
-
-    /**
-     * Write the contents of the array as JSON array to a writer.
-     * <p>
-     * Warning: This method assumes that the data structure is acyclical.
-     *
-     * @param array
-     *            The array to be written
-     * @param writer
-     *            Writes the serialized JSON
-     * @param indentFactor
-     *            The number of spaces to add to each level of indentation.
-     * @param indent
-     *            The indention of the top level.
-     * @param <T> a subtype of {@code Appendable}, returned to the caller
-     *            for chaining purposes
-     * @return The writer.
-     * @throws JSONException there was a problem writing the array
-     */
-    static <T extends Appendable> T writeArray(Object array, T writer,
-            int indentFactor, int indent) throws JSONException {
-        try {
-            final int length = Array.getLength(array);
-            boolean commanate = false;
-            writer.append('[');
-
-            if (length == 1) {
-                writeValue(Array.get(array, 0), writer,
-                        indentFactor, indent);
-            } else if (length != 0) {
-                final int newindent = indent + indentFactor;
-
-                for (int i = 0; i < length; i += 1) {
-                    if (commanate) {
-                        writer.append(',');
-                    }
-                    if (indentFactor > 0) {
-                        writer.append('\n');
-                    }
-                    indent(newindent, writer);
-                    writeValue(Array.get(array, i), writer,
-                            indentFactor, newindent);
-                    commanate = true;
-                }
-                if (indentFactor > 0) {
-                    writer.append('\n');
-                }
-                indent(indent, writer);
-            }
-            writer.append(']');
-            return writer;
-        } catch (IOException e) {
-            throw new JSONException(e);
-        }
-    }
-
-    /**
-     * Write the given Enum to the given Appendable as a String.
-     *
-     * @param <T> subtype of Appendable, returned to the caller
-     * @param value
-     *            An Enum
-     * @param writer
-     *            The Appendable to which the Enum value is written
-     * @return the given Appendable
-     * @throws JSONException there was a problem writing the Enum
-     */
-    static <T extends Appendable> T writeEnum(Enum<?> value, T writer)
-            throws JSONException {
-        return writeString(value.name(), writer);
-    }
-
-    /**
-     * Write the contents of the JSONObject as JSON object to a writer.
-     * <p>
-     * Warning: This method assumes that the data structure is acyclical.
-     *
-     * @param object
-     *            The JSONObject to be written
-     * @param writer
-     *            Writes the serialized JSON
-     * @param indentFactor
-     *            The number of spaces to add to each level of indentation.
-     * @param indent
-     *            The indention of the top level.
-     * @param <T>
-     *            A subtype of {@code Appendable}, returned to the caller
-     *            for chaining purposes
-     * @return The writer.
-     * @throws JSONException there was a problem writing the JSONObject
-     */
-    static <T extends Appendable> T writeJSONObject(JSONObject object, T writer,
-            int indentFactor, int indent) throws JSONException {
-        try {
-            boolean commanate = false;
-            final int length = object.length();
-            Iterator<String> keys = object.keys();
-            writer.append('{');
-
-            if (length == 1) {
-                String key = keys.next();
-                writeString(key, writer).append(':');
-                if (indentFactor > 0) {
-                    writer.append(' ');
-                }
-                writeValue(object.opt(key), writer, indentFactor, indent);
-            } else if (length != 0) {
-                final int newindent = indent + indentFactor;
-                while (keys.hasNext()) {
-                    String key = keys.next();
-                    if (commanate) {
-                        writer.append(',');
-                    }
-                    if (indentFactor > 0) {
-                        writer.append('\n');
-                    }
-                    indent(newindent, writer);
-                    writeString(key, writer).append(':');
-                    if (indentFactor > 0) {
-                        writer.append(' ');
-                    }
-                    writeValue(object.opt(key), writer, indentFactor, newindent);
-                    commanate = true;
-                }
-                if (indentFactor > 0) {
-                    writer.append('\n');
-                }
-                indent(indent, writer);
-            }
-            writer.append('}');
-            return writer;
-        } catch (IOException exception) {
-            throw new JSONException(exception);
-        }
-    }
-
-    /**
-     * Write the contents of the JSONArray as JSON array to a writer.
-     * <p>
-     * Warning: This method assumes that the data structure is acyclical.
-     *
-     * @param array
-     *            The JSONArray to be written
-     * @param writer
-     *            Writes the serialized JSON
-     * @param indentFactor
-     *            The number of spaces to add to each level of indentation.
-     * @param indent
-     *            The indention of the top level.
-     * @param <T> a subtype of {@code Appendable}, returned to the caller
-     *            for chaining purposes
-     * @return The writer.
-     * @throws JSONException there was a problem writing the JSONArray
-     */
-    static <T extends Appendable> T writeJSONArray(JSONArray array, T writer,
-            int indentFactor, int indent) throws JSONException {
-        try {
-            boolean commanate = false;
-            int length = array.length();
-            writer.append('[');
-
-            if (length == 1) {
-                writeValue(array.get(0), writer, indentFactor, indent);
-            } else if (length != 0) {
-                final int newindent = indent + indentFactor;
-
-                for (int i = 0; i < length; i += 1) {
-                    if (commanate) {
-                        writer.append(',');
-                    }
-                    if (indentFactor > 0) {
-                        writer.append('\n');
-                    }
-                    indent(newindent, writer);
-                    writeValue(array.get(i), writer, indentFactor, newindent);
-                    commanate = true;
-                }
-                if (indentFactor > 0) {
-                    writer.append('\n');
-                }
-                indent(indent, writer);
-            }
-            writer.append(']');
-            return writer;
-        } catch (IOException e) {
-            throw new JSONException(e);
-        }
-    }
-
-    /**
-     * Produce a string in double quotes with backslash sequences in all the
-     * right places. A backslash will be inserted within &lt;/, producing &lt;\/,
-     * allowing JSON text to be delivered in HTML. In JSON text, a string cannot
-     * contain a control character or an unescaped quote or backslash.
-     *
-     * @param string
-     *            A character sequence to be quoted
-     * @param w
-     *            the Appendable to which the quoted character sequence will be
-     *            written
-     * @param <T>
-     *            A subtype of {@code Appendable}, returned to the caller
-     *            for chaining purposes
-     * @return A String correctly formatted for insertion in a JSON text.
-     * @throws JSONException there was a problem writing to the Appendable
-     */
-    static <T extends Appendable> T writeString(CharSequence string, T w)
-            throws JSONException {
-        try {
-            if (string == null || string.length() == 0) {
-                w.append("\"\"");
-                return w;
-            }
-
-            char b;
-            char c = 0;
-            String hhhh;
-            int i;
-            int len = string.length();
-            int prev = 0;
-
-            w.append('"');
-            for (i = 0; i < len; i += 1) {
-                b = c;
-                c = string.charAt(i);
-                switch (c) {
-                    case '\\':
-                    case '"':
-                        if(prev < i) {
-                            w.append(string, prev, i);
-                        }
-                        w.append('\\');
-                        prev = i;
-                        break;
-                    case '/':
-                        if (b == '<') {
-                            if(prev < i) {
-                                w.append(string, prev, i);
-                            }
-                            w.append('\\');
-                            prev = i;
-                        }
-                        break;
-                    case '\b':
-                        if(prev < i) {
-                            w.append(string, prev, i);
-                        }
-                        w.append("\\b");
-                        prev = i + 1;
-                        break;
-                    case '\t':
-                        if(prev < i) {
-                            w.append(string, prev, i);
-                        }
-                        w.append("\\t");
-                        prev = i + 1;
-                        break;
-                    case '\n':
-                        if(prev < i) {
-                            w.append(string, prev, i);
-                        }
-                        w.append("\\n");
-                        prev = i + 1;
-                        break;
-                    case '\f':
-                        if(prev < i) {
-                            w.append(string, prev, i);
-                        }
-                        w.append("\\f");
-                        prev = i + 1;
-                        break;
-                    case '\r':
-                        if(prev < i) {
-                            w.append(string, prev, i);
-                        }
-                        w.append("\\r");
-                        prev = i + 1;
-                        break;
-                    default:
-                        if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
-                                || (c >= '\u2000' && c < '\u2100')) {
-                            if(prev < i) {
-                                w.append(string, prev, i);
-                            }
-                            hhhh = Integer.toHexString(c);
-                            w.append("\\u0000", 0, 6 - hhhh.length());
-                            w.append(hhhh);
-                            prev = i + 1;
-                        }
-                }
-            }
-            if(prev == 0) {
-                w.append(string);
-            } else if(prev < len) {
-                w.append(string, prev, len);
-            }
-            w.append('"');
-            return w;
-        } catch (IOException e) {
-            throw new JSONException(e);
-        }
-    }
-
-    /**
-     * Write the given double to the given Appendable.
-     *
-     * @param <T> subtype of Appendable, returned to the caller
-     * @param d
-     *            A double
-     * @param writer
-     *            The Appendable to which the double value is written
-     * @return the given Appendable
-     * @throws JSONException there was a problem writing the double
-     */
-    static <T extends Appendable> T writeDouble(double d, T writer)
-            throws JSONException {
-        if (Double.isInfinite(d) || Double.isNaN(d)) {
-            return writeNull(writer);
-        }
-
-        // Shave off trailing zeros and decimal point, if possible.
-        String string = Double.toString(d);
-        return writeNumberDigits(string, writer);
-    }
-
-    /**
-     * Write the given number to the given Appendable.
-     *
-     * @param <T> subtype of Appendable, returned to the caller
-     * @param number
-     *            A Number
-     * @param writer
-     *            The Appendable to which the number value is written
-     * @return the given Appendable
-     * @throws JSONException there was a problem writing the number
-     */
-    static <T extends Appendable> T writeNumber(Number number, T writer)
-            throws JSONException {
-        if (number instanceof Double) {
-            if (((Double) number).isInfinite() || ((Double) number).isNaN()) {
-                return writeNull(writer);
-            }
-        } else if (number instanceof Float) {
-            if (((Float) number).isInfinite() || ((Float) number).isNaN()) {
-                return writeNull(writer);
-            }
-        }
-
-        // Shave off trailing zeros and decimal point, if possible.
-        String string = number.toString();
-        return writeNumberDigits(string, writer);
-    }
-
-    /**
-     * Write a number value, trimming any trailing zero digits from a real number.
-     * If all zeros appear immediately after a decimal, the decimal is omitted
-     * as well.
-     *
-     * @param string the string of digits
-     * @param writer the Appendable to which the digits will be written
-     * @throws JSONException there was a problem writing to the Appendable
-     */
-    private static <T extends Appendable> T writeNumberDigits(String string,
-            T writer) throws JSONException {
-        try {
-            if (string.indexOf('.') > 0 && string.indexOf('e') < 0
-                    && string.indexOf('E') < 0) {
-                final int len = string.length();
-                int last = len;
-                while ((last > 0) && (string.charAt(last - 1) == '0')) {
-                    last--;
-                }
-                if ((last > 0) && (string.charAt(last - 1) == '.')) {
-                    last--;
-                }
-                if (last < len) {
-                    writer.append(string, 0, last);
-                    return writer;
-                }
-            }
-            writer.append(string);
-            return writer;
-        } catch (IOException e) {
-            throw new JSONException(e);
-        }
-    }
-
-    /**
-     * Write the given Boolean to the given Appendable.
-     *
-     * @param <T> subtype of Appendable, returned to the caller
-     * @param value
-     *            A Boolean
-     * @param writer
-     *            The Appendable to which the boolean value is written
-     * @return the given Appendable
-     * @throws JSONException there was a problem writing the boolean
-     */
-    static <T extends Appendable> T writeBoolean(Boolean value, T writer)
-            throws JSONException {
-        try {
-            writer.append(value.toString());
-            return writer;
-        } catch (IOException e) {
-            throw new JSONException(e);
-        }
-    }
-
-    /**
-     * Write the value Null to the given Appendable.
-     *
-     * @param <T> subtype of Appendable, returned to the caller
-     * @param writer
-     *            The Appendable to which the null value is written
-     * @return the given Appendable
-     * @throws JSONException there was a problem writing null
-     */
-    static <T extends Appendable> T writeNull(T writer) throws JSONException {
-        try {
-            writer.append("null");
-            return writer;
-        } catch (IOException e) {
-            throw new JSONException(e);
         }
     }
 }

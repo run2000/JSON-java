@@ -1,7 +1,7 @@
-package org.json.stream;
+package org.json;
 
 /*
-Copyright (c) 2002 JSON.org
+Copyright (c) 2006 JSON.org
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,20 +25,31 @@ SOFTWARE.
 */
 
 /**
- * Holds an identifier that can be used to create a JSON Pointer expression.
- * See RFC 6901 for details of JSON Pointer.
+ * JSONWriterException is thrown by {@code JSONWriter} to include location
+ * information as a JSON Pointer expression.
  *
  * @author JSON.org
- * @version 2016-09-06
+ * @version 2016-09-11
  */
-public interface StructureIdentifier {
+public final class JSONWriterException extends JSONException {
+    private final String jsonPointer;
 
-    /**
-     * Returns an identifier fragment for this structure. This fragment
-     * can then be used to construct a JSON Pointer value.
-     *
-     * @return an identifier fragment for the current structure, as a String
-     * @see JSONPointerUtils#toJSONPointer(Iterable)
-     */
-    String getIdentifier();
+    public JSONWriterException(String message, String jsonPointer) {
+        super(message);
+        this.jsonPointer = jsonPointer;
+    }
+
+    public JSONWriterException(String message, Throwable cause, String jsonPointer) {
+        super(message, cause);
+        this.jsonPointer = jsonPointer;
+    }
+
+    public JSONWriterException(Throwable cause, String jsonPointer) {
+        super(cause.getMessage(), cause);
+        this.jsonPointer = jsonPointer;
+    }
+
+    public String getJSONPointer() {
+        return jsonPointer;
+    }
 }

@@ -25,7 +25,9 @@ SOFTWARE.
 */
 
 import org.json.stream.JSONStreamReader.ParseState;
+import org.json.util.JSONPointerUtils;
 import org.json.util.SizedIterable;
+import org.json.util.StructureIdentifier;
 
 /**
  * Filtering for structures during a parse. Provided by the {@link BuilderLimits}

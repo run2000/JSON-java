@@ -25,6 +25,7 @@ package org.json;
  */
 
 import org.json.JSONTokener.JSONToken;
+import org.json.write.WriterUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -855,14 +856,15 @@ public class JSONObject {
      * @return the string, with trailing digits stripped if possible
      */
     private static String stripNumberDigits(String string) {
-        if (string.indexOf('.') > 0 && string.indexOf('e') < 0
-                && string.indexOf('E') < 0) {
+        int decimal = string.indexOf('.');
+        if (decimal > 0 && string.indexOf('e', decimal) < 0
+                && string.indexOf('E', decimal) < 0) {
             final int len = string.length();
             int last = len;
             while ((last > 0) && (string.charAt(last - 1) == '0')) {
                 last--;
             }
-            if ((last > 0) && (string.charAt(last - 1) == '.')) {
+            if (decimal == (last - 1)) {
                 last--;
             }
             if (last < len) {
@@ -1495,7 +1497,8 @@ public class JSONObject {
      */
     public static String quote(CharSequence string) {
         StringBuilder sb = new StringBuilder();
-        return JSONWriter.writeString(string, sb).toString();
+        WriterUtil.writeString(string, sb);
+        return sb.toString();
     }
 
     /**
@@ -1516,7 +1519,8 @@ public class JSONObject {
      * @throws JSONException there was a problem writing to the Appendable
      */
     public static <T extends Appendable> T quote(CharSequence string, T w) throws JSONException {
-        return JSONWriter.writeString(string, w);
+        WriterUtil.writeString(string, w);
+        return w;
     }
 
     /**
@@ -1687,7 +1691,7 @@ public class JSONObject {
     @Override
     public String toString() {
         try {
-            return JSONWriter.writeJSONObject(this, new StringBuilder(), 0, 0).toString();
+            return writeValue(this, new StringBuilder(), 0, 0).toString();
         } catch (Exception e) {
             return null;
         }
@@ -1708,7 +1712,7 @@ public class JSONObject {
      *             If the object contains an invalid number.
      */
     public String toString(int indentFactor) throws JSONException {
-        return JSONWriter.writeJSONObject(this, new StringBuilder(), indentFactor, 0).toString();
+        return writeValue(this, new StringBuilder(), indentFactor, 0).toString();
     }
 
     /**
@@ -1736,9 +1740,10 @@ public class JSONObject {
      *             If the value is or contains an invalid number.
      */
     public static String valueToString(Object value) throws JSONException {
-        String result;
 
         if((value instanceof JSONString) && !(value instanceof JSONAppendable)) {
+            String result;
+
             try {
                 result = ((JSONString)value).toJSONString();
             } catch (Exception e) {
@@ -1750,9 +1755,8 @@ public class JSONObject {
                 return result;
             }
         } else {
-            result = JSONWriter.writeValue(value, new StringBuilder()).toString();
+            return writeValue(value, new StringBuilder(), 0, 0).toString();
         }
-        return result;
     }
 
     /**
@@ -1772,22 +1776,18 @@ public class JSONObject {
             if (object == null) {
                 return NULL;
             }
-            if(object instanceof Double) {
-                if(((Double)object).isInfinite() || ((Double)object).isNaN()) {
-                    return NULL;
-                }
-                return object;
-            } else if(object instanceof Float) {
-                if (((Float)object).isInfinite() || ((Float)object).isNaN()) {
+            if ((object instanceof Double) || (object instanceof Float)) {
+                double d = ((Number)object).doubleValue();
+                if(Double.isInfinite(d) || Double.isNaN(d)) {
                     return NULL;
                 }
                 return object;
             }
             if (object instanceof JSONObject || object instanceof JSONArray
-                    || NULL.equals(object) || object instanceof JSONString
-                    || object instanceof JSONAppendable || object instanceof Enum
-                    || object instanceof Number || object instanceof Character
-                    || object instanceof Boolean || object instanceof String) {
+                    || object instanceof Boolean || object instanceof String
+                    || object instanceof Number || object instanceof Enum
+                    || object instanceof JSONString || object instanceof JSONAppendable
+                    || object instanceof Character || NULL.equals(object)) {
                 return object;
             }
 
@@ -1841,7 +1841,7 @@ public class JSONObject {
      * @throws JSONException there was a problem appending the JSON value
      */
     public <T extends Appendable> T write(T writer) throws JSONException {
-        return JSONWriter.writeJSONObject(this, writer, 0, 0);
+        return writeValue(this, writer, 0, 0);
     }
 
     /**
@@ -1864,7 +1864,37 @@ public class JSONObject {
      */
     public <T extends Appendable> T write(T writer, int indentFactor, int indent)
             throws JSONException {
-        return JSONWriter.writeJSONObject(this, writer, indentFactor, indent);
+        return writeValue(this, writer, indentFactor, indent);
+    }
+
+    /**
+     * Write the contents of the JSONArray as JSON array to a writer.
+     * <p>
+     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * @param value
+     *            The Object to be written
+     * @param writer
+     *            Writes the serialized JSON
+     * @param indentFactor
+     *            The number of spaces to add to each level of indentation.
+     * @param indent
+     *            The indention of the top level.
+     * @param <T> a subtype of {@code Appendable}, returned to the caller
+     *            for chaining purposes
+     * @return The writer.
+     * @throws JSONException there was a problem writing the JSONArray
+     */
+    static <T extends Appendable> T writeValue(Object value, T writer,
+            int indentFactor, int indent) throws JSONException {
+
+        if(WriterUtil.isSimpleValue(value)) {
+            WriterUtil.writeSimpleValue(value, writer);
+        } else {
+            JSONWriter jsonWriter = new JSONWriter(writer, indentFactor, indent);
+            jsonWriter.value(value);
+        }
+        return writer;
     }
 
     /**

@@ -27,6 +27,7 @@ SOFTWARE.
 import org.json.JSONException;
 import org.json.stream.JSONStreamReader.ParseState;
 import org.json.util.ALStack;
+import org.json.util.StructureIdentifier;
 
 /**
  * Structure builder interface, used by the {@link JSONLimitBuilder}

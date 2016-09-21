@@ -63,6 +63,49 @@ public class JSONStringer extends JSONWriter {
     }
 
     /**
+     * Make a fresh JSONStringer. It can be used to build one JSON text.
+     *
+     * @param allowSimpleValues {@code true} to allow the root value to be
+     * a simple value, otherwise {@code false} to only allow objects and arrays
+     * at the root level
+     */
+    public JSONStringer(boolean allowSimpleValues) {
+        super(new StringBuilder(), allowSimpleValues);
+    }
+
+    /**
+     * Make a fresh JSONStringer. It can be used to build one JSON text.
+     *
+     * @param indentFactor indent level, or 0 for compact output
+     */
+    public JSONStringer(int indentFactor) {
+        super(new StringBuilder(), indentFactor);
+    }
+
+    /**
+     * Make a fresh JSONStringer. It can be used to build one JSON text.
+     *
+     * @param indentFactor indent level, or 0 for compact output
+     * @param indent initial indent
+     */
+    public JSONStringer(int indentFactor, int indent) {
+        super(new StringBuilder(), indentFactor, indent);
+    }
+
+    /**
+     * Make a fresh JSONStringer. It can be used to build one JSON text.
+     *
+     * @param indentFactor indent level, or 0 for compact output
+     * @param indent initial indent
+     * @param allowSimpleValues {@code true} to allow the root value to be
+     * a simple value, otherwise {@code false} to only allow objects and arrays
+     * at the root level
+     */
+    public JSONStringer(int indentFactor, int indent, boolean allowSimpleValues) {
+        super(new StringBuilder(), indentFactor, indent, allowSimpleValues);
+    }
+
+    /**
      * Return the JSON text. This method is used to obtain the product of the
      * JSONStringer instance. It will return <code>null</code> if there was a
      * problem in the construction of the JSON text (such as the calls to
@@ -71,6 +114,6 @@ public class JSONStringer extends JSONWriter {
      * @return The JSON text.
      */
     public String toString() {
-        return this.mode == 'd' ? this.writer.toString() : null;
+        return this.done ? this.writer.toString() : null;
     }
 }
