@@ -92,7 +92,7 @@ public final class SimpleStructureWriter implements StructureWriter {
      */
     @Override
     public void subValue(Appendable writer) {
-        //
+        // nothing to do
     }
 
     /**

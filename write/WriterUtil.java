@@ -62,7 +62,7 @@ public final class WriterUtil {
      *            the writer.
      * @throws IOException there was a problem writing the indentation
      */
-    public static void indent(int indent, Appendable writer) throws IOException {
+    static void indent(int indent, Appendable writer) throws IOException {
 
         while(indent >= PADDING_LENGTH) {
             writer.append(PADDING_SPACES);
