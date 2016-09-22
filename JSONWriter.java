@@ -116,7 +116,7 @@ public class JSONWriter implements Closeable {
         this.stack = new ALStack<StructureWriter>(initdepth);
         this.writer = w;
         this.factory = CompactWriterFactory.INSTANCE;
-        this.currentStructure = NullStructureWriter.INSTANCE;
+        this.currentStructure = NullStructureWriter.getInstance();
     }
 
     /**
@@ -133,8 +133,8 @@ public class JSONWriter implements Closeable {
         this.writer = w;
         this.factory = CompactWriterFactory.INSTANCE;
         this.currentStructure = allowSimpleValues ?
-                SimpleStructureWriter.INSTANCE :
-                NullStructureWriter.INSTANCE;
+                SimpleStructureWriter.getInstance(0) :
+                NullStructureWriter.getInstance();
     }
 
     /**
@@ -151,7 +151,7 @@ public class JSONWriter implements Closeable {
         this.factory = (indentFactor > 0)
                 ? new PrettyWriterFactory(indentFactor)
                 : CompactWriterFactory.INSTANCE;
-        this.currentStructure = NullStructureWriter.INSTANCE;
+        this.currentStructure = NullStructureWriter.getInstance();
     }
 
     /**
@@ -169,7 +169,7 @@ public class JSONWriter implements Closeable {
         this.factory = (indentFactor > 0)
                 ? new PrettyWriterFactory(indentFactor, indent)
                 : CompactWriterFactory.INSTANCE;
-        this.currentStructure = NullStructureWriter.INSTANCE;
+        this.currentStructure = NullStructureWriter.getInstance();
     }
 
     /**
@@ -192,8 +192,8 @@ public class JSONWriter implements Closeable {
                 ? new PrettyWriterFactory(indentFactor, indent)
                 : CompactWriterFactory.INSTANCE;
         this.currentStructure = allowSimpleValues ?
-                SimpleStructureWriter.INSTANCE :
-                NullStructureWriter.INSTANCE;
+                SimpleStructureWriter.getInstance(indent) :
+                NullStructureWriter.getInstance();
     }
 
     private String getLocation() {

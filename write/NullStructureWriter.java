@@ -37,8 +37,17 @@ import org.json.JSONString;
  * @version 2016-09-18
  */
 public final class NullStructureWriter implements StructureWriter {
-    /** The singleton instance. */
-    public static final NullStructureWriter INSTANCE = new NullStructureWriter();
+    /** A singleton instance for zero indent. */
+    private static final NullStructureWriter INSTANCE = new NullStructureWriter();
+
+    /**
+     * Factory method for {@code NullStructureWriter}.
+     *
+     * @return a {@code NullStructureWriter}
+     */
+    public static NullStructureWriter getInstance() {
+        return INSTANCE;
+    }
 
     private NullStructureWriter() {
     }

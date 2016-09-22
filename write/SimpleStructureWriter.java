@@ -28,6 +28,8 @@ import org.json.JSONAppendable;
 import org.json.JSONException;
 import org.json.JSONString;
 
+import java.io.IOException;
+
 /**
  * Initial structure writer for when a {@code JSONWriter} is only writing a
  * simple value.
@@ -36,10 +38,25 @@ import org.json.JSONString;
  * @version 2016-09-18
  */
 public final class SimpleStructureWriter implements StructureWriter {
-    /** The singleton instance. */
-    public static final SimpleStructureWriter INSTANCE = new SimpleStructureWriter();
+    /** A singleton instance for zero indent. */
+    private static final SimpleStructureWriter INSTANCE = new SimpleStructureWriter(0);
 
-    private SimpleStructureWriter() {
+    /**
+     * Factory method for {@code SimpleStructureWriter}.
+     *
+     * @return a {@code SimpleStructureWriter}
+     */
+    public static SimpleStructureWriter getInstance(int indent) {
+        if(Math.max(0, indent) == 0) {
+            return INSTANCE;
+        }
+        return new SimpleStructureWriter(indent);
+    }
+
+    private final int indent;
+
+    private SimpleStructureWriter(int indent) {
+        this.indent = Math.max(0, indent);
     }
 
     /**
@@ -75,7 +92,7 @@ public final class SimpleStructureWriter implements StructureWriter {
      */
     @Override
     public void subValue(Appendable writer) {
-        // nothing to do
+        //
     }
 
     /**
@@ -88,7 +105,16 @@ public final class SimpleStructureWriter implements StructureWriter {
      */
     @Override
     public boolean simpleValue(Object value, Appendable writer) throws JSONException {
-        WriterUtil.writeSimpleValue(value, writer);
+        if(indent > 0) {
+            try {
+                WriterUtil.indent(indent, writer);
+                WriterUtil.writeSimpleValue(value, writer);
+            } catch (IOException e) {
+                throw new JSONException(e);
+            }
+        } else {
+            WriterUtil.writeSimpleValue(value, writer);
+        }
         return true;
     }
 
@@ -102,7 +128,16 @@ public final class SimpleStructureWriter implements StructureWriter {
      */
     @Override
     public boolean jsonStringValue(JSONString value, Appendable writer) throws JSONException {
-        WriterUtil.writeJSONString(value, writer);
+        if(indent > 0) {
+            try {
+                WriterUtil.indent(indent, writer);
+                WriterUtil.writeJSONString(value, writer);
+            } catch (IOException e) {
+                throw new JSONException(e);
+            }
+        } else {
+            WriterUtil.writeJSONString(value, writer);
+        }
         return true;
     }
 
@@ -116,7 +151,16 @@ public final class SimpleStructureWriter implements StructureWriter {
      */
     @Override
     public boolean jsonAppendableValue(JSONAppendable value, Appendable writer) throws JSONException {
-        WriterUtil.writeJSONAppendable(value, writer);
+        if(indent > 0) {
+            try {
+                WriterUtil.indent(indent, writer);
+                WriterUtil.writeJSONAppendable(value, writer);
+            } catch (IOException e) {
+                throw new JSONException(e);
+            }
+        } else {
+            WriterUtil.writeJSONAppendable(value, writer);
+        }
         return true;
     }
 
@@ -129,7 +173,16 @@ public final class SimpleStructureWriter implements StructureWriter {
      */
     @Override
     public boolean nullValue(Appendable writer) throws JSONException {
-        WriterUtil.writeNull(writer);
+        if(indent > 0) {
+            try {
+                WriterUtil.indent(indent, writer);
+                WriterUtil.writeNull(writer);
+            } catch (IOException e) {
+                throw new JSONException(e);
+            }
+        } else {
+            WriterUtil.writeNull(writer);
+        }
         return true;
     }
 
@@ -143,7 +196,16 @@ public final class SimpleStructureWriter implements StructureWriter {
      */
     @Override
     public boolean booleanValue(boolean value, Appendable writer) throws JSONException {
-        WriterUtil.writeBoolean(value, writer);
+        if(indent > 0) {
+            try {
+                WriterUtil.indent(indent, writer);
+                WriterUtil.writeBoolean(value, writer);
+            } catch (IOException e) {
+                throw new JSONException(e);
+            }
+        } else {
+            WriterUtil.writeBoolean(value, writer);
+        }
         return true;
     }
 
@@ -157,7 +219,16 @@ public final class SimpleStructureWriter implements StructureWriter {
      */
     @Override
     public boolean doubleValue(double value, Appendable writer) throws JSONException {
-        WriterUtil.writeDouble(value, writer);
+        if (indent > 0) {
+            try {
+                WriterUtil.indent(indent, writer);
+                WriterUtil.writeDouble(value, writer);
+            } catch (IOException e) {
+                throw new JSONException(e);
+            }
+        } else {
+            WriterUtil.writeDouble(value, writer);
+        }
         return true;
     }
 
@@ -171,7 +242,16 @@ public final class SimpleStructureWriter implements StructureWriter {
      */
     @Override
     public boolean longValue(long value, Appendable writer) throws JSONException {
-        WriterUtil.writeLong(value, writer);
+        if (indent > 0) {
+            try {
+                WriterUtil.indent(indent, writer);
+                WriterUtil.writeLong(value, writer);
+            } catch (IOException e) {
+                throw new JSONException(e);
+            }
+        } else {
+            WriterUtil.writeLong(value, writer);
+        }
         return true;
     }
 

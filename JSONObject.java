@@ -1778,7 +1778,7 @@ public class JSONObject {
             }
             if ((object instanceof Double) || (object instanceof Float)) {
                 double d = ((Number)object).doubleValue();
-                if(Double.isInfinite(d) || Double.isNaN(d)) {
+                if (Double.isInfinite(d) || Double.isNaN(d)) {
                     return NULL;
                 }
                 return object;
