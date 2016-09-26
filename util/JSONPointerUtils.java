@@ -88,7 +88,7 @@ public final class JSONPointerUtils {
     }
 
     /**
-     * Given a {@link StructureIdentifier} stack as an {@code Iterable},
+     * Given a sequence of {@link StructureIdentifier}s as an {@code Iterable},
      * create a JSON Pointer string.
      *
      * @param ids an Iterable of StructureBuilder objects, from which the

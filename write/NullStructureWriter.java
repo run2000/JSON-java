@@ -41,7 +41,8 @@ public final class NullStructureWriter implements StructureWriter {
     private static final NullStructureWriter INSTANCE = new NullStructureWriter();
 
     /**
-     * Factory method for {@code NullStructureWriter}.
+     * Factory method for {@code NullStructureWriter}. Returns a singleton
+     * instance.
      *
      * @return a {@code NullStructureWriter}
      */

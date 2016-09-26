@@ -42,8 +42,10 @@ public final class SimpleStructureWriter implements StructureWriter {
     private static final SimpleStructureWriter INSTANCE = new SimpleStructureWriter(0);
 
     /**
-     * Factory method for {@code SimpleStructureWriter}.
+     * Factory method for {@code SimpleStructureWriter}. Simplifies to a
+     * singleton instance if the given indent level is zero.
      *
+     * @param indent the indent level for the simple value
      * @return a {@code SimpleStructureWriter}
      */
     public static SimpleStructureWriter getInstance(int indent) {
