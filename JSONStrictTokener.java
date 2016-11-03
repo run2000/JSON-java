@@ -479,7 +479,16 @@ public class JSONStrictTokener extends JSONTokener {
             dbl = true;
             sb.append(c);
 
-            // decimal place values
+            // at least one digit after decimal
+            c = this.next();
+            if ((c >= '0') && (c <= '9')) {
+                sb.append(c);
+                c = this.next();
+            } else {
+                throw this.syntaxError("Expected number");
+            }
+
+            // remaining decimal place values
             c = this.next();
             while((c >= '0') && (c <= '9')) {
                 sb.append(c);
