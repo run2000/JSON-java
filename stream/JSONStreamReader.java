@@ -381,6 +381,7 @@ public class JSONStreamReader {
                 case END_ARRAY:
                 case END_OBJECT:
                     if(objectStack.isEmpty()) {
+                        consumePostfix();
                         state = ParseState.END_DOCUMENT;
                         break;
                     }
@@ -493,6 +494,20 @@ public class JSONStreamReader {
                 break;
             default:
                 throw new JSONParseException("Invalid state", lexer.parsePosition());
+        }
+    }
+
+    /**
+     * Scan the remaining content of the stream to ensure there is no illegal
+     * postfix data. Some strict definitions of JSON insist that the stream
+     * must be scanned to the end.
+     */
+    private void consumePostfix() {
+        if(!objectStack.isEmpty() || state == ParseState.INIT) {
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
+        }
+        if(lexer.nextTokenType() != Token.END) {
+            throw new JSONParseException("Invalid token", lexer.parsePosition());
         }
     }
 
