@@ -102,7 +102,6 @@ public class Scanner {
         this.index -= 1;
         this.character -= 1;
         this.usePrevious = true;
-        this.eof = false;
     }
 
 

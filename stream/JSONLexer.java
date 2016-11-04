@@ -590,8 +590,16 @@ public final class JSONLexer {
                 dbl = true;
                 sb.append(c);
 
-                // decimal place values
+                // at least one digit after decimal
                 c = scanner.next();
+                if ((c >= '0') && (c <= '9')) {
+                    sb.append(c);
+                    c = scanner.next();
+                } else {
+                    throw new JSONParseException("Expected number", scanner.parsePosition());
+                }
+
+                // remaining decimal place values
                 while((c >= '0') && (c <= '9')) {
                     sb.append(c);
                     c = scanner.next();
@@ -686,8 +694,17 @@ public final class JSONLexer {
                 dbl = true;
                 sb.append(c);
 
-                // decimal place values
+                // at least one digit after decimal
                 c = scanner.next();
+                if ((c >= '0') && (c <= '9')) {
+                    sb.append(c);
+                    m++;
+                    c = scanner.next();
+                } else {
+                    throw new JSONParseException("Expected number", scanner.parsePosition());
+                }
+
+                // remaining decimal place values
                 while((c >= '0') && (c <= '9') && (m <= mDigits)) {
                     sb.append(c);
                     m++;
@@ -755,8 +772,15 @@ public final class JSONLexer {
         }
 
         if(c == '.') {
-            // decimal place values
+            // at least one digit after decimal
             c = scanner.next();
+            if ((c >= '0') && (c <= '9')) {
+                c = scanner.next();
+            } else {
+                throw new JSONParseException("Expected number", scanner.parsePosition());
+            }
+
+            // remaining decimal place values
             while((c >= '0') && (c <= '9')) {
                 c = scanner.next();
             }
