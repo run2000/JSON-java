@@ -489,7 +489,6 @@ public class JSONStrictTokener extends JSONTokener {
             }
 
             // remaining decimal place values
-            c = this.next();
             while((c >= '0') && (c <= '9')) {
                 sb.append(c);
                 c = this.next();
