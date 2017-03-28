@@ -255,6 +255,49 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
+     * If the {@code ParseState} was {@link ParseState#STRING_VALUE},
+     * append the decoded value to the given {@code Appendable}.
+     * <p>
+     * This method is suitable for cases where very long {@code String} data is
+     * expected, for instance for base-64 encoded data.</p>
+     * <p>
+     * This method advances the parser onto the next state.</p>
+     *
+     * @param <T> the type of Appendable, returned to the caller
+     * @param limit the limit of how many decoded characters to append to
+     *        the Appendable
+     * @param writer the writer to which the String value will be written
+     * @return the given Appendable object
+     */
+    public <T extends Appendable> T appendNextStringValue(T writer, long limit) throws JSONException {
+        if ((state != ParseState.STRING_VALUE) || (objectStack.isEmpty())) {
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
+        }
+        if(writer == null) {
+            throw new JSONException("writer is null");
+        }
+
+        Token token = objectStack.pop();
+        if (token == Token.STRING_VALUE) {
+            try {
+                state = ParseState.VALUE_SEPARATOR;
+                BufferedAppendable buff = bufferedAppender.with(writer);
+                try {
+                    lexer.nextString(buff, limit);
+                } finally {
+                    buff.close();
+                }
+                return writer;
+            } catch (IOException e) {
+                throw new JSONParseException("Error parsing string value", e,
+                        lexer.parsePosition());
+            }
+        } else {
+            throw new JSONParseException("Invalid state", lexer.parsePosition());
+        }
+    }
+
+    /**
      * If the ParseState was {@link ParseState#NUMBER_VALUE},
      * return the value as a {@code Number}.
      * <p>
