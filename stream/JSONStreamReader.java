@@ -279,6 +279,22 @@ public class JSONStreamReader {
     }
 
     /**
+     * An assertive form of {@link #nextState()}, where the intended next state
+     * is validated against the state that was found.
+     *
+     * @param assertState the expected next state
+     * @throws JSONException an unexpected state was parsed, or there was a
+     * problem with the source stream
+     */
+    public void assertNextState(ParseState assertState) throws JSONException {
+        ParseState token = nextState();
+        if(token != assertState) {
+            throw new JSONParseException("Expected " + assertState + ", got " + token,
+                    lexer.parsePosition());
+        }
+    }
+
+    /**
      * Advance the parser onto the next state in the source stream, and
      * return a {@link ParseState} representing the state that was encountered.
      *
@@ -466,6 +482,11 @@ public class JSONStreamReader {
                 objectStack.push(token);
                 state = ParseState.STRING_VALUE;
                 break;
+            case END:
+                if(objectStack.isEmpty()) {
+                    state = ParseState.END_DOCUMENT;
+                    break;
+                }
             default:
                 throw new JSONParseException("Invalid token", lexer.parsePosition());
         }
@@ -907,6 +928,21 @@ public class JSONStreamReader {
      */
     public ParsePosition getParsePosition() {
         return lexer.parsePosition();
+    }
+
+    /**
+     * An assertive form of {@link #currentState()}, where the intended current
+     * state is validated against the state that was found.
+     *
+     * @param assertState the expected current state
+     * @throws JSONException an unexpected state was parsed, or there was a
+     * problem with the source stream
+     */
+    public void assertCurrentState(ParseState assertState) throws JSONException {
+        if(state != assertState) {
+            throw new JSONParseException("Expected " + assertState + ", got " + state,
+                    lexer.parsePosition());
+        }
     }
 
     /**
