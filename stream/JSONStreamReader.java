@@ -931,6 +931,21 @@ public class JSONStreamReader {
     }
 
     /**
+     * An assertive form of {@link #currentState()}, where the intended current
+     * state is validated against the state that was found.
+     *
+     * @param assertState the expected current state
+     * @throws JSONException an unexpected state was parsed, or there was a
+     * problem with the source stream
+     */
+    public void assertCurrentState(ParseState assertState) throws JSONException {
+        if(state != assertState) {
+            throw new JSONParseException("Expected " + assertState + ", got " + state,
+                    lexer.parsePosition());
+        }
+    }
+
+    /**
      * Return the <em>current</em> state of the parser, including any of the
      * internal states. Only required in exceptional circumstances.
      *
