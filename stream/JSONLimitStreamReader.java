@@ -28,7 +28,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONParseException;
 import org.json.stream.JSONLexer.Token;
+import org.json.util.BufferedAppendable;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
