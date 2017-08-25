@@ -466,6 +466,11 @@ public class JSONStreamReader {
                 objectStack.push(token);
                 state = ParseState.STRING_VALUE;
                 break;
+            case END:
+                if(objectStack.isEmpty()) {
+                    state = ParseState.END_DOCUMENT;
+                    break;
+                }
             default:
                 throw new JSONParseException("Invalid token", lexer.parsePosition());
         }
