@@ -27,7 +27,9 @@ SOFTWARE.
 import org.json.JSONException;
 import org.json.JSONParseException;
 import org.json.stream.JSONLexer.Token;
+import org.json.util.BufferedAppendable;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -265,7 +267,7 @@ public final class JSONLimitStreamReader extends JSONStreamReader {
     }
 
     /**
-     * If the {@code ParseState} was {@link ParseState#STRING_VALUE},
+     * If the {@code ParseState} was {@link JSONStreamReader.ParseState#STRING_VALUE},
      * append the decoded value to the given {@code Appendable}.
      * <p>
      * This method is suitable for cases where very long {@code String} data is
