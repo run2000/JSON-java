@@ -89,7 +89,9 @@ public final class BufferedAppendable extends Writer {
     public BufferedAppendable with(Appendable newAppendable) {
         try {
             flushBuffer();
-        } catch (IOException | RuntimeException e) {
+        } catch (IOException e) {
+            // don't care, just set the new appender
+        } catch (RuntimeException e) {
             // don't care, just set the new appender
         }
         this.appendable = newAppendable;
