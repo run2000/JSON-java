@@ -89,7 +89,7 @@ public final class BufferedAppendable extends Writer {
     public BufferedAppendable with(Appendable newAppendable) {
         try {
             flushBuffer();
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException e) {
             // don't care, just set the new appender
         }
         this.appendable = newAppendable;
@@ -181,7 +181,7 @@ public final class BufferedAppendable extends Writer {
         if (appendable == null) {
             throw new IOException("Buffered appendable is not open");
         }
-        if (buffer.remaining() < 1) {
+        if (! buffer.hasRemaining()) {
             flushBuffer();
         }
         buffer.append(c);
@@ -212,7 +212,7 @@ public final class BufferedAppendable extends Writer {
         if(pos > 0) {
             try {
                 assertOpen();
-                buffer.rewind();
+                buffer.flip();
                 appendable.append(buffer, 0, pos);
             } finally {
                 buffer.clear();
@@ -236,7 +236,7 @@ public final class BufferedAppendable extends Writer {
         if (appendable == null) {
             throw new IOException("Buffered appendable is not open");
         }
-        if (buffer.remaining() < 1) {
+        if (! buffer.hasRemaining()) {
             flushBuffer();
         }
         buffer.append((char)c);
